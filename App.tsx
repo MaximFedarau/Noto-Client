@@ -1,14 +1,16 @@
 //Types
-import { ReactElement } from 'react';
+import React, { ReactElement } from 'react';
 
 //Constants
-import { OSLO_GRAY } from './constants/colors';
+import { OSLO_GRAY, SPRING_WOOD } from './constants/colors';
 
 //Expo
 import { StatusBar } from 'expo-status-bar';
+import { Ionicons } from '@expo/vector-icons';
+import { useFonts } from 'expo-font';
 
 //React Native
-import { StyleSheet, Text, View } from 'react-native';
+import { Text } from 'react-native';
 
 //React Navigation
 import { NavigationContainer } from '@react-navigation/native';
@@ -18,7 +20,13 @@ const Stack = createNativeStackNavigator();
 
 const Test = () => <Text>1</Text>;
 
-export default function App(): ReactElement {
+export default function App(): ReactElement | null {
+  const [fontsLoaded] = useFonts({
+    'Roboto-Regular': require('./assets/fonts/Roboto/Roboto-Regular.ttf'),
+  });
+
+  if (!fontsLoaded) return null;
+
   return (
     <>
       <StatusBar style="dark" />
@@ -27,6 +35,14 @@ export default function App(): ReactElement {
           screenOptions={{
             headerTitleAlign: 'center',
             headerTintColor: OSLO_GRAY,
+            headerTitleStyle: {
+              fontFamily: 'Roboto-Regular',
+            },
+            headerStyle: { backgroundColor: SPRING_WOOD },
+            headerShadowVisible: false,
+            headerRight: ({ tintColor }) => {
+              return <Ionicons name="person" color={tintColor} size={24} />;
+            },
           }}
         >
           <Stack.Screen
@@ -39,12 +55,3 @@ export default function App(): ReactElement {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
