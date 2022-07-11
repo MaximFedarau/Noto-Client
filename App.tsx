@@ -16,20 +16,26 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 const Stack = createNativeStackNavigator();
 
-const Test = () => <Text>1</Text>
+const Test = () => <Text>1</Text>;
 
 export default function App(): ReactElement {
   return (
     <>
-    <StatusBar style='dark' />
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{
-       headerTitleAlign: 'center',
-       headerTintColor: OSLO_GRAY
-      }}>
-        <Stack.Screen name="Home" component={Test} options={{title: 'Notes'}} />
-      </Stack.Navigator>
-    </NavigationContainer>
+      <StatusBar style="dark" />
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerTitleAlign: 'center',
+            headerTintColor: OSLO_GRAY,
+          }}
+        >
+          <Stack.Screen
+            name="Home"
+            component={Test}
+            options={{ title: 'Notes' }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
     </>
   );
 }
