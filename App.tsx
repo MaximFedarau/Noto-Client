@@ -2,14 +2,14 @@
 import React, { ReactElement } from 'react';
 
 //Constants
-import { NAVIGATION_NAMES } from './constants/data';
+import { NAVIGATION_NAMES } from '@constants/data';
 
 //Expo
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 
 //Navigation
-import MainBottomTabs from './navigation/MainBottomTabs/MainBottomTabs.navigation';
+import MainBottomTabs from '@navigation/MainBottomTabs/MainBottomTabs.navigation';
 
 //React Navigation
 import { NavigationContainer } from '@react-navigation/native';

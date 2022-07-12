@@ -2,23 +2,23 @@
 import { ReactElement } from 'react';
 
 //Constants
-import { OSLO_GRAY, SPRING_WOOD, CYBER_YELLOW } from '../../constants/colors';
-import { NAVIGATION_NAMES } from '../../constants/data';
+import { OSLO_GRAY, SPRING_WOOD, CYBER_YELLOW } from '@constants/colors';
+import { NAVIGATION_NAMES } from '@constants/data';
 
 //Expo
 import { Ionicons } from '@expo/vector-icons';
 
 //Screens
-import Notes from '../../screens/Notes/Notes.screen';
-import Drafts from '../../screens/Drafts/Drafts.screen';
+import Notes from '@screens/Notes/Notes.screen';
+import Drafts from '@screens/Drafts/Drafts.screen';
 
 //Components
-import IconButton from '../../components/Default/IconButton/IconButton.component';
+import IconButton from '@components/Default/IconButton/IconButton.component';
 
 import {
   RightHeaderView,
   LeftHeaderView,
-} from '../../components/Default/View/View.component';
+} from '@components/Default/View/View.component';
 
 //React Navigation
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';

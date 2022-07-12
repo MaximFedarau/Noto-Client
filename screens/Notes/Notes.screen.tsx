@@ -2,8 +2,8 @@
 import { ReactElement } from 'react';
 
 //Components
-import { NotesView } from '../../components/Default/View/View.component';
-import { NoItemsText } from '../../components/Default/Text/Text.component';
+import { NotesView } from '@components/Default/View/View.component';
+import { NoItemsText } from '@components/Default/Text/Text.component';
 
 export default function Notes(): ReactElement {
   return (

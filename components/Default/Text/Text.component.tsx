@@ -2,7 +2,7 @@
 import styled from 'styled-components/native';
 
 //Constants
-import { OSLO_GRAY } from '../../../constants/colors';
+import { OSLO_GRAY } from '@constants/colors';
 
 // ! Default
 
