@@ -8,6 +8,18 @@ export const DefaultView = styled.View`
   flex-direction: column;
 `;
 
+// ! App
+
+export const RightHeaderView = styled(DefaultView)`
+  margin-right: 12px;
+  flex: none;
+`;
+
+export const LeftHeaderView = styled(DefaultView)`
+  margin-left: 12px;
+  flex: none;
+`;
+
 // ! Notes Screen
 
 export const NotesView = styled(DefaultView)`

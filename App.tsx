@@ -2,79 +2,20 @@
 import React, { ReactElement } from 'react';
 
 //Constants
-import { OSLO_GRAY, SPRING_WOOD, CYBER_YELLOW } from './constants/colors';
 import { NAVIGATION_NAMES } from './constants/data';
 
 //Expo
 import { StatusBar } from 'expo-status-bar';
-import { Ionicons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
 
-//Screens
-import Notes from './screens/Notes/Notes.screen';
-import Drafts from './screens/Drafts/Drafts.screen';
+//Navigation
+import MainBottomTabs from './navigation/MainBottomTabs/MainBottomTabs.navigation';
 
 //React Navigation
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 const Stack = createNativeStackNavigator();
-const BottomTab = createBottomTabNavigator();
-
-function BottomTabApp(): ReactElement {
-  return (
-    <BottomTab.Navigator
-      screenOptions={{
-        headerTitleAlign: 'center',
-        headerTintColor: OSLO_GRAY,
-        headerTitleStyle: {
-          fontFamily: 'Roboto-Regular',
-        },
-        headerStyle: { backgroundColor: SPRING_WOOD },
-        headerShadowVisible: false,
-        headerRight: ({ tintColor }) => {
-          return (
-            <Ionicons
-              style={{ marginRight: 12 }}
-              name="person"
-              color={tintColor}
-              size={24}
-            />
-          );
-        },
-        tabBarStyle: { backgroundColor: SPRING_WOOD, justifyContent: 'center' },
-        tabBarActiveTintColor: CYBER_YELLOW,
-      }}
-      sceneContainerStyle={{
-        backgroundColor: SPRING_WOOD,
-      }}
-    >
-      <BottomTab.Screen
-        name={NAVIGATION_NAMES.NOTES}
-        component={Notes}
-        options={{
-          tabBarIcon: ({ color }) => {
-            return <Ionicons name="document" size={32} color={color} />;
-          },
-          tabBarLabel: () => null,
-          title: 'Notes',
-        }}
-      />
-      <BottomTab.Screen
-        name={NAVIGATION_NAMES.DRAFTS}
-        component={Drafts}
-        options={{
-          tabBarIcon: ({ color }) => {
-            return <Ionicons name="archive" size={32} color={color} />;
-          },
-          tabBarLabel: () => null,
-          title: 'Drafts',
-        }}
-      />
-    </BottomTab.Navigator>
-  );
-}
 
 export default function App(): ReactElement | null {
   const [fontsLoaded] = useFonts({
@@ -90,7 +31,7 @@ export default function App(): ReactElement | null {
         <Stack.Navigator>
           <Stack.Screen
             name={NAVIGATION_NAMES.NOTES_OVERVIEW}
-            component={BottomTabApp}
+            component={MainBottomTabs}
             options={{ headerShown: false }}
           />
         </Stack.Navigator>
