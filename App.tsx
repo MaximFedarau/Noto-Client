@@ -10,8 +10,9 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { useFonts } from 'expo-font';
 
-//React Native
-import { Text } from 'react-native';
+//Screens
+import Notes from './screens/Notes/Notes.screen';
+import Drafts from './screens/Drafts/Drafts.screen';
 
 //React Navigation
 import { NavigationContainer } from '@react-navigation/native';
@@ -20,9 +21,6 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 const Stack = createNativeStackNavigator();
 const BottomTab = createBottomTabNavigator();
-
-const AllNotes = () => <Text>All Notes</Text>;
-const Drafts = () => <Text>Drafts</Text>;
 
 function BottomTabApp(): ReactElement {
   return (
@@ -54,7 +52,7 @@ function BottomTabApp(): ReactElement {
     >
       <BottomTab.Screen
         name={NAVIGATION_NAMES.NOTES}
-        component={AllNotes}
+        component={Notes}
         options={{
           tabBarIcon: ({ color }) => {
             return <Ionicons name="document" size={32} color={color} />;
