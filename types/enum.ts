@@ -5,3 +5,9 @@ export enum NAVIGATION_NAMES {
   NOTES_OVERVIEW = 'NotesOverview', // * Native Stack Navigation
   NOTES_MANAGING = 'NotesManaging', // * Native Stack Navigation
 }
+
+//Button modes
+export enum BUTTON_TYPES {
+  CONTAINED = 'contained',
+  OUTLINED = 'outlined',
+}

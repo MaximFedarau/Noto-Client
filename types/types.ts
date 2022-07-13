@@ -13,3 +13,9 @@ type RootStackParamList = {
 };
 
 export type NavigationProps = NativeStackNavigationProp<RootStackParamList>;
+
+// ! Notes Managing Form Data Interface
+export interface NotesManagingFormData {
+  title: string;
+  content: string;
+}

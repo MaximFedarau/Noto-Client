@@ -1,13 +1,13 @@
 //Types
-import { ReactElement } from 'react';
+import React, { ReactElement } from 'react';
 
-//React Native
-import { View, Text } from 'react-native';
+//Components
+import Form from '@components/NotesManaging/Form/Form.component';
 
 export default function NotesManaging(): ReactElement {
   return (
-    <View>
-      <Text>Notes Managing</Text>
-    </View>
+    <>
+      <Form />
+    </>
   );
 }
