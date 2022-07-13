@@ -1,9 +1,10 @@
 //Types
 import { ReactElement } from 'react';
+import { NavigationProps } from '@app-types/types';
 
 //Constants
 import { OSLO_GRAY, SPRING_WOOD, CYBER_YELLOW } from '@constants/colors';
-import { NAVIGATION_NAMES } from '@constants/data';
+import { NAVIGATION_NAMES } from '@app-types/enum';
 
 //Expo
 import { Ionicons } from '@expo/vector-icons';
@@ -58,20 +59,28 @@ export default function MainBottomTabs(): ReactElement {
       <BottomTab.Screen
         name={NAVIGATION_NAMES.NOTES}
         component={Notes}
-        options={{
+        options={({ navigation }: { navigation: NavigationProps }) => ({
           tabBarIcon: ({ color }) => {
             return <Ionicons name="document" size={32} color={color} />;
           },
           tabBarLabel: () => null,
           headerLeft: ({ tintColor }) => {
+            function onButtonClickHandler() {
+              navigation.navigate(NAVIGATION_NAMES.NOTES_MANAGING);
+            }
             return (
               <LeftHeaderView>
-                <IconButton iconName="add" size={32} color={tintColor} />
+                <IconButton
+                  iconName="add"
+                  size={32}
+                  color={tintColor}
+                  onPress={onButtonClickHandler}
+                />
               </LeftHeaderView>
             );
           },
           title: 'Notes',
-        }}
+        })}
       />
       <BottomTab.Screen
         name={NAVIGATION_NAMES.DRAFTS}

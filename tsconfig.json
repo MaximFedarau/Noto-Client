@@ -11,6 +11,7 @@
       "@screens/*": ["./screens/*"],
       "@assets/*": ["./assets/*"],
       "@navigation/*": ["./navigation/*"],
+      "@app-types/*": ["./types/*"],
     }
   }
 }
