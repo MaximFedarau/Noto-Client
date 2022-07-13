@@ -8,14 +8,12 @@ import { notesManagingFormValidationSchema } from '@constants/validationSchemas'
 
 //Components
 import Button from '@components/Default/Button/Button.component';
+import FormField from '../FormField/FormField.component';
 
 import { FormView } from '@components/Default/View/View.component';
 
 //Formik
 import { Formik } from 'formik';
-
-//React Native Elements
-import { Input } from '@rneui/themed';
 
 //React Navigation
 import { useNavigation } from '@react-navigation/native';
@@ -51,14 +49,21 @@ export default function Form(): ReactElement {
 
         return (
           <FormView>
-            <Input
-              label="Title"
+            <FormField
               onChangeText={handleChange('title')}
               value={values.title}
-              labelStyle={{ fontWeight: '400' }}
               errorMessage={errors.title}
-              errorStyle={{ fontSize: 15 }}
-            />
+            >
+              Title
+            </FormField>
+            <FormField
+              onChangeText={handleChange('content')}
+              value={values.content}
+              errorMessage={errors.content}
+              multiline
+            >
+              Content
+            </FormField>
             <Button type={BUTTON_TYPES.CONTAINED} onPress={handleSubmit}>
               Submit
             </Button>
