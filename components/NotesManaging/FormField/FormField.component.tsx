@@ -1,6 +1,7 @@
 //Types
 import { ReactElement } from 'react';
 import { TextInputProps } from 'react-native';
+import { IconNode } from '@rneui/base';
 
 //React Native Elements
 import { Input } from '@rneui/themed';
@@ -9,6 +10,7 @@ import { Input } from '@rneui/themed';
 interface FormFieldProps extends TextInputProps {
   children: string;
   errorMessage?: string;
+  leftIcon?: IconNode;
 }
 
 export default function FormField({
@@ -21,9 +23,11 @@ export default function FormField({
       label={children}
       {...props}
       labelStyle={{ fontWeight: '400' }}
-      errorStyle={{ fontSize: 15 }}
+      errorStyle={{ fontSize: 16 }}
       errorMessage={errorMessage}
-      containerStyle={{ marginVertical: 24 }}
+      containerStyle={{
+        marginTop: 24,
+      }}
     />
   );
 }
