@@ -23,6 +23,7 @@ export default function FormField({
       labelStyle={{ fontWeight: '400' }}
       errorStyle={{ fontSize: 15 }}
       errorMessage={errorMessage}
+      containerStyle={{ marginVertical: 24 }}
     />
   );
 }

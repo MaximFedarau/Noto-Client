@@ -15,10 +15,20 @@ import { FormView } from '@components/Default/View/View.component';
 //Formik
 import { Formik } from 'formik';
 
+//React Render HTML
+import RenderHtml from 'react-native-render-html';
+
 //React Navigation
 import { useNavigation } from '@react-navigation/native';
 
+// Showdown
+import * as showdown from 'showdown';
+
 export default function Form(): ReactElement {
+  const [renderedHTML, setRenderdHTML] = React.useState<string>('');
+
+  const converter = new showdown.Converter();
+
   const navigation = useNavigation<NavigationProps>();
 
   const formInitialValues: NotesManagingFormData = {
@@ -36,7 +46,7 @@ export default function Form(): ReactElement {
       onSubmit={onFormSubmitHandler}
       validationSchema={notesManagingFormValidationSchema}
     >
-      {({ values, handleChange, handleSubmit, errors }) => {
+      {({ values, handleChange, handleBlur, handleSubmit, errors }) => {
         React.useEffect(() => {
           const title =
             values.title.length > 16
@@ -45,12 +55,17 @@ export default function Form(): ReactElement {
           navigation.setOptions({
             headerTitle: title || 'Add Note',
           });
-        }, [values]);
+        }, [values.title]);
+
+        React.useEffect(() => {
+          setRenderdHTML(converter.makeHtml(values.content));
+        }, [values.content]);
 
         return (
           <FormView>
             <FormField
               onChangeText={handleChange('title')}
+              onBlur={handleBlur('title')}
               value={values.title}
               errorMessage={errors.title}
             >
@@ -58,12 +73,20 @@ export default function Form(): ReactElement {
             </FormField>
             <FormField
               onChangeText={handleChange('content')}
+              onBlur={handleBlur('content')}
               value={values.content}
               errorMessage={errors.content}
               multiline
+              autoComplete="off"
             >
               Content
             </FormField>
+            <RenderHtml
+              contentWidth={200}
+              source={{
+                html: renderedHTML,
+              }}
+            />
             <Button type={BUTTON_TYPES.CONTAINED} onPress={handleSubmit}>
               Submit
             </Button>
