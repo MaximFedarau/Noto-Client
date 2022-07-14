@@ -13,6 +13,12 @@ export const DefaultScrollView = styled.ScrollView`
   flex-direction: column;
 `;
 
+// ! Error
+export const ErrorView = styled(DefaultView)`
+  align-items: center;
+  justify-content: center;
+`;
+
 // ! App
 
 export const RightHeaderView = styled(DefaultView)`
