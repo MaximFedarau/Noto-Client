@@ -1,6 +1,9 @@
 //Types
 import { BUTTON_TYPES } from '@app-types/enum';
 
+//Constants
+import { BUNTING } from '@constants/colors';
+
 //Styled Components
 import styled from 'styled-components/native';
 
@@ -13,9 +16,9 @@ export const ButtonContainer = styled.Pressable<ButtonStylingProps>`
   display: flex;
   justify-content: center;
   background-color: ${({ type }) =>
-    type === BUTTON_TYPES.CONTAINED ? '#0d1137' : 'transparent'};
+    type === BUTTON_TYPES.CONTAINED ? BUNTING : 'transparent'};
   border: ${({ type }) =>
-    type === BUTTON_TYPES.CONTAINED ? '' : '2px solid #0d1137'};
+    type === BUTTON_TYPES.CONTAINED ? '' : `2px solid ${BUNTING}`};
   align-self: center;
   width: 60%;
   height: 32px;
@@ -23,8 +26,7 @@ export const ButtonContainer = styled.Pressable<ButtonStylingProps>`
 `;
 
 export const ButtonText = styled.Text<ButtonStylingProps>`
-  color: ${({ type }) =>
-    type === BUTTON_TYPES.CONTAINED ? 'white' : '#0d1137'};
+  color: ${({ type }) => (type === BUTTON_TYPES.CONTAINED ? 'white' : BUNTING)};
   font-size: 16px;
   text-align: center;
 `;

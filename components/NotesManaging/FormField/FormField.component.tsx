@@ -8,7 +8,7 @@ import { Input } from '@rneui/themed';
 
 //Interface for Props
 interface FormFieldProps extends TextInputProps {
-  children: string;
+  children?: string;
   errorMessage?: string;
   leftIcon?: IconNode;
 }
@@ -26,7 +26,10 @@ export default function FormField({
       errorStyle={{ fontSize: 16 }}
       errorMessage={errorMessage}
       containerStyle={{
-        marginTop: 24,
+        marginBottom: 24,
+      }}
+      inputStyle={{
+        fontSize: 20,
       }}
     />
   );
