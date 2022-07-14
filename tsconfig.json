@@ -3,6 +3,15 @@
   "compilerOptions": {
     "strict": true,
     "jsx": "react-native",
-    "types": ["styled-components-react-native"]
+    "types": ["styled-components-react-native"],
+    "baseUrl": "./",
+    "paths": {
+      "@components/*": ["./components/*"],
+      "@constants/*": ["./constants/*"],
+      "@screens/*": ["./screens/*"],
+      "@assets/*": ["./assets/*"],
+      "@navigation/*": ["./navigation/*"],
+      "@app-types/*": ["./types/*"],
+    }
   }
 }
