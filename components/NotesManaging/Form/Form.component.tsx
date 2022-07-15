@@ -5,6 +5,8 @@ import { BUTTON_TYPES } from '@app-types/enum';
 
 //Constants
 import { notesManagingFormValidationSchema } from '@constants/validationSchemas';
+import { addDraft } from '@utils/db/drafts/add';
+import { updateDraft } from '@utils/db/drafts/update';
 
 //Components
 import Button from '@components/Default/Button/Button.component';
@@ -20,6 +22,8 @@ import { Formik } from 'formik';
 import { useNavigation } from '@react-navigation/native';
 
 export default function Form(): ReactElement {
+  const [noteId, setNoteId] = React.useState<string | null>(null);
+
   const navigation = useNavigation<NavigationProps>();
 
   const formInitialValues: NotesManagingFormData = {
@@ -29,6 +33,23 @@ export default function Form(): ReactElement {
 
   function onFormSubmitHandler(values: NotesManagingFormData) {
     console.log(values);
+  }
+
+  function saveToDrafts(values: NotesManagingFormData) {
+    if (!values.title) return;
+    if (noteId) {
+      updateDraft(noteId, values.title, values.content).then((result) => {
+        console.log(result);
+      });
+    } else {
+      addDraft(values.title, values.content)
+        .then((result) => {
+          setNoteId(String(result.insertId));
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   }
 
   return (
@@ -47,6 +68,10 @@ export default function Form(): ReactElement {
             headerTitle: title || 'Add Note',
           });
         }, [values.title]);
+
+        React.useEffect(() => {
+          saveToDrafts(values);
+        }, [values]);
 
         return (
           <FormView>

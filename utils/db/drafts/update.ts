@@ -3,17 +3,17 @@ import * as SQLite from 'expo-sqlite';
 
 const db = SQLite.openDatabase('drafts.db');
 
-export function initDbDrafts() {
+export function updateDraft(id: string, title: string, content?: string) {
   const promise = new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        'CREATE TABLE IF NOT EXISTS drafts (id INTEGER PRIMARY KEY NOT NULL, title TEXT NOT NULL, content TEXT)',
-        [],
-        () => {
-          resolve('Table drafts created successfully.');
+        'UPDATE drafts SET title = ?, content = ? WHERE id = ?',
+        [title, content!, id],
+        (_, result) => {
+          resolve(result);
         },
-        (_, error) => {
-          reject(error);
+        (_, err) => {
+          reject(err);
           return false;
         },
       );

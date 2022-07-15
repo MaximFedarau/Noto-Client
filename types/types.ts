@@ -19,3 +19,10 @@ export interface NotesManagingFormData {
   title: string;
   content: string;
 }
+
+// ! Draft Schema
+export interface DraftSchema {
+  id: string;
+  title: string;
+  content?: string;
+}

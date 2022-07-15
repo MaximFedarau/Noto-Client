@@ -1,6 +1,9 @@
 //Styled componets
 import styled from 'styled-components/native';
 
+//Constants
+import { SPRING_WOOD } from '@constants/colors';
+
 // ! Default
 
 export const DefaultView = styled.View`
@@ -17,6 +20,7 @@ export const DefaultScrollView = styled.ScrollView`
 export const ErrorView = styled(DefaultView)`
   align-items: center;
   justify-content: center;
+  background-color: ${SPRING_WOOD};
 `;
 
 // ! App

@@ -33,7 +33,7 @@ export default function App(): ReactElement | null {
         console.log(message);
       })
       .catch((error) => {
-        console.log(error);
+        console.log(error, 'App setup');
         setIsSetupError(true);
       });
   }, []);
