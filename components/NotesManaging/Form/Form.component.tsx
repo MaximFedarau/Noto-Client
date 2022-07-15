@@ -37,9 +37,13 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import * as showdown from 'showdown';
 
 export default function Form(): ReactElement {
+  // * Variables
+
+  // * Navigation
   const navigation = useNavigation<NavigationProps>();
   const route = useRoute<NavigationRouteProp>();
 
+  // * States
   const [isError, setIsError] = React.useState<boolean>(false);
   const [noteId, setNoteId] = React.useState<string | null>(null);
   const [formInitialValues, setFormInitialValues] =
@@ -48,7 +52,10 @@ export default function Form(): ReactElement {
       content: '',
     });
 
+  // * Modules
   const converter = new showdown.Converter();
+
+  // * Effects
 
   React.useLayoutEffect(() => {
     if (route.params && route.params.id) {
@@ -67,6 +74,25 @@ export default function Form(): ReactElement {
         });
     }
   }, [route]);
+
+  React.useEffect(() => {
+    if (noteId) {
+      navigation.setOptions({
+        headerRight: () => {
+          return (
+            <IconButton
+              iconName="trash"
+              size={32}
+              color="red"
+              onPress={onDraftDeleteHandler}
+            />
+          );
+        },
+      });
+    }
+  }, [noteId]);
+
+  // * Methods
 
   function onFormSubmitHandler(values: NotesManagingFormData) {
     console.log(values);
@@ -108,23 +134,6 @@ export default function Form(): ReactElement {
       });
   }
 
-  React.useEffect(() => {
-    if (noteId) {
-      navigation.setOptions({
-        headerRight: () => {
-          return (
-            <IconButton
-              iconName="trash"
-              size={32}
-              color="red"
-              onPress={onDraftDeleteHandler}
-            />
-          );
-        },
-      });
-    }
-  }, [noteId]);
-
   if (isError) return <Error />;
 
   return (
@@ -135,6 +144,7 @@ export default function Form(): ReactElement {
       enableReinitialize={true}
     >
       {({ values, handleChange, handleSubmit, errors }) => {
+        // * Effects
         React.useEffect(() => {
           const title =
             values.title.length > 16
@@ -149,6 +159,7 @@ export default function Form(): ReactElement {
           saveToDrafts(values);
         }, [values]);
 
+        // * Form
         return (
           <FormView>
             <FormField
@@ -156,7 +167,7 @@ export default function Form(): ReactElement {
               value={values.title}
               errorMessage={errors.title}
             >
-              Title
+              Title*
             </FormField>
             <MarkdownField
               onChangeText={handleChange('content')}
