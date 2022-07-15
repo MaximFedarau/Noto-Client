@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "noto-client",
-    "slug": "noto-client",
+    "name": "Noto",
+    "slug": "Noto",
     "version": "1.0.0",
     "orientation": "default",
     "icon": "./assets/images/icon.png",
@@ -9,7 +9,7 @@
     "splash": {
       "image": "./assets/images/splash_screen.png",
       "resizeMode": "cover",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#F1EFE4"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -19,14 +19,14 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.maximfedarau.notoclient"
+      "bundleIdentifier": "com.maximfedarau.noto"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#F1EFE4"
       },
-      "package": "com.maximfedarau.notoclient"
+      "package": "com.maximfedarau.noto"
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
