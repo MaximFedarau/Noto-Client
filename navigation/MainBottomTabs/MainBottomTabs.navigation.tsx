@@ -90,7 +90,7 @@ export default function MainBottomTabs(): ReactElement {
             return <Ionicons name="archive" size={32} color={color} />;
           },
           tabBarLabel: () => null,
-          title: 'Drafts',
+          title: 'Loading...',
         }}
       />
     </BottomTab.Navigator>

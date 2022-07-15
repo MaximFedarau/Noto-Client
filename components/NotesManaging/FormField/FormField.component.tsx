@@ -20,6 +20,7 @@ const FormField = React.memo(function FormField({
 }: FormFieldProps): ReactElement {
   return (
     <Input
+      selectionColor="black"
       label={children}
       {...props}
       labelStyle={{ fontWeight: '400' }}
