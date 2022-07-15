@@ -2,7 +2,6 @@
 import styled from 'styled-components/native';
 
 export const DraftContainer = styled.Pressable`
-  flex: 1;
   margin-vertical: 16px;
   background-color: white;
   margin-horizontal: 18px;

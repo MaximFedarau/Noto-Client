@@ -20,6 +20,8 @@ export default function DraftsList({
     <FlatList
       data={children}
       renderItem={(item) => <Draft>{item.item}</Draft>}
+      scrollsToTop
+      inverted
     />
   );
 }
