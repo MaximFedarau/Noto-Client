@@ -16,4 +16,18 @@ export const NoItemsText = styled(DefaultText)`
   font-size: 20px;
   text-transform: uppercase;
   font-family: 'Roboto-Regular';
+  align-self: center;
+`;
+
+// ! Drafts
+export const DraftTitle = styled(DefaultText)`
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+`;
+
+export const NoDraftText = styled(DefaultText)`
+  text-align: center;
+  font-size: 22px;
+  align-self: center;
 `;

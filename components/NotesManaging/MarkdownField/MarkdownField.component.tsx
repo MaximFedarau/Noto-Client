@@ -3,7 +3,7 @@ import React, { ReactElement } from 'react';
 import { TextInputProps, useWindowDimensions } from 'react-native';
 
 //Components
-import FormField from '../FormField/FormField.component';
+import FormField from '@components/NotesManaging/FormField/FormField.component';
 
 import {
   MarkdownFieldContainer,
@@ -27,7 +27,7 @@ interface MarkdownFieldProps extends TextInputProps {
   errorMessage?: string;
 }
 
-export default function MarkdownField({
+const MarkdownField = React.memo(function MarkdownField({
   children,
   errorMessage,
   value,
@@ -65,6 +65,7 @@ export default function MarkdownField({
       {tabIndex === 0 && (
         <FormField
           {...props}
+          selectionColor="black"
           value={value}
           errorMessage={errorMessage}
           multiline
@@ -93,4 +94,6 @@ export default function MarkdownField({
       )}
     </>
   );
-}
+});
+
+export default MarkdownField;

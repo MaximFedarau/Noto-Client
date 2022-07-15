@@ -1,6 +1,9 @@
 //Styled componets
 import styled from 'styled-components/native';
 
+//Constants
+import { SPRING_WOOD } from '@constants/colors';
+
 // ! Default
 
 export const DefaultView = styled.View`
@@ -11,6 +14,20 @@ export const DefaultView = styled.View`
 export const DefaultScrollView = styled.ScrollView`
   flex: 1;
   flex-direction: column;
+`;
+
+// ! Error
+export const ErrorView = styled(DefaultView)`
+  align-items: center;
+  justify-content: center;
+  background-color: ${SPRING_WOOD};
+`;
+
+// ! Loading
+export const LoadingView = styled(DefaultView)`
+  flex: 1;
+  align-items: center;
+  justify-content: center;
 `;
 
 // ! App
@@ -41,6 +58,5 @@ export const FormView = styled(DefaultScrollView)`
 // ! Drafts Screen
 
 export const DraftsView = styled(DefaultView)`
-  align-items: center;
   justify-content: center;
 `;
