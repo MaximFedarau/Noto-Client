@@ -7,6 +7,7 @@ import { fetchDrafts } from '@utils/db/drafts/fetch';
 
 //Screens
 import Error from '@screens/Error/Error.screen';
+import Loading from '@screens/Loading/Loading.screen';
 
 //Components
 import DraftsList from '@components/Drafts/DraftsList/DraftsList.component';
@@ -34,12 +35,7 @@ export default function Drafts(): ReactElement {
   }, [drafts]);
 
   if (isError) return <Error />;
-  if (loading)
-    return (
-      <DraftsView>
-        <NoItemsText>Loading...</NoItemsText>
-      </DraftsView>
-    );
+  if (loading) return <Loading />;
 
   return (
     <DraftsView>

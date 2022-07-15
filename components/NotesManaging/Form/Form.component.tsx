@@ -18,6 +18,7 @@ import { deleteDraftById } from '@utils/db/drafts/delete';
 
 //Screens
 import Error from '@screens/Error/Error.screen';
+import Loading from '@screens/Loading/Loading.screen';
 
 //Components
 import IconButton from '@components/Default/IconButton/IconButton.component';
@@ -33,9 +34,6 @@ import { Formik } from 'formik';
 //React Navigation
 import { useNavigation, useRoute } from '@react-navigation/native';
 
-// Showdown
-import * as showdown from 'showdown';
-
 export default function Form(): ReactElement {
   // * Variables
 
@@ -44,6 +42,7 @@ export default function Form(): ReactElement {
   const route = useRoute<NavigationRouteProp>();
 
   // * States
+  const [isLoading, setIsLoading] = React.useState(false);
   const [isError, setIsError] = React.useState<boolean>(false);
   const [noteId, setNoteId] = React.useState<string | null>(null);
   const [formInitialValues, setFormInitialValues] =
@@ -52,47 +51,52 @@ export default function Form(): ReactElement {
       content: '',
     });
 
-  // * Modules
-  const converter = new showdown.Converter();
-
   // * Effects
 
-  React.useLayoutEffect(() => {
-    if (route.params && route.params.id) {
-      setNoteId(route.params.id);
-      fetchDraftById(route.params.id)
-        .then((draft) => {
-          setFormInitialValues({
-            title: draft.title,
-            content: draft.content!,
-          });
-          setIsError(false);
-        })
-        .catch((error) => {
-          console.log(error, 'fetching draft');
-          setIsError(true);
-        });
-    }
-  }, [route]);
-
   React.useEffect(() => {
-    if (noteId) {
-      navigation.setOptions({
-        headerRight: () => {
-          return (
-            <IconButton
-              iconName="trash"
-              size={32}
-              color="red"
-              onPress={onDraftDeleteHandler}
-            />
-          );
-        },
-      });
-    }
-  }, [noteId]);
+    if (!noteId) return;
+    if (isLoading) return;
+    navigation.setOptions({
+      headerRight: () => {
+        return (
+          <IconButton
+            iconName="trash"
+            size={32}
+            color="red"
+            onPress={onDraftDeleteHandler}
+          />
+        );
+      },
+    });
+  }, [noteId, isLoading]);
+
+  React.useLayoutEffect(() => {
+    if (!route.params || !route.params.id) return;
+    setIsLoading(true);
+    fetchingDraft();
+    setNoteId(route.params.id);
+  }, []);
 
   // * Methods
+
+  function fetchingDraft(): void {
+    if (!route.params || !route.params.id) return;
+    fetchDraftById(route.params.id)
+      .then((draft) => {
+        setFormInitialValues({
+          title: draft.title,
+          content: draft.content,
+        });
+        setIsError(false);
+      })
+      .catch((error) => {
+        console.log(error, 'fetching draft');
+        setIsError(true);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }
 
   function onFormSubmitHandler(values: NotesManagingFormData) {
     console.log(values);
@@ -101,7 +105,7 @@ export default function Form(): ReactElement {
   function saveToDrafts(values: NotesManagingFormData) {
     if (!values.title) return;
     if (noteId) {
-      updateDraft(noteId, values.title, converter.makeHtml(values.content))
+      updateDraft(noteId, values.title, values.content)
         .then(() => {
           setIsError(false);
         })
@@ -109,21 +113,22 @@ export default function Form(): ReactElement {
           setIsError(true);
           console.log(error, 'updating draft');
         });
-    } else {
-      addDraft(values.title, converter.makeHtml(values.content))
-        .then((result) => {
-          setIsError(false);
-          setNoteId(String(result.insertId));
-        })
-        .catch((error) => {
-          setIsError(true);
-          console.log(error, 'adding draft');
-        });
+      return;
     }
+    addDraft(values.title, values.content)
+      .then((result) => {
+        setIsError(false);
+        setNoteId(String(result.insertId));
+      })
+      .catch((error) => {
+        setIsError(true);
+        console.log(error, 'adding draft');
+      });
   }
 
   function onDraftDeleteHandler() {
-    deleteDraftById(noteId || '')
+    if (!noteId) return;
+    deleteDraftById(noteId)
       .then(() => {
         setIsError(true);
         navigation.replace(NAVIGATION_NAMES.NOTES_OVERVIEW);
@@ -134,7 +139,9 @@ export default function Form(): ReactElement {
       });
   }
 
+  // * Cases handlers
   if (isError) return <Error />;
+  if (isLoading) return <Loading />;
 
   return (
     <Formik
@@ -145,13 +152,13 @@ export default function Form(): ReactElement {
     >
       {({ values, handleChange, handleSubmit, errors }) => {
         // * Effects
-        React.useEffect(() => {
+        React.useLayoutEffect(() => {
           const title =
             values.title.length > 16
               ? values.title.substring(0, 16) + '...'
               : values.title;
           navigation.setOptions({
-            headerTitle: title || 'Add Note',
+            headerTitle: title || 'Manage Note',
           });
         }, [values.title]);
 

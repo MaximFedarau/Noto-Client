@@ -27,7 +27,7 @@ interface MarkdownFieldProps extends TextInputProps {
   errorMessage?: string;
 }
 
-export default function MarkdownField({
+const MarkdownField = React.memo(function MarkdownField({
   children,
   errorMessage,
   value,
@@ -93,4 +93,6 @@ export default function MarkdownField({
       )}
     </>
   );
-}
+});
+
+export default MarkdownField;

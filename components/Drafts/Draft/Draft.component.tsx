@@ -1,5 +1,5 @@
 //Types
-import { ReactElement } from 'react';
+import React, { ReactElement } from 'react';
 import { DraftSchema } from '@app-types/types';
 import { NavigationProps } from '@app-types/types';
 import { NAVIGATION_NAMES } from '@app-types/enum';
@@ -24,14 +24,20 @@ import { useNavigation } from '@react-navigation/native';
 //React Render HTML
 import { RenderHTML } from 'react-native-render-html';
 
+//Showdown
+import * as showdown from 'showdown';
+
 //Interface for Props
 interface DraftProps {
   children: DraftSchema;
 }
 
-export default function Draft({ children }: DraftProps): ReactElement {
+const Draft = React.memo(function Draft({
+  children,
+}: DraftProps): ReactElement {
   const { title, content, id } = children;
-  const modifiedContent = contentFormat(content!);
+  const converter = new showdown.Converter();
+  const modifiedContent = converter.makeHtml(contentFormat(content!));
 
   const { width } = useWindowDimensions();
 
@@ -61,4 +67,6 @@ export default function Draft({ children }: DraftProps): ReactElement {
       )}
     </DraftContainer>
   );
-}
+});
+
+export default Draft;

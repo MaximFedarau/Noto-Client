@@ -23,6 +23,13 @@ export const ErrorView = styled(DefaultView)`
   background-color: ${SPRING_WOOD};
 `;
 
+// ! Loading
+export const LoadingView = styled(DefaultView)`
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+`;
+
 // ! App
 
 export const RightHeaderView = styled(DefaultView)`

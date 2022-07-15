@@ -1,5 +1,5 @@
 //Types
-import { ReactElement } from 'react';
+import React, { ReactElement } from 'react';
 import { TextInputProps } from 'react-native';
 import { IconNode } from '@rneui/base';
 
@@ -13,7 +13,7 @@ interface FormFieldProps extends TextInputProps {
   leftIcon?: IconNode;
 }
 
-export default function FormField({
+const FormField = React.memo(function FormField({
   children,
   errorMessage,
   ...props
@@ -33,4 +33,6 @@ export default function FormField({
       }}
     />
   );
-}
+});
+
+export default FormField;
