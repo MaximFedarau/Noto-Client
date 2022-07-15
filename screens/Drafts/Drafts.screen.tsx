@@ -8,8 +8,8 @@ import { fetchDrafts } from '@utils/db/drafts/fetch';
 //Screens
 import Error from '@screens/Error/Error.screen';
 
-//React Native
-import { View, Text, FlatList } from 'react-native';
+//Components
+import DraftsList from '@components/Drafts/DraftsList/DraftsList.component';
 
 //Componets
 import { DraftsView } from '@components/Default/View/View.component';
@@ -36,19 +36,7 @@ export default function Drafts(): ReactElement {
   return (
     <DraftsView>
       {drafts.length === 0 && <NoItemsText>No drafts</NoItemsText>}
-      {drafts.length > 0 && (
-        <FlatList
-          data={drafts}
-          keyExtractor={(item) => item.id}
-          renderItem={(item) => (
-            <View style={{ marginVertical: 16 }}>
-              <Text>{item.item.id}</Text>
-              <Text>{item.item.title}</Text>
-              <Text>{item.item.content}</Text>
-            </View>
-          )}
-        />
-      )}
+      {drafts.length > 0 && <DraftsList>{drafts}</DraftsList>}
     </DraftsView>
   );
 }

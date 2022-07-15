@@ -3,7 +3,7 @@ import React, { ReactElement } from 'react';
 import { TextInputProps, useWindowDimensions } from 'react-native';
 
 //Components
-import FormField from '../FormField/FormField.component';
+import FormField from '@components/NotesManaging/FormField/FormField.component';
 
 import {
   MarkdownFieldContainer,

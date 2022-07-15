@@ -51,6 +51,5 @@ export const FormView = styled(DefaultScrollView)`
 // ! Drafts Screen
 
 export const DraftsView = styled(DefaultView)`
-  align-items: center;
   justify-content: center;
 `;

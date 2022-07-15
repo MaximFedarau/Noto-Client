@@ -10,8 +10,8 @@ import { updateDraft } from '@utils/db/drafts/update';
 
 //Components
 import Button from '@components/Default/Button/Button.component';
-import FormField from '../FormField/FormField.component';
-import MarkdownField from '../MarkdownField/MarkdownField.component';
+import FormField from '@components/NotesManaging/FormField/FormField.component';
+import MarkdownField from '@components/NotesManaging/MarkdownField/MarkdownField.component';
 
 import { FormView } from '@components/Default/View/View.component';
 
@@ -21,10 +21,15 @@ import { Formik } from 'formik';
 //React Navigation
 import { useNavigation } from '@react-navigation/native';
 
+// Showdown
+import * as showdown from 'showdown';
+
 export default function Form(): ReactElement {
   const [noteId, setNoteId] = React.useState<string | null>(null);
 
   const navigation = useNavigation<NavigationProps>();
+
+  const converter = new showdown.Converter();
 
   const formInitialValues: NotesManagingFormData = {
     title: '',
@@ -38,16 +43,20 @@ export default function Form(): ReactElement {
   function saveToDrafts(values: NotesManagingFormData) {
     if (!values.title) return;
     if (noteId) {
-      updateDraft(noteId, values.title, values.content).then((result) => {
-        console.log(result);
+      updateDraft(
+        noteId,
+        values.title,
+        converter.makeHtml(values.content),
+      ).catch((error) => {
+        console.log(error, 'updating draft');
       });
     } else {
-      addDraft(values.title, values.content)
+      addDraft(values.title, converter.makeHtml(values.content))
         .then((result) => {
           setNoteId(String(result.insertId));
         })
         .catch((error) => {
-          console.log(error);
+          console.log(error, 'adding draft');
         });
     }
   }

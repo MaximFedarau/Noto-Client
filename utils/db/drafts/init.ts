@@ -19,5 +19,8 @@ export function initDbDrafts() {
       );
     });
   });
+  // db.transaction((tx) => {
+  //   tx.executeSql('DELETE FROM drafts');
+  // });
   return promise;
 }
