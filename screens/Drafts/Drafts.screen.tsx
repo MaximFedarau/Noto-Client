@@ -1,6 +1,5 @@
 //Types
 import React, { ReactElement } from 'react';
-import { NativeSyntheticEvent, TextInputChangeEventData } from 'react-native';
 import { DraftSchema } from '@app-types/types';
 import { NavigationProps } from '@app-types/types';
 
