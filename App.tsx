@@ -48,7 +48,7 @@ export default function App(): ReactElement | null {
 
   return (
     <>
-      <StatusBar style="dark" />
+      <StatusBar style="dark" animated />
       <NavigationContainer>
         <Stack.Navigator>
           <Stack.Screen
@@ -60,7 +60,7 @@ export default function App(): ReactElement | null {
             name={NAVIGATION_NAMES.NOTES_MANAGING}
             component={NotesManaging}
             options={{
-              title: 'Add Note',
+              title: 'Manage Note',
               headerTitleAlign: 'center',
               headerTintColor: OSLO_GRAY,
               headerTitleStyle: {

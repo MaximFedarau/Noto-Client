@@ -40,12 +40,7 @@ export default function MainBottomTabs(): ReactElement {
         headerRight: ({ tintColor }) => {
           return (
             <RightHeaderView>
-              <IconButton
-                iconName="person"
-                size={32}
-                color={tintColor}
-                style={{ marginRight: 12 }}
-              />
+              <IconButton iconName="person" size={32} color={tintColor} />
             </RightHeaderView>
           );
         },
@@ -60,8 +55,8 @@ export default function MainBottomTabs(): ReactElement {
         name={NAVIGATION_NAMES.NOTES}
         component={Notes}
         options={({ navigation }: { navigation: NavigationProps }) => ({
-          tabBarIcon: ({ color }) => {
-            return <Ionicons name="document" size={32} color={color} />;
+          tabBarIcon: ({ color, size }) => {
+            return <Ionicons name="document" size={size} color={color} />;
           },
           tabBarLabel: () => null,
           headerLeft: ({ tintColor }) => {
@@ -86,8 +81,8 @@ export default function MainBottomTabs(): ReactElement {
         name={NAVIGATION_NAMES.DRAFTS}
         component={Drafts}
         options={{
-          tabBarIcon: ({ color }) => {
-            return <Ionicons name="archive" size={32} color={color} />;
+          tabBarIcon: ({ color, size }) => {
+            return <Ionicons name="archive" size={size} color={color} />;
           },
           tabBarLabel: () => null,
           title: 'Loading...',

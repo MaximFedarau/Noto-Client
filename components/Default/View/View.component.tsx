@@ -16,6 +16,10 @@ export const DefaultScrollView = styled.ScrollView`
   flex-direction: column;
 `;
 
+export const DefaultSafeAreaView = styled.SafeAreaView`
+  flex: 1;
+`;
+
 // ! Error
 export const ErrorView = styled(DefaultView)`
   align-items: center;
@@ -57,6 +61,7 @@ export const FormView = styled(DefaultScrollView)`
 
 // ! Drafts Screen
 
-export const DraftsView = styled(DefaultView)`
+export const DraftsView = styled.SafeAreaView`
+  flex: 1;
   justify-content: center;
 `;
