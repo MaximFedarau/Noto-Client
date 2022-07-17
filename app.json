@@ -28,6 +28,10 @@
       },
       "package": "com.maximfedarau.noto"
     },
+    "androidStatusBar": {
+      "barStyle": "dark-content",
+      "backgroundColor": "#F1EFE4"
+    },
     "web": {
       "favicon": "./assets/images/favicon.png"
     }

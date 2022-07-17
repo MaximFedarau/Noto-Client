@@ -130,7 +130,7 @@ export default function Form(): ReactElement {
     if (!noteId) return;
     deleteDraftById(noteId)
       .then(() => {
-        setIsError(true);
+        setIsError(false);
         navigation.replace(NAVIGATION_NAMES.NOTES_OVERVIEW);
       })
       .catch((error) => {

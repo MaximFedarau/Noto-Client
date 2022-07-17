@@ -1,7 +1,10 @@
 //Styled Components
-import styled from 'styled-components/native';
+import styled from 'styled-components';
 
-export const SearchBarInput = styled.TextInput`
+//React Native
+import { TextInput } from 'react-native';
+
+export const SearchBarInput = styled(TextInput)`
   background-color: white;
   font-size: 16px;
   height: 100%;
