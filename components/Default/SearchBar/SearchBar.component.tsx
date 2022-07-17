@@ -1,25 +1,30 @@
 //Types
 import { ReactElement } from 'react';
-import { TextInputAndroidProps } from 'react-native';
+import { TextInputIOSProps } from 'react-native';
 
 //Components
 import { View } from 'react-native';
 import { SearchBarInput } from './SearchBar.styles';
 
 //React Native
-import { useWindowDimensions } from 'react-native';
+import { useWindowDimensions, Platform } from 'react-native';
 
-export default function SearchBar(props: TextInputAndroidProps): ReactElement {
+export default function SearchBar(props: TextInputIOSProps): ReactElement {
   const { width } = useWindowDimensions();
+  const { OS } = Platform;
   return (
     <View
       style={{
         width: width > 600 ? 500 : 240,
         height: 40,
         alignSelf: 'center',
+        marginTop: OS === 'ios' ? 8 : 0,
       }}
     >
-      <SearchBarInput {...props} />
+      <SearchBarInput
+        {...(OS === 'ios' && { selectionColor: 'black' })}
+        {...props}
+      />
     </View>
   );
 }

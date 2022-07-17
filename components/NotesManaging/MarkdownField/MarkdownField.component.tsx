@@ -65,7 +65,6 @@ const MarkdownField = React.memo(function MarkdownField({
       {tabIndex === 0 && (
         <FormField
           {...props}
-          selectionColor="black"
           value={value}
           errorMessage={errorMessage}
           multiline
