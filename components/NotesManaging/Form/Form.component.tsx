@@ -76,24 +76,24 @@ export default function Form(): ReactElement {
     setNoteId(route.params.id);
   }, []);
 
-  React.useEffect(() => {
-    if (!noteId) return;
-    if (isLoading) return;
-    navigation.setOptions({
-      headerRight: () => {
-        return (
-          <RightHeaderView>
-            <IconButton
-              iconName="trash"
-              size={32}
-              color="red"
-              onPress={onDraftDeleteHandler}
-            />
-          </RightHeaderView>
-        );
-      },
-    });
-  }, [noteId, isLoading]);
+  // React.useEffect(() => {
+  //   if (!noteId) return;
+  //   if (isLoading) return;
+  //   navigation.setOptions({
+  //     headerRight: () => {
+  //       return (
+  //         <RightHeaderView>
+  //           <IconButton
+  //             iconName="trash"
+  //             size={32}
+  //             color="red"
+  //             onPress={onDraftDeleteHandler}
+  //           />
+  //         </RightHeaderView>
+  //       );
+  //     },
+  //   });
+  // }, [noteId, isLoading]);
 
   // * Methods
 
@@ -166,6 +166,23 @@ export default function Form(): ReactElement {
 
         React.useEffect(() => {
           saveToDrafts(values);
+          navigation.setOptions({
+            headerRight:
+              values.title || values.content
+                ? () => {
+                    return (
+                      <RightHeaderView>
+                        <IconButton
+                          iconName="trash"
+                          size={32}
+                          color="red"
+                          onPress={onDraftDeleteHandler}
+                        />
+                      </RightHeaderView>
+                    );
+                  }
+                : () => null,
+          });
         }, [values]);
 
         // * Form
@@ -176,7 +193,7 @@ export default function Form(): ReactElement {
               value={values.title}
               errorMessage={errors.title}
             >
-              Title*
+              Title
             </FormField>
             <MarkdownField
               onChangeText={handleChange('content')}
