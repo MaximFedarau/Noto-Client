@@ -9,7 +9,6 @@ import { BUTTON_TYPES } from '@app-types/enum';
 
 //Constants
 import { notesManagingFormValidationSchema } from '@constants/validationSchemas';
-import { NAVIGATION_NAMES } from '@app-types/enum';
 
 import { addDraft } from '@utils/db/drafts/add';
 import { fetchDraftById } from '@utils/db/drafts/fetch';
@@ -131,16 +130,13 @@ export default function Form(): ReactElement {
       });
   }
 
-  function onDraftDeleteHandler() {
+  async function onDraftDeleteHandler() {
     if (!noteId) return;
-    deleteDraftById(noteId)
-      .then(() => {
-        navigation.replace(NAVIGATION_NAMES.NOTES_OVERVIEW);
-      })
-      .catch((error) => {
-        console.log(error, 'deleting draft');
-        setIsError(true);
-      });
+    await deleteDraftById(noteId).catch((error) => {
+      console.log(error, 'deleting draft');
+      setIsError(true);
+    });
+    navigation.goBack();
   }
 
   function cleanup() {
