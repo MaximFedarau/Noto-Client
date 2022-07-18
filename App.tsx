@@ -3,7 +3,6 @@ import React, { ReactElement } from 'react';
 import { NAVIGATION_NAMES } from '@app-types/enum';
 
 //Constants
-import { OSLO_GRAY, SPRING_WOOD } from '@constants/colors';
 import { initDbDrafts } from '@utils/db/drafts/init';
 
 //Expo
@@ -14,7 +13,6 @@ import { useFonts } from 'expo-font';
 import MainBottomTabs from '@navigation/MainBottomTabs/MainBottomTabs.navigation';
 
 //Screens
-import NotesManaging from '@screens/NotesManaging/NotesManaging.screen';
 import Error from '@screens/Error/Error.screen';
 
 //React Navigation
@@ -55,23 +53,6 @@ export default function App(): ReactElement | null {
             name={NAVIGATION_NAMES.NOTES_OVERVIEW}
             component={MainBottomTabs}
             options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name={NAVIGATION_NAMES.NOTES_MANAGING}
-            component={NotesManaging}
-            options={{
-              title: 'Manage Note',
-              headerTitleAlign: 'center',
-              headerTintColor: OSLO_GRAY,
-              headerTitleStyle: {
-                fontFamily: 'Roboto-Regular',
-              },
-              headerStyle: { backgroundColor: SPRING_WOOD },
-              headerShadowVisible: false,
-              contentStyle: {
-                backgroundColor: SPRING_WOOD,
-              },
-            }}
           />
         </Stack.Navigator>
       </NavigationContainer>

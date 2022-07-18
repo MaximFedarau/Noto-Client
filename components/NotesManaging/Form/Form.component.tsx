@@ -27,6 +27,7 @@ import FormField from '@components/NotesManaging/FormField/FormField.component';
 import MarkdownField from '@components/NotesManaging/MarkdownField/MarkdownField.component';
 
 import { FormView } from '@components/Default/View/View.component';
+import { RightHeaderView } from '@components/Default/View/View.component';
 
 //Formik
 import { Formik } from 'formik';
@@ -59,15 +60,18 @@ export default function Form(): ReactElement {
     navigation.setOptions({
       headerRight: () => {
         return (
-          <IconButton
-            iconName="trash"
-            size={32}
-            color="red"
-            onPress={onDraftDeleteHandler}
-          />
+          <RightHeaderView>
+            <IconButton
+              iconName="trash"
+              size={32}
+              color="red"
+              onPress={onDraftDeleteHandler}
+            />
+          </RightHeaderView>
         );
       },
     });
+    return cleanup;
   }, [noteId, isLoading]);
 
   React.useLayoutEffect(() => {
@@ -75,6 +79,7 @@ export default function Form(): ReactElement {
     setIsLoading(true);
     fetchingDraft();
     setNoteId(route.params.id);
+    return cleanup;
   }, []);
 
   // * Methods
@@ -130,13 +135,19 @@ export default function Form(): ReactElement {
     if (!noteId) return;
     deleteDraftById(noteId)
       .then(() => {
-        setIsError(false);
         navigation.replace(NAVIGATION_NAMES.NOTES_OVERVIEW);
       })
       .catch((error) => {
         console.log(error, 'deleting draft');
         setIsError(true);
       });
+  }
+
+  function cleanup() {
+    setIsError(false);
+    setIsLoading(false);
+    setNoteId(null);
+    setFormInitialValues({ title: '', content: '' });
   }
 
   // * Cases handlers

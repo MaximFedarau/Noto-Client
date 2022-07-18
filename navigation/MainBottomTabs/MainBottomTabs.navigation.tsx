@@ -11,15 +11,14 @@ import { Ionicons } from '@expo/vector-icons';
 
 //Screens
 import Notes from '@screens/Notes/Notes.screen';
+import NotesManaging from '@screens/NotesManaging/NotesManaging.screen';
 import Drafts from '@screens/Drafts/Drafts.screen';
 
 //Components
 import IconButton from '@components/Default/IconButton/IconButton.component';
+import { Pressable } from 'react-native';
 
-import {
-  RightHeaderView,
-  LeftHeaderView,
-} from '@components/Default/View/View.component';
+import { RightHeaderView } from '@components/Default/View/View.component';
 
 //React Navigation
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -37,13 +36,6 @@ export default function MainBottomTabs(): ReactElement {
         },
         headerStyle: { backgroundColor: SPRING_WOOD },
         headerShadowVisible: false,
-        headerRight: ({ tintColor }) => {
-          return (
-            <RightHeaderView>
-              <IconButton iconName="person" size={32} color={tintColor} />
-            </RightHeaderView>
-          );
-        },
         tabBarStyle: { backgroundColor: SPRING_WOOD, justifyContent: 'center' },
         tabBarActiveTintColor: CYBER_YELLOW,
       }}
@@ -54,27 +46,46 @@ export default function MainBottomTabs(): ReactElement {
       <BottomTab.Screen
         name={NAVIGATION_NAMES.NOTES}
         component={Notes}
-        options={({ navigation }: { navigation: NavigationProps }) => ({
+        options={{
           tabBarIcon: ({ color, size }) => {
             return <Ionicons name="document" size={size} color={color} />;
           },
           tabBarLabel: () => null,
-          headerLeft: ({ tintColor }) => {
-            function onButtonClickHandler() {
-              navigation.navigate(NAVIGATION_NAMES.NOTES_MANAGING);
-            }
+          headerRight: ({ tintColor }) => {
             return (
-              <LeftHeaderView>
-                <IconButton
-                  iconName="add"
-                  size={32}
-                  color={tintColor}
-                  onPress={onButtonClickHandler}
-                />
-              </LeftHeaderView>
+              <RightHeaderView>
+                <IconButton iconName="person" size={32} color={tintColor} />
+              </RightHeaderView>
             );
           },
           title: 'Notes',
+        }}
+      />
+      <BottomTab.Screen
+        name={NAVIGATION_NAMES.NOTES_MANAGING}
+        component={NotesManaging}
+        options={({ navigation }: { navigation: NavigationProps }) => ({
+          title: 'Manage Note',
+          headerTitleAlign: 'center',
+          headerTintColor: OSLO_GRAY,
+          headerTitleStyle: {
+            fontFamily: 'Roboto-Regular',
+          },
+          headerStyle: { backgroundColor: SPRING_WOOD },
+          headerShadowVisible: false,
+          unmountOnBlur: true,
+          tabBarLabel: () => null,
+          tabBarIcon: ({ color, size }) => {
+            return (
+              <Ionicons name="add-circle-sharp" size={size} color={color} />
+            );
+          },
+          tabBarButton: (props) => {
+            function onButtonClickHandler() {
+              navigation.navigate(NAVIGATION_NAMES.NOTES_MANAGING);
+            }
+            return <Pressable {...props} onPress={onButtonClickHandler} />;
+          },
         })}
       />
       <BottomTab.Screen
@@ -85,6 +96,13 @@ export default function MainBottomTabs(): ReactElement {
             return <Ionicons name="archive" size={size} color={color} />;
           },
           tabBarLabel: () => null,
+          headerRight: ({ tintColor }) => {
+            return (
+              <RightHeaderView>
+                <IconButton iconName="person" size={32} color={tintColor} />
+              </RightHeaderView>
+            );
+          },
           title: 'Loading...',
         }}
       />
