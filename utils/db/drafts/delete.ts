@@ -21,3 +21,22 @@ export function deleteDraftById(id: string) {
   });
   return promise;
 }
+
+export function deleteEmptyDrafts() {
+  const promise = new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        `DELETE FROM drafts WHERE title = '' AND content = ''`,
+        [],
+        (_, result) => {
+          resolve(result);
+        },
+        (_, error) => {
+          reject(error);
+          return false;
+        },
+      );
+    });
+  });
+  return promise;
+}

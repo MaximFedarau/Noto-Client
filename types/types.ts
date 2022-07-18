@@ -18,13 +18,13 @@ export type NavigationRouteProp = RouteProp<RootStackParamList>;
 
 // ! Notes Managing Form Data Interface
 export interface NotesManagingFormData {
-  title: string;
+  title?: string;
   content?: string;
 }
 
 // ! Draft Schema
 export interface DraftSchema {
   id: string;
-  title: string;
+  title?: string;
   content?: string;
 }

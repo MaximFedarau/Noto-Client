@@ -54,6 +54,29 @@ export default function Form(): ReactElement {
   // * Effects
 
   React.useEffect(() => {
+    if (route.params) return;
+    addDraft('', '')
+      .then((result) => {
+        setIsError(false);
+        setNoteId((prevNoteId) => {
+          if (prevNoteId) return prevNoteId;
+          return String(result.insertId);
+        });
+      })
+      .catch((error) => {
+        setIsError(true);
+        console.log(error, 'adding draft');
+      });
+  }, []);
+
+  React.useLayoutEffect(() => {
+    if (!route.params || !route.params.id) return;
+    setIsLoading(true);
+    fetchingDraft();
+    setNoteId(route.params.id);
+  }, []);
+
+  React.useEffect(() => {
     if (!noteId) return;
     if (isLoading) return;
     navigation.setOptions({
@@ -70,16 +93,7 @@ export default function Form(): ReactElement {
         );
       },
     });
-    return cleanup;
   }, [noteId, isLoading]);
-
-  React.useLayoutEffect(() => {
-    if (!route.params || !route.params.id) return;
-    setIsLoading(true);
-    fetchingDraft();
-    setNoteId(route.params.id);
-    return cleanup;
-  }, []);
 
   // * Methods
 
@@ -107,26 +121,14 @@ export default function Form(): ReactElement {
   }
 
   function saveToDrafts(values: NotesManagingFormData) {
-    if (!values.title) return;
-    if (noteId) {
-      updateDraft(noteId, values.title, values.content)
-        .then(() => {
-          setIsError(false);
-        })
-        .catch((error) => {
-          setIsError(true);
-          console.log(error, 'updating draft');
-        });
-      return;
-    }
-    addDraft(values.title, values.content)
-      .then((result) => {
+    if (!noteId) return;
+    updateDraft(noteId, values.title!, values.content)
+      .then(() => {
         setIsError(false);
-        setNoteId(String(result.insertId));
       })
       .catch((error) => {
         setIsError(true);
-        console.log(error, 'adding draft');
+        console.log(error, 'updating draft');
       });
   }
 
@@ -137,13 +139,6 @@ export default function Form(): ReactElement {
       setIsError(true);
     });
     navigation.goBack();
-  }
-
-  function cleanup() {
-    setIsError(false);
-    setIsLoading(false);
-    setNoteId(null);
-    setFormInitialValues({ title: '', content: '' });
   }
 
   // * Cases handlers
@@ -161,11 +156,11 @@ export default function Form(): ReactElement {
         // * Effects
         React.useLayoutEffect(() => {
           const title =
-            values.title.length > 16
+            values.title && values.title.length > 16
               ? values.title.substring(0, 16) + '...'
-              : values.title;
+              : values.title || 'Manage Note';
           navigation.setOptions({
-            headerTitle: title || 'Manage Note',
+            headerTitle: title,
           });
         }, [values.title]);
 

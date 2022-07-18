@@ -81,7 +81,7 @@ export default function Drafts(): ReactElement {
   }, [drafts]);
 
   const filteredDrafts = drafts.filter((draft) => {
-    return draft.title.toLowerCase().includes(searchText.toLowerCase());
+    return draft.title!.toLowerCase().includes(searchText.toLowerCase());
   });
 
   if (isError) return <Error />;

@@ -5,6 +5,7 @@ import { NavigationProps } from '@app-types/types';
 //Constants
 import { OSLO_GRAY, SPRING_WOOD, CYBER_YELLOW } from '@constants/colors';
 import { NAVIGATION_NAMES } from '@app-types/enum';
+import { deleteEmptyDrafts } from '@utils/db/drafts/delete';
 
 //Expo
 import { Ionicons } from '@expo/vector-icons';
@@ -91,7 +92,7 @@ export default function MainBottomTabs(): ReactElement {
       <BottomTab.Screen
         name={NAVIGATION_NAMES.DRAFTS}
         component={Drafts}
-        options={{
+        options={({ navigation }: { navigation: NavigationProps }) => ({
           tabBarIcon: ({ color, size }) => {
             return <Ionicons name="archive" size={size} color={color} />;
           },
@@ -104,7 +105,19 @@ export default function MainBottomTabs(): ReactElement {
             );
           },
           title: 'Loading...',
-        }}
+          tabBarButton: (props) => {
+            async function onButtonClickHandler() {
+              await deleteEmptyDrafts()
+                .then(() => {
+                  navigation.navigate(NAVIGATION_NAMES.DRAFTS);
+                })
+                .catch((error) => {
+                  console.log(error, 'deleting empty drafts');
+                });
+            }
+            return <Pressable {...props} onPress={onButtonClickHandler} />;
+          },
+        })}
       />
     </BottomTab.Navigator>
   );

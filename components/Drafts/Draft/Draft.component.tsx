@@ -54,7 +54,7 @@ const Draft = React.memo(function Draft({
       onPress={onDraftPressHandler}
       style={({ pressed }) => [pressed ? { opacity: 0.75 } : {}]}
     >
-      <DraftTitle>{title}</DraftTitle>
+      <DraftTitle>{title || ''}</DraftTitle>
       {!content ? (
         <NoDraftText>-</NoDraftText>
       ) : (
