@@ -6,6 +6,7 @@ import {
   NavigationRouteProp,
 } from '@app-types/types';
 import { BUTTON_TYPES } from '@app-types/enum';
+import { AppState, AppStateStatus } from 'react-native';
 
 //Constants
 import { notesManagingFormValidationSchema } from '@constants/validationSchemas';
@@ -51,6 +52,9 @@ export default function Form(): ReactElement {
       content: '',
     });
 
+  // * Refs
+  const appState = React.useRef(AppState.currentState);
+
   // * Effects
 
   React.useEffect(() => {
@@ -85,6 +89,25 @@ export default function Form(): ReactElement {
       });
     };
   }, [noteId]);
+
+  React.useEffect(() => {
+    const subscription = AppState.addEventListener(
+      'change',
+      _handleAppStateChange,
+    );
+    return () => {
+      subscription.remove();
+    };
+  }, [noteId]);
+
+  const _handleAppStateChange = (nextAppState: AppStateStatus) => {
+    if (appState.current === 'active') {
+      if (!noteId) return;
+      deleteDraftIfEmpty(noteId);
+    }
+
+    appState.current = nextAppState;
+  };
 
   // * Methods
 
