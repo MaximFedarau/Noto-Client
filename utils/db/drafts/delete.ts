@@ -22,12 +22,12 @@ export function deleteDraftById(id: string) {
   return promise;
 }
 
-export function deleteEmptyDrafts() {
+export function deleteDraftIfEmpty(id: string) {
   const promise = new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        `DELETE FROM drafts WHERE title = '' AND content = ''`,
-        [],
+        `DELETE FROM drafts WHERE id = ? AND title = '' AND content = ''`,
+        [id],
         (_, result) => {
           resolve(result);
         },

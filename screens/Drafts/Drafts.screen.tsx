@@ -72,7 +72,7 @@ export default function Drafts(): ReactElement {
         });
       })
       .catch((error) => {
-        console.log(error, 'Drafts set up');
+        console.error(error, 'Drafts setup');
         setIsError(true);
       })
       .finally(() => {

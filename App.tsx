@@ -28,10 +28,10 @@ export default function App(): ReactElement | null {
     initDbDrafts()
       .then((message) => {
         setIsSetupError(false);
-        console.log(message);
+        console.info(message);
       })
       .catch((error) => {
-        console.log(error, 'App setup');
+        console.error(error, 'App setup');
         setIsSetupError(true);
       });
   }, []);

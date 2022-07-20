@@ -13,7 +13,7 @@ import { notesManagingFormValidationSchema } from '@constants/validationSchemas'
 import { addDraft } from '@utils/db/drafts/add';
 import { fetchDraftById } from '@utils/db/drafts/fetch';
 import { updateDraft } from '@utils/db/drafts/update';
-import { deleteDraftById } from '@utils/db/drafts/delete';
+import { deleteDraftById, deleteDraftIfEmpty } from '@utils/db/drafts/delete';
 
 //Screens
 import Error from '@screens/Error/Error.screen';
@@ -65,7 +65,7 @@ export default function Form(): ReactElement {
       })
       .catch((error) => {
         setIsError(true);
-        console.log(error, 'adding draft');
+        console.error(error, 'Adding Draft');
       });
   }, []);
 
@@ -76,24 +76,15 @@ export default function Form(): ReactElement {
     setNoteId(route.params.id);
   }, []);
 
-  // React.useEffect(() => {
-  //   if (!noteId) return;
-  //   if (isLoading) return;
-  //   navigation.setOptions({
-  //     headerRight: () => {
-  //       return (
-  //         <RightHeaderView>
-  //           <IconButton
-  //             iconName="trash"
-  //             size={32}
-  //             color="red"
-  //             onPress={onDraftDeleteHandler}
-  //           />
-  //         </RightHeaderView>
-  //       );
-  //     },
-  //   });
-  // }, [noteId, isLoading]);
+  React.useLayoutEffect(() => {
+    return () => {
+      if (!noteId) return;
+      deleteDraftIfEmpty(noteId).catch((error) => {
+        console.error(error, 'Deleting empty Draft');
+        setIsError(true);
+      });
+    };
+  }, [noteId]);
 
   // * Methods
 
@@ -108,7 +99,7 @@ export default function Form(): ReactElement {
         setIsError(false);
       })
       .catch((error) => {
-        console.log(error, 'fetching draft');
+        console.error(error, 'Fetching Draft');
         setIsError(true);
       })
       .finally(() => {
@@ -128,14 +119,14 @@ export default function Form(): ReactElement {
       })
       .catch((error) => {
         setIsError(true);
-        console.log(error, 'updating draft');
+        console.error(error, 'Updating Draft');
       });
   }
 
   async function onDraftDeleteHandler() {
     if (!noteId) return;
     await deleteDraftById(noteId).catch((error) => {
-      console.log(error, 'deleting draft');
+      console.error(error, 'Deleting Draft');
       setIsError(true);
     });
     navigation.goBack();
