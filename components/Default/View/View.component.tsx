@@ -4,6 +4,9 @@ import styled from 'styled-components/native';
 //Constants
 import { SPRING_WOOD } from '@constants/colors';
 
+//React Native
+import { Platform, StatusBar } from 'react-native';
+
 // ! Default
 
 export const DefaultView = styled.View`
@@ -64,4 +67,15 @@ export const FormView = styled(DefaultScrollView)`
 export const DraftsView = styled.SafeAreaView`
   flex: 1;
   justify-content: center;
+`;
+
+// ! Auth Screens
+
+export const AuthScreenContainer = styled.SafeAreaView`
+  flex: 1;
+  margin-top: ${Platform.OS === 'android'
+    ? StatusBar.currentHeight
+      ? StatusBar.currentHeight + 24
+      : 24
+    : 24}px;
 `;

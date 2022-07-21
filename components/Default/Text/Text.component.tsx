@@ -31,3 +31,11 @@ export const NoDraftText = styled(DefaultText)`
   font-size: 22px;
   align-self: center;
 `;
+
+// ! Auth Screens
+
+export const AuthNavigationText = styled(DefaultText)`
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+`;

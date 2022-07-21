@@ -42,3 +42,9 @@ export interface DraftSchema {
   title?: string;
   content?: string;
 }
+
+// ! Auth Sign In Interface
+export interface SignInFormData {
+  nickname: string;
+  password: string;
+}

@@ -24,7 +24,7 @@ export default function IconButton({
   return (
     <Pressable
       {...props}
-      style={({ pressed }) => [pressed ? { opacity: 0.5 } : {}]}
+      style={({ pressed }) => [pressed ? { opacity: 0.5 } : {}, props.style]}
     >
       <Ionicons name={iconName} size={size} color={color} />
     </Pressable>

@@ -7,12 +7,15 @@ import { BUNTING } from '@constants/colors';
 //Styled Components
 import styled from 'styled-components/native';
 
+//React Native
+import { Pressable } from 'react-native';
+
 //Interface for Props
 interface ButtonStylingProps {
   type?: BUTTON_TYPES;
 }
 
-export const ButtonContainer = styled.Pressable<ButtonStylingProps>`
+export const ButtonContainer = styled(Pressable)<ButtonStylingProps>`
   display: flex;
   justify-content: center;
   background-color: ${({ type }) =>
