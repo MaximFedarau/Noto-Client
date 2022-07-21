@@ -44,6 +44,7 @@ const Draft = React.memo(function Draft({
   const navigation = useNavigation<NavigationProps>();
 
   function onDraftPressHandler() {
+    if (!title && !content) return;
     navigation.navigate(NAVIGATION_NAMES.NOTES_MANAGING, {
       id,
     });
