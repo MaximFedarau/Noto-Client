@@ -4,11 +4,14 @@ export enum NAVIGATION_AUTH_NAMES {
   SIGN_UP = 'SignUp', // * Native Stack Navigation
 }
 
-export enum NAVIGATION_NAMES {
+export enum NAVIGATION_NOTES_NAMES {
   NOTES = 'Notes', // * Bottom Navigation
-  DRAFTS = 'Drafts', // * Bottom Navigation
-  AUTH = 'Auth', // * Native Stack Navigation
   NOTES_MANAGING = 'NotesManaging', // * Bottom Navigation
+  DRAFTS = 'Drafts', // * Bottom Navigation
+}
+
+export enum NAVIGATION_NAMES {
+  AUTH = 'Auth', // * Native Stack Navigation
   NOTES_OVERVIEW = 'NotesOverview', // * Native Stack Navigation
 }
 

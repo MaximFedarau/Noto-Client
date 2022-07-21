@@ -4,7 +4,7 @@ import { NavigationProps } from '@app-types/types';
 
 //Constants
 import { OSLO_GRAY, SPRING_WOOD, CYBER_YELLOW } from '@constants/colors';
-import { NAVIGATION_NAMES } from '@app-types/enum';
+import { NAVIGATION_NAMES, NAVIGATION_NOTES_NAMES } from '@app-types/enum';
 
 //Expo
 import { Ionicons } from '@expo/vector-icons';
@@ -51,7 +51,7 @@ export default function MainBottomTabs(): ReactElement {
       }}
     >
       <BottomTab.Screen
-        name={NAVIGATION_NAMES.NOTES}
+        name={NAVIGATION_NOTES_NAMES.NOTES}
         component={Notes}
         options={{
           tabBarIcon: ({ color, size }) => {
@@ -74,7 +74,7 @@ export default function MainBottomTabs(): ReactElement {
         }}
       />
       <BottomTab.Screen
-        name={NAVIGATION_NAMES.NOTES_MANAGING}
+        name={NAVIGATION_NOTES_NAMES.NOTES_MANAGING}
         component={NotesManaging}
         options={{
           title: 'Manage Note',
@@ -94,14 +94,14 @@ export default function MainBottomTabs(): ReactElement {
           },
           tabBarButton: (props) => {
             function onButtonClickHandler() {
-              navigation.navigate(NAVIGATION_NAMES.NOTES_MANAGING);
+              navigation.navigate(NAVIGATION_NOTES_NAMES.NOTES_MANAGING);
             }
             return <Pressable {...props} onPress={onButtonClickHandler} />;
           },
         }}
       />
       <BottomTab.Screen
-        name={NAVIGATION_NAMES.DRAFTS}
+        name={NAVIGATION_NOTES_NAMES.DRAFTS}
         component={Drafts}
         options={{
           tabBarIcon: ({ color, size }) => {

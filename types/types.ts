@@ -1,5 +1,9 @@
 //Types
-import { NAVIGATION_NAMES, NAVIGATION_AUTH_NAMES } from './enum';
+import {
+  NAVIGATION_NAMES,
+  NAVIGATION_NOTES_NAMES,
+  NAVIGATION_AUTH_NAMES,
+} from './enum';
 
 //React Navigation
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -12,9 +16,9 @@ type NavigationRootStackParamList = {
 };
 
 type NotesRootStackParamList = {
-  [NAVIGATION_NAMES.NOTES]?: undefined;
-  [NAVIGATION_NAMES.DRAFTS]?: undefined;
-  [NAVIGATION_NAMES.NOTES_MANAGING]?: { id?: string };
+  [NAVIGATION_NOTES_NAMES.NOTES]?: undefined;
+  [NAVIGATION_NOTES_NAMES.DRAFTS]?: undefined;
+  [NAVIGATION_NOTES_NAMES.NOTES_MANAGING]?: { id?: string };
 };
 
 type RootStackParamList = {

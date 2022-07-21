@@ -2,7 +2,7 @@
 import React, { ReactElement } from 'react';
 import { DraftSchema } from '@app-types/types';
 import { NavigationProps } from '@app-types/types';
-import { NAVIGATION_NAMES } from '@app-types/enum';
+import { NAVIGATION_NAMES, NAVIGATION_NOTES_NAMES } from '@app-types/enum';
 
 //Components
 import { DraftContainer } from './Draft.styles';
@@ -45,7 +45,7 @@ const Draft = React.memo(function Draft({
 
   function onDraftPressHandler() {
     if (!title && !content) return;
-    navigation.navigate(NAVIGATION_NAMES.NOTES_MANAGING, {
+    navigation.navigate(NAVIGATION_NOTES_NAMES.NOTES_MANAGING, {
       id,
     });
   }
