@@ -11,6 +11,7 @@ import { useFonts } from 'expo-font';
 
 //Navigation
 import MainBottomTabs from '@navigation/MainBottomTabs/MainBottomTabs.navigation';
+import AuthStack from '@navigation/AuthStack/AuthStack.navigation';
 
 //Screens
 import Error from '@screens/Error/Error.screen';
@@ -48,12 +49,16 @@ export default function App(): ReactElement | null {
     <>
       <StatusBar style="dark" animated />
       <NavigationContainer>
-        <Stack.Navigator>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+          }}
+        >
           <Stack.Screen
             name={NAVIGATION_NAMES.NOTES_OVERVIEW}
             component={MainBottomTabs}
-            options={{ headerShown: false }}
           />
+          <Stack.Screen name={NAVIGATION_NAMES.AUTH} component={AuthStack} />
         </Stack.Navigator>
       </NavigationContainer>
     </>

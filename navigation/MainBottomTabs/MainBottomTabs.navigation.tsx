@@ -21,11 +21,18 @@ import { Pressable } from 'react-native';
 import { RightHeaderView } from '@components/Default/View/View.component';
 
 //React Navigation
+import { useNavigation } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 const BottomTab = createBottomTabNavigator();
 
 export default function MainBottomTabs(): ReactElement {
+  const navigation = useNavigation<NavigationProps>();
+
+  function navigateToAuth() {
+    navigation.navigate(NAVIGATION_NAMES.AUTH);
+  }
+
   return (
     <BottomTab.Navigator
       screenOptions={{
@@ -54,7 +61,12 @@ export default function MainBottomTabs(): ReactElement {
           headerRight: ({ tintColor }) => {
             return (
               <RightHeaderView>
-                <IconButton iconName="person" size={32} color={tintColor} />
+                <IconButton
+                  iconName="person"
+                  size={32}
+                  color={tintColor}
+                  onPress={navigateToAuth}
+                />
               </RightHeaderView>
             );
           },
@@ -64,7 +76,7 @@ export default function MainBottomTabs(): ReactElement {
       <BottomTab.Screen
         name={NAVIGATION_NAMES.NOTES_MANAGING}
         component={NotesManaging}
-        options={({ navigation }: { navigation: NavigationProps }) => ({
+        options={{
           title: 'Manage Note',
           headerTitleAlign: 'center',
           headerTintColor: OSLO_GRAY,
@@ -86,7 +98,7 @@ export default function MainBottomTabs(): ReactElement {
             }
             return <Pressable {...props} onPress={onButtonClickHandler} />;
           },
-        })}
+        }}
       />
       <BottomTab.Screen
         name={NAVIGATION_NAMES.DRAFTS}
@@ -99,7 +111,12 @@ export default function MainBottomTabs(): ReactElement {
           headerRight: ({ tintColor }) => {
             return (
               <RightHeaderView>
-                <IconButton iconName="person" size={32} color={tintColor} />
+                <IconButton
+                  iconName="person"
+                  size={32}
+                  color={tintColor}
+                  onPress={navigateToAuth}
+                />
               </RightHeaderView>
             );
           },
