@@ -14,7 +14,7 @@ interface FormFieldProps {
   onChangeText?: (text: string) => void;
   placeholder?: string;
   error?: string;
-  forceShowingError?: boolean;
+  forceErrorShowing?: boolean;
 }
 
 export default function FormField({
@@ -22,7 +22,7 @@ export default function FormField({
   placeholder,
   onChangeText,
   error,
-  forceShowingError,
+  forceErrorShowing,
 }: FormFieldProps): ReactElement {
   const formSelectionColor = {
     ...(Platform.OS === 'ios' && { selectionColor: 'black' }),
@@ -31,14 +31,14 @@ export default function FormField({
     <>
       <AuthInput
         value={children}
-        onChangeText={onChangeText}
         placeholder={placeholder}
+        onChangeText={onChangeText}
         {...formSelectionColor}
       />
-      {forceShowingError
+      {forceErrorShowing
         ? error && <AuthFormErrorText>{error}</AuthFormErrorText>
         : error && !children && <AuthFormErrorText>{error}</AuthFormErrorText>}
-      {/* Statement above means, that is forceShowingError is true, then we check if error exists and then show this error.
+      {/* Statement above means, that is forceErrorShowing is true, then we check if error exists and then show this error.
       Else we show error only if error exists and input is not empty. */}
     </>
   );

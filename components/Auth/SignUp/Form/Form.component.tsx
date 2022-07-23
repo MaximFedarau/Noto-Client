@@ -8,18 +8,14 @@ import { signUpFormValidationSchema } from '@constants/validationSchemas';
 
 //Components
 import FormField from '@components/Auth/FormField/FormField.component';
+import FormButtons from '@components/Auth/FormButtons/FormButtons.component';
 
 import {
   AuthFormContainer,
   AuthFormFieldsContainer,
   AuthFormContentContainer,
-  AuthFormButtonsContainer,
 } from '@components/Default/View/View.component';
 import { AuthNavigationText } from '@components/Default/Text/Text.component';
-import {
-  FormSubmitButton,
-  HomeButton,
-} from '@components/Auth/Buttons/Buttons.component';
 
 //Formik
 import { Formik } from 'formik';
@@ -63,6 +59,8 @@ export default function Form({ image }: FormProps): ReactElement {
         initialValues={fontInitialValues}
         onSubmit={onFormSubmitHandler}
         validationSchema={signUpFormValidationSchema}
+        validateOnChange={false}
+        validateOnBlur={false}
       >
         {({ values, errors, handleChange, handleSubmit }) => (
           <AuthFormContentContainer>
@@ -85,7 +83,7 @@ export default function Form({ image }: FormProps): ReactElement {
                 onChangeText={handleChange('confirmPassword')}
                 placeholder="Confirm password:"
                 error={errors.confirmPassword}
-                forceShowingError
+                forceErrorShowing
               >
                 {values.confirmPassword}
               </FormField>
@@ -93,25 +91,12 @@ export default function Form({ image }: FormProps): ReactElement {
             <AuthNavigationText onPress={onNavigationTextHandler}>
               Sign In
             </AuthNavigationText>
-            <AuthFormButtonsContainer>
-              <FormSubmitButton
-                onPress={handleSubmit}
-                textStyle={{
-                  color: 'white',
-                  fontSize: 22,
-                  fontWeight: 'bold',
-                }}
-              >
-                Sign Up
-              </FormSubmitButton>
-              {/* ! Formik behaviour */}
-              <HomeButton
-                iconName="home"
-                color="white"
-                size={24}
-                onPress={onHomeReturnHandler}
-              />
-            </AuthFormButtonsContainer>
+            <FormButtons
+              onSubmit={handleSubmit}
+              onHomeReturn={onHomeReturnHandler}
+            >
+              Sign Up
+            </FormButtons>
           </AuthFormContentContainer>
         )}
       </Formik>

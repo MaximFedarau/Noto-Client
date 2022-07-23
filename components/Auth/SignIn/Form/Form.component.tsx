@@ -8,15 +8,14 @@ import { signInFormValidationSchema } from '@constants/validationSchemas';
 
 //Components
 import FormField from '@components/Auth/FormField/FormField.component';
+import FormButtons from '@components/Auth/FormButtons/FormButtons.component';
 
 import {
   AuthFormContainer,
   AuthFormFieldsContainer,
   AuthFormContentContainer,
-  AuthFormButtonsContainer,
 } from '@components/Default/View/View.component';
 import { AuthNavigationText } from '@components/Default/Text/Text.component';
-import { FormSubmitButton, HomeButton } from './Form.styles';
 
 //Formik
 import { Formik } from 'formik';
@@ -78,25 +77,12 @@ export default function Form(): ReactElement {
             <AuthNavigationText onPress={onNavigationTextHandler}>
               Sign Up
             </AuthNavigationText>
-            <AuthFormButtonsContainer>
-              <FormSubmitButton
-                onPress={handleSubmit}
-                textStyle={{
-                  color: 'white',
-                  fontSize: 22,
-                  fontWeight: 'bold',
-                }}
-              >
-                Sign In
-              </FormSubmitButton>
-              {/* ! Formik behaviour */}
-              <HomeButton
-                iconName="home"
-                color="white"
-                size={24}
-                onPress={onHomeReturnHandler}
-              />
-            </AuthFormButtonsContainer>
+            <FormButtons
+              onSubmit={handleSubmit}
+              onHomeReturn={onHomeReturnHandler}
+            >
+              Sign In
+            </FormButtons>
           </AuthFormContentContainer>
         )}
       </Formik>
