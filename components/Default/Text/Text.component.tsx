@@ -34,6 +34,13 @@ export const NoDraftText = styled(DefaultText)`
 
 // ! Auth Screens
 
+export const AuthFormErrorText = styled(DefaultText)`
+  color: red;
+  font-size: 14px;
+  margin-horizontal: 12px;
+  margin-bottom: 12px;
+`;
+
 export const AuthNavigationText = styled(DefaultText)`
   font-size: 16px;
   font-weight: bold;

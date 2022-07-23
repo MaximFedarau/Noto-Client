@@ -7,12 +7,16 @@ import { NAVIGATION_NAMES, NAVIGATION_AUTH_NAMES } from '@app-types/enum';
 import { signInFormValidationSchema } from '@constants/validationSchemas';
 
 //Components
-import { AuthInput } from '@components/Default/Input/Input.component';
+import FormField from '@components/Auth/FormField/FormField.component';
+
+import {
+  AuthFormContainer,
+  AuthFormFieldsContainer,
+  AuthFormContentContainer,
+  AuthFormButtonsContainer,
+} from '@components/Default/View/View.component';
 import { AuthNavigationText } from '@components/Default/Text/Text.component';
 import { FormSubmitButton, HomeButton } from './Form.styles';
-
-//React Native
-import { View, Platform } from 'react-native';
 
 //Formik
 import { Formik } from 'formik';
@@ -24,10 +28,6 @@ export default function Form(): ReactElement {
   // * Variables
 
   const navigation = useNavigation<NavigationProps>();
-
-  const formSelectionColor = {
-    ...(Platform.OS === 'ios' && { selectionColor: 'black' }),
-  };
 
   const fontInitialValues: SignInFormData = {
     nickname: '',
@@ -49,32 +49,36 @@ export default function Form(): ReactElement {
   }
 
   return (
-    <View style={{ paddingVertical: 16 }}>
+    <AuthFormContainer>
       <Formik
         initialValues={fontInitialValues}
         onSubmit={onFormSubmitHandler}
         validationSchema={signInFormValidationSchema}
+        validateOnChange={false}
+        validateOnBlur={false}
       >
-        {({ values, handleChange, handleSubmit }) => (
-          <View style={{ alignItems: 'center' }}>
-            <View>
-              <AuthInput
-                value={values.nickname}
+        {({ values, errors, handleChange, handleSubmit }) => (
+          <AuthFormContentContainer>
+            <AuthFormFieldsContainer>
+              <FormField
                 onChangeText={handleChange('nickname')}
                 placeholder="Nickname:"
-                {...formSelectionColor}
-              />
-              <AuthInput
-                value={values.password}
+                error={errors.nickname}
+              >
+                {values.nickname}
+              </FormField>
+              <FormField
                 onChangeText={handleChange('password')}
                 placeholder="Password:"
-                {...formSelectionColor}
-              />
-            </View>
+                error={errors.password}
+              >
+                {values.password}
+              </FormField>
+            </AuthFormFieldsContainer>
             <AuthNavigationText onPress={onNavigationTextHandler}>
               Sign Up
             </AuthNavigationText>
-            <View style={{ marginTop: 32, alignItems: 'center' }}>
+            <AuthFormButtonsContainer>
               <FormSubmitButton
                 onPress={handleSubmit}
                 textStyle={{
@@ -92,10 +96,10 @@ export default function Form(): ReactElement {
                 size={24}
                 onPress={onHomeReturnHandler}
               />
-            </View>
-          </View>
+            </AuthFormButtonsContainer>
+          </AuthFormContentContainer>
         )}
       </Formik>
-    </View>
+    </AuthFormContainer>
   );
 }

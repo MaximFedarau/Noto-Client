@@ -13,7 +13,7 @@ export const AuthInput = styled(DefaultInput)`
   min-width: 90%;
   height: 48px;
   padding: 12px;
-  margin-vertical: 12px;
+  margin-vertical: 8px;
   border-radius: 24px;
   font-size: 18px;
 `;

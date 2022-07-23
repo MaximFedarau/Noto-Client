@@ -79,3 +79,18 @@ export const AuthScreenContainer = styled.SafeAreaView`
       : 24
     : 24}px;
 `;
+
+export const AuthFormContainer = styled.View`
+  padding-vertical: 16px;
+`;
+
+export const AuthFormContentContainer = styled.View`
+  align-items: center;
+`;
+
+export const AuthFormFieldsContainer = styled.View``;
+
+export const AuthFormButtonsContainer = styled.View`
+  margin-top: 32px;
+  align-items: center;
+`;

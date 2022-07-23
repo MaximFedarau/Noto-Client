@@ -2,17 +2,14 @@
 import { ReactElement } from 'react';
 
 //Components
-import Form from '@components/SignIn/Form/Form.component';
+import Form from '@components/Auth/SignIn/Form/Form.component';
 
 import { Logo } from './Content.styles';
-
-//React Native
-import { ScrollView } from 'react-native';
+import { DefaultScrollView } from '@components/Default/View/View.component';
 
 export default function Content(): ReactElement {
   return (
-    <ScrollView
-      style={{ flex: 1 }}
+    <DefaultScrollView
       contentContainerStyle={{
         flexGrow: 1,
         justifyContent: 'center',
@@ -24,6 +21,6 @@ export default function Content(): ReactElement {
     >
       <Logo source={require('@assets/images/noto-plus.png')} />
       <Form />
-    </ScrollView>
+    </DefaultScrollView>
   );
 }
