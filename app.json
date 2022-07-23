@@ -35,6 +35,14 @@
     "web": {
       "favicon": "./assets/images/favicon.png"
     },
-    "jsEngine": "hermes"
+    "jsEngine": "hermes",
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you use them with account."
+        }
+      ]
+    ]
   }
 }
