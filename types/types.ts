@@ -48,3 +48,10 @@ export interface SignInFormData {
   nickname: string;
   password: string;
 }
+
+// ! Auth Sign Up Interface
+export interface SignUpFormData {
+  nickname: string;
+  password: string;
+  confirmPassword: string;
+}

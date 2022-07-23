@@ -11,3 +11,13 @@ export const signInFormValidationSchema = yup.object().shape({
   nickname: yup.string().required('Nickname is required.'),
   password: yup.string().required('Password is required.'),
 });
+
+// * Sign Up Form
+export const signUpFormValidationSchema = yup.object().shape({
+  nickname: yup.string().required('Nickname is required.'),
+  password: yup.string().required('Password is required.'),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref('password')], 'Passwords must match.')
+    .required('Confirm Password is required.'),
+});
