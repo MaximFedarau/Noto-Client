@@ -16,6 +16,7 @@ module.exports = function (api) {
             '@utils': './utils',
           },
         },
+        'transform-inline-environment-variables',
       ],
     ],
   };
