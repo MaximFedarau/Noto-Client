@@ -1,5 +1,5 @@
 //Types
-import { ReactElement } from 'react';
+import React, { ReactElement } from 'react';
 import { NavigationProps } from '@app-types/types';
 
 //Constants
@@ -8,6 +8,7 @@ import { NAVIGATION_NAMES, NAVIGATION_NOTES_NAMES } from '@app-types/enum';
 
 //Expo
 import { Ionicons } from '@expo/vector-icons';
+import * as SecureStore from 'expo-secure-store';
 
 //Screens
 import Notes from '@screens/Notes/Notes.screen';
@@ -28,10 +29,23 @@ const BottomTab = createBottomTabNavigator();
 
 export default function MainBottomTabs(): ReactElement {
   const navigation = useNavigation<NavigationProps>();
+  const [isAuth, setIsAuth] = React.useState(false);
 
   function navigateToAuth() {
     navigation.navigate(NAVIGATION_NAMES.AUTH);
   }
+
+  React.useEffect(() => {
+    async function checkIsAuth() {
+      if (
+        (await SecureStore.getItemAsync('accessToken')) &&
+        (await SecureStore.getItemAsync('refreshToken'))
+      ) {
+        setIsAuth(true);
+      }
+    }
+    checkIsAuth();
+  }, []);
 
   return (
     <BottomTab.Navigator
@@ -65,7 +79,7 @@ export default function MainBottomTabs(): ReactElement {
                   iconName="person"
                   size={32}
                   color={tintColor}
-                  onPress={navigateToAuth}
+                  onPress={!isAuth ? navigateToAuth : null}
                 />
               </RightHeaderView>
             );
@@ -115,7 +129,7 @@ export default function MainBottomTabs(): ReactElement {
                   iconName="person"
                   size={32}
                   color={tintColor}
-                  onPress={navigateToAuth}
+                  onPress={!isAuth ? navigateToAuth : null}
                 />
               </RightHeaderView>
             );

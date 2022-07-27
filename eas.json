@@ -10,7 +10,7 @@
     "preview": {
       "distribution": "internal",
       "env": {
-        "API_URL": "http://localhost:5000/"
+        "API_URL": "http://localhost:5000"
       },
       "android": {
         "buildType": "apk"
@@ -21,7 +21,7 @@
     },
     "production": {
       "env": {
-        "API_URL": "http://localhost:5000/"
+        "API_URL": "http://localhost:5000"
       }
     }
   },

@@ -73,11 +73,7 @@ export const DraftsView = styled.SafeAreaView`
 
 export const AuthScreenContainer = styled.SafeAreaView`
   flex: 1;
-  margin-top: ${Platform.OS === 'android'
-    ? StatusBar.currentHeight
-      ? StatusBar.currentHeight + 24
-      : 24
-    : 24}px;
+  margin-top: ${Platform.OS === 'android' ? StatusBar.currentHeight : 24}px;
 `;
 
 export const AuthFormContainer = styled.View`
