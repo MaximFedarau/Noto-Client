@@ -76,6 +76,8 @@ export default function Form({ image }: FormProps): ReactElement {
                 onChangeText={handleChange('password')}
                 placeholder="Password:"
                 error={errors.password}
+                forceErrorShowing
+                secureTextEntry
               >
                 {values.password}
               </FormField>
@@ -84,6 +86,7 @@ export default function Form({ image }: FormProps): ReactElement {
                 placeholder="Confirm password:"
                 error={errors.confirmPassword}
                 forceErrorShowing
+                secureTextEntry
               >
                 {values.confirmPassword}
               </FormField>

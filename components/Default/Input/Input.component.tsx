@@ -1,9 +1,12 @@
 //Styled Components
 import styled from 'styled-components/native';
 
+//React Native
+import { TextInput } from 'react-native';
+
 // ! Default
 
-export const DefaultInput = styled.TextInput`
+export const DefaultInput = styled(TextInput)`
   background-color: white;
   color: black;
 `;

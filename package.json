@@ -34,7 +34,6 @@
     "react-native-web": "0.17.7",
     "showdown": "^2.1.0",
     "styled-components": "^5.3.5",
-    "uuid": "^8.3.2",
     "yup": "^0.32.11"
   },
   "devDependencies": {
@@ -44,7 +43,6 @@
     "@types/react-native": "~0.66.13",
     "@types/showdown": "^2.0.0",
     "@types/styled-components": "^5.1.25",
-    "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.30.6",
     "@typescript-eslint/parser": "^5.30.6",
     "babel-plugin-transform-inline-environment-variables": "^0.4.4",

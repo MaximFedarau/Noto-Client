@@ -15,7 +15,13 @@ export const signInFormValidationSchema = yup.object().shape({
 // * Sign Up Form
 export const signUpFormValidationSchema = yup.object().shape({
   nickname: yup.string().required('Nickname is required.'),
-  password: yup.string().required('Password is required.'),
+  password: yup
+    .string()
+    .required('Password is required.')
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/,
+      'Password is too weak.',
+    ),
   confirmPassword: yup
     .string()
     .oneOf([yup.ref('password')], 'Passwords must match.')

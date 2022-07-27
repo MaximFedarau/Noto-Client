@@ -70,6 +70,7 @@ export default function Form(): ReactElement {
                 onChangeText={handleChange('password')}
                 placeholder="Password:"
                 error={errors.password}
+                secureTextEntry
               >
                 {values.password}
               </FormField>
