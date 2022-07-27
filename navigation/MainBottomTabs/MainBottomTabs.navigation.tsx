@@ -3,21 +3,28 @@ import React, { ReactElement } from 'react';
 import { NavigationProps } from '@app-types/types';
 
 //Constants
-import { OSLO_GRAY, SPRING_WOOD, CYBER_YELLOW } from '@constants/colors';
+import {
+  OSLO_GRAY,
+  SPRING_WOOD,
+  CYBER_YELLOW,
+  SOFT_BLUE,
+} from '@constants/colors';
 import { NAVIGATION_NAMES, NAVIGATION_NOTES_NAMES } from '@app-types/enum';
+import { getPublicData } from '@utils/auth/get/publicData';
 
 //Expo
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
 
 //Screens
+import Loading from '@screens/Loading/Loading.screen';
 import Notes from '@screens/Notes/Notes.screen';
 import NotesManaging from '@screens/NotesManaging/NotesManaging.screen';
 import Drafts from '@screens/Drafts/Drafts.screen';
 
 //Components
 import IconButton from '@components/Default/IconButton/IconButton.component';
-import { Pressable } from 'react-native';
+import { Pressable, Image } from 'react-native';
 
 import { RightHeaderView } from '@components/Default/View/View.component';
 
@@ -28,24 +35,42 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 const BottomTab = createBottomTabNavigator();
 
 export default function MainBottomTabs(): ReactElement {
+  // * Variables
   const navigation = useNavigation<NavigationProps>();
-  const [isAuth, setIsAuth] = React.useState(false);
 
+  // * States
+  const [isAuth, setIsAuth] = React.useState(false);
+  const [nickname, setNickname] = React.useState<string | undefined>(undefined);
+  const [avatar, setAvatar] = React.useState<string | undefined>(undefined);
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  // * Methods
   function navigateToAuth() {
     navigation.navigate(NAVIGATION_NAMES.AUTH);
   }
 
+  // * Effects
   React.useEffect(() => {
     async function checkIsAuth() {
-      if (
-        (await SecureStore.getItemAsync('accessToken')) &&
-        (await SecureStore.getItemAsync('refreshToken'))
-      ) {
+      const accessToken = await SecureStore.getItemAsync('accessToken');
+      const refreshToken = await SecureStore.getItemAsync('refreshToken');
+      if (accessToken && refreshToken) {
         setIsAuth(true);
+        const data = await getPublicData(accessToken, refreshToken);
+        if (data) {
+          setNickname(data.nickname);
+          setAvatar(data.avatar);
+        }
       }
+      // await SecureStore.deleteItemAsync('accessToken');
+      // await SecureStore.deleteItemAsync('refreshToken');
     }
-    checkIsAuth();
+    checkIsAuth().finally(() => {
+      setIsLoading(false);
+    });
   }, []);
+
+  if (isLoading) return <Loading />;
 
   return (
     <BottomTab.Navigator
@@ -75,16 +100,27 @@ export default function MainBottomTabs(): ReactElement {
           headerRight: ({ tintColor }) => {
             return (
               <RightHeaderView>
-                <IconButton
-                  iconName="person"
-                  size={32}
-                  color={tintColor}
-                  onPress={!isAuth ? navigateToAuth : null}
-                />
+                {!avatar ? (
+                  <IconButton
+                    iconName="person"
+                    size={32}
+                    color={!isAuth ? tintColor : SOFT_BLUE}
+                    onPress={!isAuth ? navigateToAuth : null}
+                  />
+                ) : (
+                  <Image
+                    source={{ uri: avatar }}
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 16,
+                    }}
+                  />
+                )}
               </RightHeaderView>
             );
           },
-          title: 'Notes',
+          title: nickname ? `${nickname}'s Notes` : 'Notes',
         }}
       />
       <BottomTab.Screen
@@ -125,12 +161,23 @@ export default function MainBottomTabs(): ReactElement {
           headerRight: ({ tintColor }) => {
             return (
               <RightHeaderView>
-                <IconButton
-                  iconName="person"
-                  size={32}
-                  color={tintColor}
-                  onPress={!isAuth ? navigateToAuth : null}
-                />
+                {!avatar ? (
+                  <IconButton
+                    iconName="person"
+                    size={32}
+                    color={!isAuth ? tintColor : SOFT_BLUE}
+                    onPress={!isAuth ? navigateToAuth : null}
+                  />
+                ) : (
+                  <Image
+                    source={{ uri: avatar }}
+                    style={{
+                      width: 32,
+                      height: 32,
+                      borderRadius: 16,
+                    }}
+                  />
+                )}
               </RightHeaderView>
             );
           },

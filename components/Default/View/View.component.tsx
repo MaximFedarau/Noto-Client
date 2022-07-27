@@ -33,6 +33,7 @@ export const ErrorView = styled(DefaultView)`
 // ! Loading
 export const LoadingView = styled(DefaultView)`
   flex: 1;
+  background-color: ${SPRING_WOOD};
   align-items: center;
   justify-content: center;
 `;
