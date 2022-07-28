@@ -71,14 +71,14 @@ export default function Form(): ReactElement {
         setIsError(true);
         console.error(error, 'Adding Draft');
       });
-  }, []);
+  }, []); // when open this screen, then automatically new draft is created
 
   React.useLayoutEffect(() => {
     if (!route.params || !route.params.id) return;
     setIsLoading(true);
     fetchingDraft();
     setNoteId(route.params.id);
-  }, []);
+  }, []); // setting info, depending on params
 
   React.useLayoutEffect(() => {
     return () => {
@@ -88,7 +88,7 @@ export default function Form(): ReactElement {
         setIsError(true);
       });
     };
-  }, [noteId]);
+  }, [noteId]); //  deleteing empty draft, when exiting screen
 
   React.useEffect(() => {
     const subscription = AppState.addEventListener(
@@ -98,8 +98,9 @@ export default function Form(): ReactElement {
     return () => {
       subscription.remove();
     };
-  }, [noteId]);
+  }, [noteId]); // handling when app goes to the background
 
+  // if current note is empty and app goes to the background, then we delete this note
   const _handleAppStateChange = (nextAppState: AppStateStatus) => {
     if (appState.current === 'active') {
       if (!noteId) return;
@@ -111,6 +112,7 @@ export default function Form(): ReactElement {
 
   // * Methods
 
+  // fetching draft info
   function fetchingDraft(): void {
     if (!route.params || !route.params.id) return;
     fetchDraftById(route.params.id)
@@ -130,10 +132,12 @@ export default function Form(): ReactElement {
       });
   }
 
+  // on form submit method
   function onFormSubmitHandler(values: NotesManagingFormData) {
     console.log(values);
   }
 
+  // saving to Drafts section
   function saveToDrafts(values: NotesManagingFormData) {
     if (!noteId) return;
     updateDraft(noteId, values.title!, values.content)
@@ -146,6 +150,7 @@ export default function Form(): ReactElement {
       });
   }
 
+  // deleting draft
   async function onDraftDeleteHandler() {
     if (!noteId) return;
     await deleteDraftById(noteId).catch((error) => {

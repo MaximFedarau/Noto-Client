@@ -23,9 +23,13 @@ export default function LogoPicker({
   image,
   setImage,
 }: LogoPickerProps): ReactElement {
+  // * Variables
   const [cameraPermission, requestPermission] =
     ImagePicker.useMediaLibraryPermissions();
 
+  // * Methods
+
+  //checking permissions
   async function verifyPermissions() {
     if (
       cameraPermission?.status === ImagePicker.PermissionStatus.UNDETERMINED
@@ -36,6 +40,7 @@ export default function LogoPicker({
     }
 
     if (cameraPermission?.status === ImagePicker.PermissionStatus.DENIED) {
+      // asking for checking the phone preferences
       Alert.alert(
         'Insufficient permissions',
         'You need to grant Image Gallery permissions to use this app. Please, go to Settings and grant permissions.',
@@ -46,13 +51,14 @@ export default function LogoPicker({
     return true;
   }
 
+  // getting image from gallery
   async function takeImageHandler() {
     const status = await verifyPermissions();
     if (!status) return;
     const image = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
       aspect: [16, 9],
-      quality: 1,
+      quality: 1, // best quality
     });
     if (!image.cancelled) {
       setImage(image.uri);

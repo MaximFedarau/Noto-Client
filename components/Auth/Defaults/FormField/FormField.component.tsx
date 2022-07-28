@@ -31,8 +31,8 @@ export default function FormField({
       {forceErrorShowing
         ? error && <AuthFormErrorText>{error}</AuthFormErrorText>
         : error && !children && <AuthFormErrorText>{error}</AuthFormErrorText>}
-      {/* Statement above means, that is forceErrorShowing is true, then we check if error exists and then show this error.
-      Else we show error only if error exists and input is not empty. */}
+      {/* Statement above means, that if forceErrorShowing is true, then we check existence of an error and then show this error.
+      Else, we show error only if error exists and input is not empty. */}
     </>
   );
 }

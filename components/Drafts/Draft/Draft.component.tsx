@@ -2,7 +2,7 @@
 import React, { ReactElement } from 'react';
 import { DraftSchema } from '@app-types/types';
 import { NavigationProps } from '@app-types/types';
-import { NAVIGATION_NAMES, NAVIGATION_NOTES_NAMES } from '@app-types/enum';
+import { NAVIGATION_NOTES_NAMES } from '@app-types/enum';
 
 //Components
 import { DraftContainer } from './Draft.styles';
@@ -35,14 +35,17 @@ interface DraftProps {
 const Draft = React.memo(function Draft({
   children,
 }: DraftProps): ReactElement {
+  // * Variables
   const { title, content, id } = children;
   const converter = new showdown.Converter();
-  const modifiedContent = converter.makeHtml(contentFormat(content!));
+  const modifiedContent = converter.makeHtml(contentFormat(content || ''));
 
   const { width } = useWindowDimensions();
 
+  // * React Navigation
   const navigation = useNavigation<NavigationProps>();
 
+  // going to the notes overview screen passing route.id as a prop
   function onDraftPressHandler() {
     if (!title && !content) return;
     navigation.navigate(NAVIGATION_NOTES_NAMES.NOTES_MANAGING, {
@@ -62,7 +65,7 @@ const Draft = React.memo(function Draft({
         <RenderHTML
           contentWidth={width}
           source={{
-            html: modifiedContent!,
+            html: modifiedContent,
           }}
         />
       )}

@@ -33,15 +33,14 @@ const MarkdownField = React.memo(function MarkdownField({
   value,
   ...props
 }: MarkdownFieldProps): ReactElement {
+  // * Variables
   const window = useWindowDimensions();
+  const converter = new showdown.Converter();
 
+  // * States
   const [renderedHTML, setRenderdHTML] = React.useState<string>('');
   const [tabIndex, setTabIndex] = React.useState<number>(0);
 
-  const converter = new showdown.Converter();
-  React.useEffect(() => {
-    setRenderdHTML(converter.makeHtml(value || ''));
-  }, [value]);
   return (
     <>
       <MarkdownFieldContainer>
@@ -56,6 +55,7 @@ const MarkdownField = React.memo(function MarkdownField({
         <TabContainer
           isActive={tabIndex === 1}
           onPress={() => {
+            setRenderdHTML(converter.makeHtml(value || '')); // when we switch to markdown (html) tab, then we convert our value to html
             setTabIndex(1);
           }}
         >
@@ -82,10 +82,10 @@ const MarkdownField = React.memo(function MarkdownField({
             ignoredDomTags={['script', 'img', 'svg', 'button']}
             renderersProps={{
               ul: {
-                enableExperimentalRtl: true,
+                enableExperimentalRtl: true, // enabling feature
               },
               ol: {
-                enableExperimentalRtl: true,
+                enableExperimentalRtl: true, // enabling feature
               },
             }}
           />

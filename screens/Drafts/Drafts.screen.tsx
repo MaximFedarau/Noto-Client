@@ -24,6 +24,8 @@ import { NoItemsText } from '@components/Default/Text/Text.component';
 import { useNavigation } from '@react-navigation/native';
 
 export default function Drafts(): ReactElement {
+  // * States
+
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [isError, setIsError] = React.useState<boolean>(false);
 
@@ -32,14 +34,17 @@ export default function Drafts(): ReactElement {
 
   const [drafts, setDrafts] = React.useState<DraftSchema[]>([]);
 
+  // * React Navigation
   const navigation = useNavigation<NavigationProps>();
 
   React.useEffect(() => {
+    // fetching drafts
     fetchDrafts()
       .then((result) => {
         setDrafts(result);
         setIsError(false);
         navigation.setOptions({
+          // adding search bar
           headerTitle: () => {
             function onSearchBarChange(text: string) {
               setSearchText(text);
@@ -53,6 +58,7 @@ export default function Drafts(): ReactElement {
               );
           },
           headerTitleAlign: 'center',
+          // open search bar button
           headerLeft: ({ tintColor }) => {
             function onButtonClickHandler() {
               setOpenSearchBar(!openSearchBar);
@@ -72,14 +78,17 @@ export default function Drafts(): ReactElement {
         });
       })
       .catch((error) => {
+        //handling possible errors
         console.error(error, 'Drafts setup');
         setIsError(true);
       })
       .finally(() => {
+        // in any case - loading is finished :)
         setIsLoading(false);
       });
   }, [drafts]);
 
+  // filtering drafts, depending on search pattern
   const filteredDrafts = drafts.filter((draft) => {
     return draft.title!.toLowerCase().includes(searchText.toLowerCase());
   });

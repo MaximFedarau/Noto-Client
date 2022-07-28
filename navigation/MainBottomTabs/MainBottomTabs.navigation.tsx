@@ -24,9 +24,12 @@ import Drafts from '@screens/Drafts/Drafts.screen';
 
 //Components
 import IconButton from '@components/Default/IconButton/IconButton.component';
-import { Pressable, Image } from 'react-native';
+import Avatar from '@components/Navigation/Avatar/Avatar.component';
 
 import { RightHeaderView } from '@components/Default/View/View.component';
+
+//React Native
+import { Pressable, BackHandler } from 'react-native';
 
 //React Navigation
 import { useNavigation } from '@react-navigation/native';
@@ -52,6 +55,10 @@ export default function MainBottomTabs(): ReactElement {
 
   // * Effects
   React.useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => true,
+    ); // subscribing to the hardware back button
     async function checkIsAuth() {
       // await SecureStore.deleteItemAsync('accessToken');
       // await SecureStore.deleteItemAsync('refreshToken');
@@ -77,6 +84,7 @@ export default function MainBottomTabs(): ReactElement {
     checkIsAuth().finally(() => {
       setIsLoading(false);
     });
+    return () => backHandler.remove(); // unsubscribing from the hardware back button (blocking effect of the hardware back button)
   }, []);
 
   if (isLoading) return <Loading />;
@@ -118,14 +126,7 @@ export default function MainBottomTabs(): ReactElement {
                     onPress={!isAuth ? navigateToAuth : null}
                   />
                 ) : (
-                  <Image
-                    source={{ uri: avatar }}
-                    style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: 16,
-                    }}
-                  />
+                  <Avatar size={32} image={avatar} />
                 )}
               </RightHeaderView>
             );
@@ -183,14 +184,7 @@ export default function MainBottomTabs(): ReactElement {
                     onPress={!isAuth ? navigateToAuth : null}
                   />
                 ) : (
-                  <Image
-                    source={{ uri: avatar }}
-                    style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: 16,
-                    }}
-                  />
+                  <Avatar size={32} image={avatar} />
                 )}
               </RightHeaderView>
             );
