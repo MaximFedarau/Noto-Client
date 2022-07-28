@@ -2,6 +2,7 @@
 export enum NAVIGATION_AUTH_NAMES {
   SIGN_IN = 'SignIn', // * Native Stack Navigation
   SIGN_UP = 'SignUp', // * Native Stack Navigation
+  AVATAR_PICKER = 'AvatarPicker', // * Native Stack Navigation
 }
 
 export enum NAVIGATION_NOTES_NAMES {

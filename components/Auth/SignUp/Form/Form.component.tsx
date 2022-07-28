@@ -8,7 +8,6 @@ import { signUpFormValidationSchema } from '@constants/validationSchemas';
 import { showingSubmitError } from '@utils/showingSubmitError';
 
 //Expo
-import * as FileSystem from 'expo-file-system';
 import * as SecureStore from 'expo-secure-store';
 
 //Components
@@ -35,12 +34,7 @@ import { useNavigation } from '@react-navigation/native';
 //axios
 import axios from 'axios';
 
-//Interface for Props
-interface FormProps {
-  image: string | undefined;
-}
-
-export default function Form({ image }: FormProps): ReactElement {
+export default function Form(): ReactElement {
   // * Variables
 
   const navigation = useNavigation<NavigationProps>();
@@ -86,32 +80,6 @@ export default function Form({ image }: FormProps): ReactElement {
     if (!signUpResponse) return; // if the response is undefined, stoping method - error was handled before
     const userId = signUpResponse.data.id;
 
-    // * section: upload image
-    if (image) {
-      // is user wants to upload an image, then we upload it
-      const data = await FileSystem.uploadAsync(
-        `${process.env.API_URL}/auth/image/upload/${userId}`,
-        image,
-        {
-          httpMethod: 'POST',
-          uploadType: FileSystem.FileSystemUploadType.MULTIPART,
-          fieldName: 'file',
-        },
-      );
-      if (data) {
-        if (data.status >= 400) {
-          // if the status is >= 400 (client or server error), then the image was not uploaded
-          showingSubmitError(
-            'Avatar Uploading Error',
-            'Something went wrong:( Try again later',
-            () => {
-              setIsLoading(false);
-            },
-          );
-        }
-      }
-    }
-
     // * section: login
     await axios // in any case we login user
       .post<{ accessToken: string; refreshToken: string }>(
@@ -137,7 +105,9 @@ export default function Form({ image }: FormProps): ReactElement {
         if (!res || !res.data) return; //checking is the response is undefined - type checking
         await SecureStore.setItemAsync('accessToken', res.data.accessToken); // saving access token to secure store
         await SecureStore.setItemAsync('refreshToken', res.data.refreshToken); // saving refresh token to secure store
-        onHomeReturnHandler(); // going to the home screen
+        navigation.replace(NAVIGATION_AUTH_NAMES.AVATAR_PICKER, {
+          id: userId,
+        });
       });
   }
 
@@ -207,5 +177,5 @@ export default function Form({ image }: FormProps): ReactElement {
 }
 
 Form.defaultProps = {
-  API_URL: (process.env.API_URL = 'http://localhost:5000'),
+  API_URL: (process.env.API_URL = 'http://192.168.100.248:5000'),
 };

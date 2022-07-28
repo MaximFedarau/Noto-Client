@@ -1,11 +1,12 @@
 //Styled Components
 import styled from 'styled-components/native';
 
-export const PickeImagePressable = styled.Pressable`
-  width: 176px;
-  height: 176px;
-  border-radius: ${176 / 2}px;
+export const PickedImagePressable = styled.Pressable`
+  width: 256px;
+  height: 256px;
+  border-radius: ${256 / 2}px;
   overflow: hidden;
+  margin-bottom: 18px;
 `;
 
 export const PickedImage = styled.Image`

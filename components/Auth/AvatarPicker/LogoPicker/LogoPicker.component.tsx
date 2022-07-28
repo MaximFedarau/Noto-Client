@@ -10,7 +10,7 @@ import * as ImagePicker from 'expo-image-picker';
 //Components
 import IconButton from '@components/Default/IconButton/IconButton.component';
 
-import { PickeImagePressable, PickedImage } from './LogoPicker.styles';
+import { PickedImagePressable, PickedImage } from './LogoPicker.styles';
 
 //React Native
 import { View, Alert } from 'react-native';
@@ -65,14 +65,14 @@ export default function LogoPicker({
       {!image ? (
         <IconButton
           iconName="person-circle"
-          size={176}
+          size={256}
           color={SOFT_BLUE}
           onPress={takeImageHandler}
         />
       ) : (
-        <PickeImagePressable onPress={takeImageHandler}>
+        <PickedImagePressable onPress={takeImageHandler}>
           <PickedImage source={{ uri: image }} />
-        </PickeImagePressable>
+        </PickedImagePressable>
       )}
     </View>
   );

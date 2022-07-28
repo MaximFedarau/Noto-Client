@@ -13,6 +13,7 @@ import { RouteProp } from '@react-navigation/native';
 type NavigationRootStackParamList = {
   [NAVIGATION_AUTH_NAMES.SIGN_IN]: undefined;
   [NAVIGATION_AUTH_NAMES.SIGN_UP]: undefined;
+  [NAVIGATION_AUTH_NAMES.AVATAR_PICKER]: { id: string };
 };
 
 type NotesRootStackParamList = {

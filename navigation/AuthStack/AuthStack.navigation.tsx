@@ -8,6 +8,7 @@ import { SPRING_WOOD } from '@constants/colors';
 //Screens
 import SignIn from '@screens/SignIn/SignIn.screen';
 import SignUp from '@screens/SignUp/SignUp.screen';
+import AvatarPicker from '@screens/AvatarPicker/AvatarPicker.screen';
 
 //React Navigation
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -26,6 +27,10 @@ export default function AuthStack(): ReactElement {
     >
       <Stack.Screen name={NAVIGATION_AUTH_NAMES.SIGN_IN} component={SignIn} />
       <Stack.Screen name={NAVIGATION_AUTH_NAMES.SIGN_UP} component={SignUp} />
+      <Stack.Screen
+        name={NAVIGATION_AUTH_NAMES.AVATAR_PICKER}
+        component={AvatarPicker}
+      />
     </Stack.Navigator>
   );
 }

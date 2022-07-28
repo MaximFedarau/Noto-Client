@@ -138,3 +138,7 @@ export default function Form(): ReactElement {
     </AuthFormContainer>
   );
 }
+
+Form.defaultProps = {
+  API_URL: (process.env.API_URL = 'http://localhost:5000'),
+};

@@ -21,6 +21,7 @@ export default function FormButtons({
     <AuthFormButtonsContainer>
       <FormSubmitButton
         onPress={onSubmit}
+        style={({ pressed }) => [pressed ? { opacity: 0.8 } : {}]}
         textStyle={{
           color: 'white',
           fontSize: 22,
