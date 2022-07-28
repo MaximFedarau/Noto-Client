@@ -2,7 +2,7 @@
 import { ReactElement } from 'react';
 
 //Components
-import Content from '@components/Auth/SignIn/Content/Content.component';
+import Content from '@components/Auth/Screens/SignIn/Content/Content.component';
 
 import { AuthScreenContainer } from '@components/Default/View/View.component';
 

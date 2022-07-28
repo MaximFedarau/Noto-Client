@@ -10,14 +10,12 @@ import { showingSubmitError } from '@utils/showingSubmitError';
 import * as FileSystem from 'expo-file-system';
 
 //Components
-import LogoPicker from '@components/Auth/AvatarPicker/LogoPicker/LogoPicker.component';
+import ContentScrollView from '@components/Auth/Defaults/ContentScrollView/ContentScrollView.component';
+import LogoPicker from '@components/Auth/Screens/AvatarPicker/LogoPicker/LogoPicker.component';
+import Spinner from '@components/Auth/Defaults/Spinner/Spinner.component';
+import FormButtons from '@components/Auth/Defaults/FormButtons/FormButtons.component';
 
-import { AuthNavigationText } from '@components/Default/Text/Text.component';
-import { AuthFormButtonsContainer } from '@components/Default/View/View.component';
-import { FormSubmitButton } from '@components/Auth/FormButtons/FormButtons.styles';
-
-//React Native
-import { View, ActivityIndicator, ScrollView } from 'react-native';
+import { AuthAvatarPickerContainer } from '@components/Default/View/View.component';
 
 //React Navigation
 import { useRoute, useNavigation } from '@react-navigation/native';
@@ -61,37 +59,21 @@ export default function Content(): ReactElement {
   }
 
   return (
-    <ScrollView
-      style={{ flex: 1 }}
-      contentContainerStyle={{
-        flexGrow: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: '16%',
-      }}
-      bounces={false}
-    >
-      <LogoPicker image={image} setImage={setImage} />
-      <AuthNavigationText onPress={onHomeReturnHandler}>
-        Add later?
-      </AuthNavigationText>
-      <AuthFormButtonsContainer>
+    <ContentScrollView>
+      <AuthAvatarPickerContainer>
+        <LogoPicker image={image} setImage={setImage} />
         {isLoading ? (
-          <ActivityIndicator size="large" />
+          <Spinner />
         ) : (
-          <FormSubmitButton
-            textStyle={{
-              color: 'white',
-              fontSize: 22,
-              fontWeight: 'bold',
-            }}
-            onPress={onSubmitHandler}
+          <FormButtons
+            onSubmit={onSubmitHandler}
+            onHomeReturn={onHomeReturnHandler}
           >
-            Add
-          </FormSubmitButton>
+            Submit
+          </FormButtons>
         )}
-      </AuthFormButtonsContainer>
-    </ScrollView>
+      </AuthAvatarPickerContainer>
+    </ContentScrollView>
   );
 }
 

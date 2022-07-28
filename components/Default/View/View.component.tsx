@@ -91,3 +91,9 @@ export const AuthFormButtonsContainer = styled.View`
   margin-top: 32px;
   align-items: center;
 `;
+
+export const AuthAvatarPickerContainer = styled.View`
+  justify-content: center;
+  align-items: center;
+  padding-vertical: 16px;
+`;

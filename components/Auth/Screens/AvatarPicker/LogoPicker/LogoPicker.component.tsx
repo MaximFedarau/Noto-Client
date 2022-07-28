@@ -2,18 +2,16 @@
 import React, { ReactElement } from 'react';
 
 //Constants
-import { SOFT_BLUE } from '@constants/colors';
+import { styles } from './LogoPicker.styles';
 
 //Expo
 import * as ImagePicker from 'expo-image-picker';
 
 //Components
-import IconButton from '@components/Default/IconButton/IconButton.component';
-
-import { PickedImagePressable, PickedImage } from './LogoPicker.styles';
+import { PickedImage } from './LogoPicker.styles';
 
 //React Native
-import { View, Alert } from 'react-native';
+import { View, Alert, Pressable } from 'react-native';
 
 //Interface for Props
 interface LogoPickerProps {
@@ -63,16 +61,28 @@ export default function LogoPicker({
   return (
     <View>
       {!image ? (
-        <IconButton
-          iconName="person-circle"
-          size={256}
-          color={SOFT_BLUE}
+        <Pressable
           onPress={takeImageHandler}
-        />
+          style={({ pressed }) => [
+            pressed ? { opacity: 0.5 } : {},
+            styles.button,
+          ]}
+        >
+          <PickedImage source={require('@assets/images/empty-avatar.png')} />
+        </Pressable>
       ) : (
-        <PickedImagePressable onPress={takeImageHandler}>
+        <Pressable
+          onPress={takeImageHandler}
+          style={({ pressed }) => [
+            pressed ? { opacity: 0.5 } : {},
+            styles.button,
+            {
+              marginBottom: 16,
+            },
+          ]}
+        >
           <PickedImage source={{ uri: image }} />
-        </PickedImagePressable>
+        </Pressable>
       )}
     </View>
   );
