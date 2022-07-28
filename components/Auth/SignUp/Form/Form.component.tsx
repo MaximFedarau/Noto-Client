@@ -5,6 +5,7 @@ import { NavigationProps, SignUpFormData } from '@app-types/types';
 //Constants
 import { NAVIGATION_NAMES, NAVIGATION_AUTH_NAMES } from '@app-types/enum';
 import { signUpFormValidationSchema } from '@constants/validationSchemas';
+import { showingSubmitError } from '@utils/showingSubmitError';
 
 //Expo
 import * as FileSystem from 'expo-file-system';
@@ -31,9 +32,6 @@ import { Formik } from 'formik';
 //React Navigation
 import { useNavigation } from '@react-navigation/native';
 
-//React Native Toast Message
-import Toast from 'react-native-toast-message';
-
 //axios
 import axios from 'axios';
 
@@ -58,24 +56,12 @@ export default function Form({ image }: FormProps): ReactElement {
 
   // * Methods
 
-  // reusbale method for showing errors
-  function showingSubmitError(title: string, text: string) {
-    setIsLoading(false);
-    Toast.show({
-      type: 'error',
-      position: 'top',
-      text1: title,
-      text2: text,
-    });
-    console.error(`${title}\n`, text);
-  }
-
   //going to the sign in screen
   function onNavigationTextHandler() {
     navigation.replace(NAVIGATION_AUTH_NAMES.SIGN_IN);
   }
 
-  // submit hanlder
+  // submit hanlder (sign up + (optional?) image upload + log in)
   async function onFormSubmitHandler(values: SignUpFormData) {
     setIsLoading(true); // setting that the form is loading
 
@@ -92,6 +78,9 @@ export default function Form({ image }: FormProps): ReactElement {
           error.response.data
             ? error.response.data.message
             : 'Something went wrong:(',
+          () => {
+            setIsLoading(false);
+          },
         );
       });
     if (!signUpResponse) return; // if the response is undefined, stoping method - error was handled before
@@ -111,10 +100,13 @@ export default function Form({ image }: FormProps): ReactElement {
       );
       if (data) {
         if (data.status >= 400) {
-          // if the status is >= 400, then the image was not uploaded
+          // if the status is >= 400 (client or server error), then the image was not uploaded
           showingSubmitError(
             'Avatar Uploading Error',
             'Something went wrong:( Try again later',
+            () => {
+              setIsLoading(false);
+            },
           );
         }
       }
@@ -136,6 +128,9 @@ export default function Form({ image }: FormProps): ReactElement {
           error.response.data
             ? error.response.data.message
             : 'Something went wrong:(',
+          () => {
+            setIsLoading(false);
+          },
         );
       })
       .then(async (res) => {
