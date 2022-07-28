@@ -1,6 +1,6 @@
 //Types
 import React, { ReactElement } from 'react';
-import { NavigationProps } from '@app-types/types';
+import { NavigationProps, PublicUserData } from '@app-types/types';
 
 //Constants
 import {
@@ -40,8 +40,9 @@ export default function MainBottomTabs(): ReactElement {
 
   // * States
   const [isAuth, setIsAuth] = React.useState(false);
-  const [nickname, setNickname] = React.useState<string | undefined>(undefined);
-  const [avatar, setAvatar] = React.useState<string | undefined>(undefined);
+  const [publicData, setPublicData] = React.useState<
+    PublicUserData | undefined
+  >(undefined);
   const [isLoading, setIsLoading] = React.useState(true);
 
   // * Methods
@@ -52,18 +53,26 @@ export default function MainBottomTabs(): ReactElement {
   // * Effects
   React.useEffect(() => {
     async function checkIsAuth() {
+      // await SecureStore.deleteItemAsync('accessToken');
+      // await SecureStore.deleteItemAsync('refreshToken');
       const accessToken = await SecureStore.getItemAsync('accessToken');
       const refreshToken = await SecureStore.getItemAsync('refreshToken');
       if (accessToken && refreshToken) {
         setIsAuth(true);
         const data = await getPublicData(accessToken, refreshToken);
         if (data) {
-          setNickname(data.nickname);
-          setAvatar(data.avatar);
+          // if there is a data we set it
+          setPublicData(data);
+        } else {
+          // if there is no data we delete the tokens (in function) and remove all states
+          setIsAuth(false);
+          setPublicData(undefined);
         }
+      } else {
+        //if there is no tokens we remove all states
+        setIsAuth(false);
+        setPublicData(undefined);
       }
-      // await SecureStore.deleteItemAsync('accessToken');
-      // await SecureStore.deleteItemAsync('refreshToken');
     }
     checkIsAuth().finally(() => {
       setIsLoading(false);
@@ -98,6 +107,7 @@ export default function MainBottomTabs(): ReactElement {
           },
           tabBarLabel: () => null,
           headerRight: ({ tintColor }) => {
+            const { avatar } = publicData || {};
             return (
               <RightHeaderView>
                 {!avatar ? (
@@ -120,7 +130,10 @@ export default function MainBottomTabs(): ReactElement {
               </RightHeaderView>
             );
           },
-          title: nickname ? `${nickname}'s Notes` : 'Notes',
+          title:
+            publicData && publicData.nickname
+              ? `${publicData.nickname}'s Notes`
+              : 'Notes',
         }}
       />
       <BottomTab.Screen
@@ -159,6 +172,7 @@ export default function MainBottomTabs(): ReactElement {
           },
           tabBarLabel: () => null,
           headerRight: ({ tintColor }) => {
+            const { avatar } = publicData || {};
             return (
               <RightHeaderView>
                 {!avatar ? (

@@ -55,3 +55,9 @@ export interface SignUpFormData {
   password: string;
   confirmPassword: string;
 }
+
+// ! Public User Data Interface
+export interface PublicUserData {
+  nickname: string;
+  avatar?: string;
+}

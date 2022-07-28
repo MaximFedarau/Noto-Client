@@ -75,16 +75,18 @@ export default function Form({ image }: FormProps): ReactElement {
     navigation.replace(NAVIGATION_AUTH_NAMES.SIGN_IN);
   }
 
-  // All sign up logic
-  async function creatingUser(values: SignUpFormData) {
+  // submit hanlder
+  async function onFormSubmitHandler(values: SignUpFormData) {
     setIsLoading(true); // setting that the form is loading
+
+    // * section: sign up
     const signUpResponse = await axios
       .post<{ id: string }>(`${process.env.API_URL}/auth/signup`, {
         nickname: values.nickname,
         password: values.password,
       }) // signing up the user
       .catch((error) => {
-        // cathcing possible errors
+        // catching possible errors
         showingSubmitError(
           'Sign Up Error',
           error.response.data
@@ -94,9 +96,11 @@ export default function Form({ image }: FormProps): ReactElement {
       });
     if (!signUpResponse) return; // if the response is undefined, stoping method - error was handled before
     const userId = signUpResponse.data.id;
+
+    // * section: upload image
     if (image) {
       // is user wants to upload an image, then we upload it
-      await FileSystem.uploadAsync(
+      const data = await FileSystem.uploadAsync(
         `${process.env.API_URL}/auth/image/upload/${userId}`,
         image,
         {
@@ -104,45 +108,42 @@ export default function Form({ image }: FormProps): ReactElement {
           uploadType: FileSystem.FileSystemUploadType.MULTIPART,
           fieldName: 'file',
         },
-      ).catch((error) => {
+      );
+      if (data) {
+        if (data.status >= 400) {
+          // if the status is >= 400, then the image was not uploaded
+          showingSubmitError(
+            'Avatar Uploading Error',
+            'Something went wrong:( Try again later',
+          );
+        }
+      }
+    }
+
+    // * section: login
+    await axios // in any case we login user
+      .post<{ accessToken: string; refreshToken: string }>(
+        `${process.env.API_URL}/auth/login`,
+        {
+          nickname: values.nickname,
+          password: values.password,
+        },
+      )
+      .catch((error) => {
         //handling possible errors
         showingSubmitError(
-          'Avatar Uploading Error',
+          'Login Error',
           error.response.data
             ? error.response.data.message
-            : 'Something went wrong:( Try again later',
+            : 'Something went wrong:(',
         );
+      })
+      .then(async (res) => {
+        if (!res || !res.data) return; //checking is the response is undefined - type checking
+        await SecureStore.setItemAsync('accessToken', res.data.accessToken); // saving access token to secure store
+        await SecureStore.setItemAsync('refreshToken', res.data.refreshToken); // saving refresh token to secure store
+        onHomeReturnHandler(); // going to the home screen
       });
-    }
-  }
-
-  // submit hanlder
-  function onFormSubmitHandler(values: SignUpFormData) {
-    creatingUser(values).finally(async () => {
-      await axios // in any case we login user
-        .post<{ accessToken: string; refreshToken: string }>(
-          `${process.env.API_URL}/auth/login`,
-          {
-            nickname: values.nickname,
-            password: values.password,
-          },
-        )
-        .catch((error) => {
-          //handling possible errors
-          showingSubmitError(
-            'Login Error',
-            error.response.data
-              ? error.response.data.message
-              : 'Something went wrong:(',
-          );
-        })
-        .then(async (res) => {
-          if (!res || !res.data) return; //checking is the response is undefined - type checking
-          await SecureStore.setItemAsync('accessToken', res.data.accessToken); // saving access token to secure store
-          await SecureStore.setItemAsync('refreshToken', res.data.refreshToken); // saving refresh token to secure store
-          onHomeReturnHandler();
-        });
-    });
   }
 
   // returning to the main screen
