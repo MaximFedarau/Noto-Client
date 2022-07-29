@@ -8,9 +8,14 @@ import { Pressable, Image } from 'react-native';
 interface AvatarProps {
   size: number;
   image: string;
+  onPress?: () => void;
 }
 
-export default function Avatar({ size, image }: AvatarProps): ReactElement {
+export default function Avatar({
+  size,
+  image,
+  onPress,
+}: AvatarProps): ReactElement {
   return (
     <Pressable
       style={({ pressed }) => [
@@ -22,6 +27,7 @@ export default function Avatar({ size, image }: AvatarProps): ReactElement {
           overflow: 'hidden',
         },
       ]}
+      onPress={onPress}
     >
       <Image
         source={{ uri: image }}

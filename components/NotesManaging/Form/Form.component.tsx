@@ -30,7 +30,7 @@ import { FormView } from '@components/Default/View/View.component';
 import { RightHeaderView } from '@components/Default/View/View.component';
 
 //Formik
-import { Formik } from 'formik';
+import { Formik, FormikProps } from 'formik';
 
 //React Navigation
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -54,6 +54,9 @@ export default function Form(): ReactElement {
 
   // * Refs
   const appState = React.useRef(AppState.currentState);
+  const formRef = React.useRef<FormikProps<NotesManagingFormData> | undefined>(
+    undefined,
+  ) as React.MutableRefObject<FormikProps<NotesManagingFormData>>;
 
   // * Effects
 
@@ -103,9 +106,34 @@ export default function Form(): ReactElement {
   // if current note is empty and app goes to the background, then we delete this note
   const _handleAppStateChange = (nextAppState: AppStateStatus) => {
     if (appState.current === 'active') {
+      // deleting draft, when app goes to the background
       if (!noteId) return;
       deleteDraftIfEmpty(noteId);
     }
+
+    // restoring draft when app comes back from the background (including Notification Center and etc. on iOS)
+    if (
+      (appState.current === 'background' || appState.current === 'inactive') &&
+      nextAppState === 'active'
+    ) {
+      const { title, content } = formRef.current?.values ?? {};
+      if (!title && !content) {
+        addDraft('', '')
+          .then((result) => {
+            setIsError(false);
+            setNoteId((prevNoteId) => {
+              if (prevNoteId) return prevNoteId;
+              return String(result.insertId);
+            });
+          })
+          .catch((error) => {
+            setIsError(true);
+            console.error(error, 'Adding Draft after deletion');
+          });
+      }
+    }
+
+    console.log(appState.current, nextAppState);
 
     appState.current = nextAppState;
   };
@@ -140,7 +168,7 @@ export default function Form(): ReactElement {
   // saving to Drafts section
   function saveToDrafts(values: NotesManagingFormData) {
     if (!noteId) return;
-    updateDraft(noteId, values.title!, values.content)
+    updateDraft(noteId, values.title || '', values.content)
       .then(() => {
         setIsError(false);
       })
@@ -169,6 +197,7 @@ export default function Form(): ReactElement {
       initialValues={formInitialValues}
       onSubmit={onFormSubmitHandler}
       validationSchema={notesManagingFormValidationSchema}
+      innerRef={formRef}
       enableReinitialize={true}
     >
       {({ values, handleChange, handleSubmit, errors }) => {

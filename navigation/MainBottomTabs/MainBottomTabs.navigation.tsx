@@ -53,6 +53,13 @@ export default function MainBottomTabs(): ReactElement {
     navigation.navigate(NAVIGATION_NAMES.AUTH);
   }
 
+  async function logOut() {
+    await SecureStore.deleteItemAsync('accessToken');
+    await SecureStore.deleteItemAsync('refreshToken');
+    setIsAuth(false);
+    setPublicData(undefined);
+  }
+
   // * Effects
   React.useEffect(() => {
     const backHandler = BackHandler.addEventListener(
@@ -123,10 +130,10 @@ export default function MainBottomTabs(): ReactElement {
                     iconName="person"
                     size={32}
                     color={!isAuth ? tintColor : SOFT_BLUE}
-                    onPress={!isAuth ? navigateToAuth : null}
+                    onPress={!isAuth ? navigateToAuth : logOut}
                   />
                 ) : (
-                  <Avatar size={32} image={avatar} />
+                  <Avatar size={32} image={avatar} onPress={logOut} />
                 )}
               </RightHeaderView>
             );
@@ -181,10 +188,10 @@ export default function MainBottomTabs(): ReactElement {
                     iconName="person"
                     size={32}
                     color={!isAuth ? tintColor : SOFT_BLUE}
-                    onPress={!isAuth ? navigateToAuth : null}
+                    onPress={!isAuth ? navigateToAuth : logOut}
                   />
                 ) : (
-                  <Avatar size={32} image={avatar} />
+                  <Avatar size={32} image={avatar} onPress={logOut} />
                 )}
               </RightHeaderView>
             );
