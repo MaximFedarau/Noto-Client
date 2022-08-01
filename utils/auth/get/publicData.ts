@@ -7,7 +7,10 @@ import * as SecureStore from 'expo-secure-store';
 //axios
 import axios from 'axios';
 
-export async function getPublicData(accessToken: string, refreshToken: string) {
+export const getPublicData = async (
+  accessToken: string,
+  refreshToken: string,
+) => {
   let data: PublicUserData | undefined = undefined; // public data = result
   await axios
     .get<PublicUserData>(`${process.env.API_URL}/auth/user`, {
@@ -55,7 +58,7 @@ export async function getPublicData(accessToken: string, refreshToken: string) {
       }
     });
   return data;
-}
+};
 
 getPublicData.defaultProps = {
   API_URL: (process.env.API_URL = 'http://localhost:5000'),

@@ -44,12 +44,12 @@ const Draft = React.memo(function Draft({
   const navigation = useNavigation<NavigationProps>();
 
   // going to the notes overview screen passing route.id as a prop
-  function onDraftPressHandler() {
+  const onDraftPressHandler = () => {
     if (!title && !content) return;
     navigation.navigate(NAVIGATION_NOTES_NAMES.NOTES_MANAGING, {
       id,
     });
-  }
+  };
 
   return (
     <DraftContainer

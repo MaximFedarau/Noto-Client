@@ -1,4 +1,4 @@
-export function contentFormat(content: string): string {
+export const contentFormat = (content: string) => {
   if (content.length <= 300) return content; // optimal length
   const shortContent = content.substring(0, 300);
   const closingTag = shortContent.lastIndexOf('<'); // we don't want to break tags (elements)
@@ -7,4 +7,4 @@ export function contentFormat(content: string): string {
   } else {
     return shortContent.substring(0, closingTag) + '...';
   }
-}
+};

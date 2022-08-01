@@ -43,19 +43,20 @@ export default function Form(): ReactElement {
   const [isLoading, setIsLoading] = React.useState(false);
 
   //going to the sign in screen
-  function onNavigationTextHandler() {
+  const onNavigationTextHandler = () => {
     navigation.replace(NAVIGATION_AUTH_NAMES.SIGN_IN);
-  }
+  };
 
   // submit hanlder (sign up + (optional?) image upload + log in)
-  async function onFormSubmitHandler(values: SignUpFormData) {
+  async function onFormSubmitHandler({ nickname, password }: SignUpFormData) {
     setIsLoading(true); // setting that the form is loading
+    const trimmedNickname = nickname.trim(); // trimming the nickname
 
     // * section: sign up
     const signUpResponse = await axios
       .post<{ id: string }>(`${process.env.API_URL}/auth/signup`, {
-        nickname: values.nickname,
-        password: values.password,
+        nickname: trimmedNickname,
+        password,
       }) // signing up the user
       .catch((error) => {
         // catching possible errors
@@ -73,14 +74,22 @@ export default function Form(): ReactElement {
     const userId = signUpResponse.data.id;
 
     // * section: login
-    await axios // in any case we login user
+    axios // in any case we login user
       .post<{ accessToken: string; refreshToken: string }>(
         `${process.env.API_URL}/auth/login`,
         {
-          nickname: values.nickname,
-          password: values.password,
+          nickname: trimmedNickname,
+          password,
         },
       )
+      .then(async (res) => {
+        if (!res || !res.data) return; //checking is the response is undefined - type checking
+        await SecureStore.setItemAsync('accessToken', res.data.accessToken); // saving access token to secure store
+        await SecureStore.setItemAsync('refreshToken', res.data.refreshToken); // saving refresh token to secure store
+        navigation.replace(NAVIGATION_AUTH_NAMES.AVATAR_PICKER, {
+          id: userId,
+        });
+      })
       .catch((error) => {
         //handling possible errors
         showingSubmitError(
@@ -92,21 +101,13 @@ export default function Form(): ReactElement {
             setIsLoading(false);
           },
         );
-      })
-      .then(async (res) => {
-        if (!res || !res.data) return; //checking is the response is undefined - type checking
-        await SecureStore.setItemAsync('accessToken', res.data.accessToken); // saving access token to secure store
-        await SecureStore.setItemAsync('refreshToken', res.data.refreshToken); // saving refresh token to secure store
-        navigation.replace(NAVIGATION_AUTH_NAMES.AVATAR_PICKER, {
-          id: userId,
-        });
       });
   }
 
   // returning to the main screen
-  function handleReturnToHome() {
+  const handleReturnToHome = () => {
     navigation.replace(NAVIGATION_NAMES.NOTES_OVERVIEW);
-  }
+  };
 
   return (
     <AuthFormContainer>

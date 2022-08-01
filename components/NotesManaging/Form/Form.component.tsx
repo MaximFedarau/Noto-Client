@@ -126,13 +126,13 @@ export default function Form(): ReactElement {
       }
     }
 
-    console.log(appState.current, nextAppState);
+    console.log(appState.current, nextAppState, 'app state');
 
     appState.current = nextAppState;
   };
 
   // fetching draft info
-  function fetchingDraft(): void {
+  const fetchingDraft = () => {
     if (!route.params || !route.params.id) return;
     fetchDraftById(route.params.id)
       .then((draft) => {
@@ -149,15 +149,15 @@ export default function Form(): ReactElement {
       .finally(() => {
         setIsLoading(false);
       });
-  }
+  };
 
   // on form submit method
-  function onFormSubmitHandler(values: NotesManagingFormData) {
+  const onFormSubmitHandler = (values: NotesManagingFormData) => {
     console.log(values);
-  }
+  };
 
   // saving to Drafts section
-  function saveToDrafts(values: NotesManagingFormData) {
+  const saveToDrafts = (values: NotesManagingFormData) => {
     if (!noteId) return;
     updateDraft(noteId, values.title || '', values.content)
       .then(() => {
@@ -167,17 +167,17 @@ export default function Form(): ReactElement {
         setIsError(true);
         console.error(error, 'Updating Draft');
       });
-  }
+  };
 
   // deleting draft
-  async function onDraftDeleteHandler() {
+  const onDraftDeleteHandler = async () => {
     if (!noteId) return;
     await deleteDraftById(noteId).catch((error) => {
       console.error(error, 'Deleting Draft');
       setIsError(true);
     });
     navigation.goBack();
-  }
+  };
 
   // * Cases handlers
   if (isError) return <Error />;

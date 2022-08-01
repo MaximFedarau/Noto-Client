@@ -3,7 +3,7 @@ import * as SQLite from 'expo-sqlite';
 
 const db = SQLite.openDatabase('drafts.db');
 
-export function addDraft(title: string, content?: string) {
+export const addDraft = (title: string, content?: string) => {
   const promise = new Promise<SQLite.SQLResultSet>((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
@@ -20,4 +20,4 @@ export function addDraft(title: string, content?: string) {
     });
   });
   return promise;
-}
+};

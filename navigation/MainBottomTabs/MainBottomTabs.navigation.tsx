@@ -62,7 +62,7 @@ export default function MainBottomTabs(): ReactElement {
       'hardwareBackPress',
       () => true,
     ); // subscribing to the hardware back button
-    async function checkIsAuth() {
+    const checkIsAuth = async () => {
       // await SecureStore.deleteItemAsync('accessToken');
       // await SecureStore.deleteItemAsync('refreshToken');
       const accessToken = await SecureStore.getItemAsync('accessToken');
@@ -83,7 +83,7 @@ export default function MainBottomTabs(): ReactElement {
         setIsAuth(false);
         setPublicData(undefined);
       }
-    }
+    };
     checkIsAuth().finally(() => {
       setIsLoading(false);
     });

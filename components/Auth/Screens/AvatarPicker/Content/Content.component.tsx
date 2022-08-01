@@ -32,7 +32,7 @@ export default function Content(): ReactElement {
   const [isLoading, setIsLoading] = React.useState(false);
 
   // image uploading
-  async function onSubmitHandler() {
+  const onSubmitHandler = async () => {
     if (!route.params || !image) return; // if there is no id or image, then function hadnling is cancelled
     setIsLoading(true);
     // image uploading
@@ -91,12 +91,12 @@ export default function Content(): ReactElement {
       // if everyting is successful, then we need to go home
       handleReturnToHome();
     }
-  }
+  };
 
   //returning home handler
-  function handleReturnToHome() {
+  const handleReturnToHome = () => {
     navigation.replace(NAVIGATION_NAMES.NOTES_OVERVIEW);
-  }
+  };
 
   return (
     <ContentScrollView>

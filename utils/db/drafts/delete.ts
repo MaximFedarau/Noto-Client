@@ -3,7 +3,7 @@ import * as SQLite from 'expo-sqlite';
 
 const db = SQLite.openDatabase('drafts.db');
 
-export function deleteDraftById(id: string) {
+export const deleteDraftById = (id: string) => {
   const promise = new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
@@ -20,9 +20,9 @@ export function deleteDraftById(id: string) {
     });
   });
   return promise;
-}
+};
 
-export function deleteDraftIfEmpty(id: string) {
+export const deleteDraftIfEmpty = (id: string) => {
   const promise = new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
@@ -39,4 +39,4 @@ export function deleteDraftIfEmpty(id: string) {
     });
   });
   return promise;
-}
+};

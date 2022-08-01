@@ -1,11 +1,11 @@
 //React Native Toast Message
 import Toast from 'react-native-toast-message';
 
-export function showingSubmitError(
+export const showingSubmitError = (
   title: string,
   text: string,
   callback?: () => void,
-) {
+) => {
   if (callback) callback(); // possible callback execution, for example, setting loading state to false
   Toast.show({
     type: 'error',
@@ -14,4 +14,4 @@ export function showingSubmitError(
     text2: text,
   });
   console.error(`${title}\n`, text); // logging
-}
+};

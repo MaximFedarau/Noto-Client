@@ -27,7 +27,7 @@ export default function LogoPicker({
     ImagePicker.useMediaLibraryPermissions();
 
   //checking permissions
-  async function verifyPermissions() {
+  const verifyPermissions = async () => {
     if (
       cameraPermission?.status === ImagePicker.PermissionStatus.UNDETERMINED
     ) {
@@ -46,10 +46,10 @@ export default function LogoPicker({
     }
 
     return true;
-  }
+  };
 
   // getting image from gallery
-  async function takeImageHandler() {
+  const takeImageHandler = async () => {
     const status = await verifyPermissions();
     if (!status) return;
     const image = await ImagePicker.launchImageLibraryAsync({
@@ -60,33 +60,27 @@ export default function LogoPicker({
     if (!image.cancelled) {
       setImage(image.uri);
     }
-  }
+  };
   return (
     <View>
-      {!image ? (
-        <Pressable
-          onPress={takeImageHandler}
-          style={({ pressed }) => [
-            pressed ? { opacity: 0.5 } : {},
-            styles.button,
-          ]}
-        >
-          <PickedImage source={require('@assets/images/empty-avatar.png')} />
-        </Pressable>
-      ) : (
-        <Pressable
-          onPress={takeImageHandler}
-          style={({ pressed }) => [
-            pressed ? { opacity: 0.5 } : {},
-            styles.button,
-            {
-              marginBottom: 16,
-            },
-          ]}
-        >
-          <PickedImage source={{ uri: image }} />
-        </Pressable>
-      )}
+      <Pressable
+        onPress={takeImageHandler}
+        style={({ pressed }) => [
+          pressed ? { opacity: 0.5 } : {},
+          styles.button,
+          image
+            ? {
+                marginBottom: 16,
+              }
+            : {},
+        ]}
+      >
+        <PickedImage
+          source={
+            image ? { uri: image } : require('@assets/images/empty-avatar.png')
+          }
+        />
+      </Pressable>
     </View>
   );
 }
