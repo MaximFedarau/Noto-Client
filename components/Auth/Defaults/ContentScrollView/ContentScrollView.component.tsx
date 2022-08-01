@@ -1,12 +1,9 @@
-//Types
 import { ReactElement } from 'react';
 import { ScrollViewProps } from 'react-native';
 
-//Constants
-import { styles } from './ContentScrollView.styles';
-
-//Components
 import { DefaultScrollView } from '@components/Default/View/View.component';
+
+import { styles } from './ContentScrollView.styles';
 
 export default function ContentScrollView({
   children,

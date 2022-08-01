@@ -1,7 +1,5 @@
-//Styles Components
 import styled from 'styled-components/native';
 
-//Constants
 import { BUNTING } from '@constants/colors';
 
 //Interface for TabContainer

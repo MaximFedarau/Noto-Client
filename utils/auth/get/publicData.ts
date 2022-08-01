@@ -1,11 +1,7 @@
-//Types
-import { PublicUserData } from '@app-types/types';
-
-//Expo
 import * as SecureStore from 'expo-secure-store';
-
-//axios
 import axios from 'axios';
+
+import { PublicUserData } from '@app-types/types';
 
 export const getPublicData = async (
   accessToken: string,

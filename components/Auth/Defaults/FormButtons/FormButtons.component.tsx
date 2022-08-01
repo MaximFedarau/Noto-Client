@@ -1,8 +1,7 @@
-//Types
 import { ReactElement } from 'react';
 
-//Components
 import { AuthFormButtonsContainer } from '@components/Default/View/View.component';
+
 import { FormSubmitButton, HomeButton } from './FormButtons.styles';
 
 //Interface for Props

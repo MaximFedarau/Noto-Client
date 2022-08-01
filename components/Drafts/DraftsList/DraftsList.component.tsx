@@ -1,12 +1,8 @@
-//Types
 import { ReactElement } from 'react';
-import { DraftSchema } from '@app-types/types';
-
-//Components
-import Draft from '@components/Drafts/Draft/Draft.component';
-
-//React Native
 import { FlatList } from 'react-native';
+
+import Draft from '@components/Drafts/Draft/Draft.component';
+import { DraftSchema } from '@app-types/types';
 
 //Interface for Props
 interface DraftsListProps {

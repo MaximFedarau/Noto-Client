@@ -1,8 +1,6 @@
-//Types
-import { DraftSchema } from '@app-types/types';
-
-//Expo
 import * as SQLite from 'expo-sqlite';
+
+import { DraftSchema } from '@app-types/types';
 
 const db = SQLite.openDatabase('drafts.db');
 

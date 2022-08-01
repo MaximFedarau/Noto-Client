@@ -1,27 +1,17 @@
-//Types
 import React, { ReactElement } from 'react';
-import { DraftSchema } from '@app-types/types';
-import { NavigationProps } from '@app-types/types';
+import { useNavigation } from '@react-navigation/native';
 
-//Constants
-import { fetchDrafts } from '@utils/db/drafts/fetch';
-
-//Screens
 import Error from '@screens/Error/Error.screen';
 import Loading from '@screens/Loading/Loading.screen';
-
-//Components
 import IconButton from '@components/Default/IconButton/IconButton.component';
 import SearchBar from '@components/Default/SearchBar/SearchBar.component';
 import DraftsList from '@components/Drafts/DraftsList/DraftsList.component';
-
+import { fetchDrafts } from '@utils/db/drafts/fetch';
 import { LeftHeaderView } from '@components/Default/View/View.component';
-
 import { DraftsView } from '@components/Default/View/View.component';
 import { NoItemsText } from '@components/Default/Text/Text.component';
-
-//React Navigation
-import { useNavigation } from '@react-navigation/native';
+import { DraftSchema } from '@app-types/types';
+import { NavigationProps } from '@app-types/types';
 
 export default function Drafts(): ReactElement {
   const [isLoading, setIsLoading] = React.useState<boolean>(true);

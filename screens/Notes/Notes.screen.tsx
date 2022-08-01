@@ -1,7 +1,5 @@
-//Types
 import { ReactElement } from 'react';
 
-//Components
 import { NotesView } from '@components/Default/View/View.component';
 import { NoItemsText } from '@components/Default/Text/Text.component';
 

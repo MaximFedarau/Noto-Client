@@ -1,10 +1,6 @@
-//Types
 import React, { ReactElement } from 'react';
-
-//Expo
 import { StatusBar } from 'expo-status-bar';
 
-//Components
 import { LoadingView } from '@components/Default/View/View.component';
 import { NoItemsText } from '@components/Default/Text/Text.component';
 

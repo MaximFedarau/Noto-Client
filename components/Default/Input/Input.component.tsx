@@ -1,7 +1,4 @@
-//Styled Components
 import styled from 'styled-components/native';
-
-//React Native
 import { TextInput } from 'react-native';
 
 // ! Default

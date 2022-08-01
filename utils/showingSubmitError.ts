@@ -1,4 +1,3 @@
-//React Native Toast Message
 import Toast from 'react-native-toast-message';
 
 export const showingSubmitError = (

@@ -1,8 +1,18 @@
-//Types
 import React, { ReactElement } from 'react';
 import { NavigationProps, PublicUserData } from '@app-types/types';
+import { Ionicons } from '@expo/vector-icons';
+import * as SecureStore from 'expo-secure-store';
+import { Pressable, BackHandler } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-//Constants
+import Loading from '@screens/Loading/Loading.screen';
+import Notes from '@screens/Notes/Notes.screen';
+import NotesManaging from '@screens/NotesManaging/NotesManaging.screen';
+import Drafts from '@screens/Drafts/Drafts.screen';
+import IconButton from '@components/Default/IconButton/IconButton.component';
+import Avatar from '@components/Navigation/Avatar/Avatar.component';
+import { RightHeaderView } from '@components/Default/View/View.component';
 import {
   OSLO_GRAY,
   SPRING_WOOD,
@@ -11,29 +21,6 @@ import {
 } from '@constants/colors';
 import { NAVIGATION_NAMES, NAVIGATION_NOTES_NAMES } from '@app-types/enum';
 import { getPublicData } from '@utils/auth/get/publicData';
-
-//Expo
-import { Ionicons } from '@expo/vector-icons';
-import * as SecureStore from 'expo-secure-store';
-
-//Screens
-import Loading from '@screens/Loading/Loading.screen';
-import Notes from '@screens/Notes/Notes.screen';
-import NotesManaging from '@screens/NotesManaging/NotesManaging.screen';
-import Drafts from '@screens/Drafts/Drafts.screen';
-
-//Components
-import IconButton from '@components/Default/IconButton/IconButton.component';
-import Avatar from '@components/Navigation/Avatar/Avatar.component';
-
-import { RightHeaderView } from '@components/Default/View/View.component';
-
-//React Native
-import { Pressable, BackHandler } from 'react-native';
-
-//React Navigation
-import { useNavigation } from '@react-navigation/native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 const BottomTab = createBottomTabNavigator();
 

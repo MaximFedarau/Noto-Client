@@ -1,39 +1,27 @@
-//Types
 import React, { ReactElement } from 'react';
+import { AppState, AppStateStatus } from 'react-native';
+import { Formik, FormikProps } from 'formik';
+import { useNavigation, useRoute } from '@react-navigation/native';
+
+import Error from '@screens/Error/Error.screen';
+import Loading from '@screens/Loading/Loading.screen';
+import IconButton from '@components/Default/IconButton/IconButton.component';
+import Button from '@components/Default/Button/Button.component';
+import FormField from '@components/NotesManaging/FormField/FormField.component';
+import MarkdownField from '@components/NotesManaging/MarkdownField/MarkdownField.component';
+import { FormView } from '@components/Default/View/View.component';
+import { RightHeaderView } from '@components/Default/View/View.component';
+import { notesManagingFormValidationSchema } from '@constants/validationSchemas';
+import { addDraft } from '@utils/db/drafts/add';
+import { fetchDraftById } from '@utils/db/drafts/fetch';
+import { updateDraft } from '@utils/db/drafts/update';
+import { deleteDraftById, deleteDraftIfEmpty } from '@utils/db/drafts/delete';
 import {
   NotesManagingFormData,
   NavigationProps,
   NavigationRouteProp,
 } from '@app-types/types';
 import { BUTTON_TYPES } from '@app-types/enum';
-import { AppState, AppStateStatus } from 'react-native';
-
-//Constants
-import { notesManagingFormValidationSchema } from '@constants/validationSchemas';
-
-import { addDraft } from '@utils/db/drafts/add';
-import { fetchDraftById } from '@utils/db/drafts/fetch';
-import { updateDraft } from '@utils/db/drafts/update';
-import { deleteDraftById, deleteDraftIfEmpty } from '@utils/db/drafts/delete';
-
-//Screens
-import Error from '@screens/Error/Error.screen';
-import Loading from '@screens/Loading/Loading.screen';
-
-//Components
-import IconButton from '@components/Default/IconButton/IconButton.component';
-import Button from '@components/Default/Button/Button.component';
-import FormField from '@components/NotesManaging/FormField/FormField.component';
-import MarkdownField from '@components/NotesManaging/MarkdownField/MarkdownField.component';
-
-import { FormView } from '@components/Default/View/View.component';
-import { RightHeaderView } from '@components/Default/View/View.component';
-
-//Formik
-import { Formik, FormikProps } from 'formik';
-
-//React Navigation
-import { useNavigation, useRoute } from '@react-navigation/native';
 
 export default function Form(): ReactElement {
   const navigation = useNavigation<NavigationProps>();
@@ -192,7 +180,6 @@ export default function Form(): ReactElement {
       enableReinitialize={true}
     >
       {({ values, handleChange, handleSubmit, errors }) => {
-        // * Effects
         React.useLayoutEffect(() => {
           const title =
             values.title && values.title.length > 16
@@ -224,7 +211,6 @@ export default function Form(): ReactElement {
           });
         }, [values]);
 
-        // * Form
         return (
           <FormView>
             <FormField

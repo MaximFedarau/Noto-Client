@@ -1,25 +1,16 @@
-//Types
 import React, { ReactElement } from 'react';
 import { TextInputProps, useWindowDimensions } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import RenderHtml from 'react-native-render-html';
+import * as showdown from 'showdown';
 
-//Components
 import FormField from '@components/NotesManaging/FormField/FormField.component';
-
 import {
   MarkdownFieldContainer,
   TabContainer,
   TabText,
   MarkdownContainer,
 } from './MarkdownField.styles';
-
-//Expo
-import { Ionicons } from '@expo/vector-icons';
-
-//React Render HTML
-import RenderHtml from 'react-native-render-html';
-
-// Showdown
-import * as showdown from 'showdown';
 
 //Interface for Props
 interface MarkdownFieldProps extends TextInputProps {

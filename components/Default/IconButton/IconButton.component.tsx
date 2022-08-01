@@ -1,11 +1,6 @@
-//Types
 import { ReactElement } from 'react';
 import { PressableProps } from 'react-native';
-
-//Expo
 import { Ionicons } from '@expo/vector-icons';
-
-//React Native
 import { Pressable } from 'react-native';
 
 //Interface for Props

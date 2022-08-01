@@ -1,7 +1,4 @@
-//Types
 import { ReactElement } from 'react';
-
-//React Native SVG
 import Svg, { Path } from 'react-native-svg';
 
 export default function Logo(): ReactElement {

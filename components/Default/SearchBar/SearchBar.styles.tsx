@@ -1,7 +1,4 @@
-//Styled Components
 import styled from 'styled-components';
-
-//React Native
 import { TextInput } from 'react-native';
 
 export const SearchBarInput = styled(TextInput)`

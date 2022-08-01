@@ -1,13 +1,12 @@
-//Types
 import { ReactElement } from 'react';
-import { TextInputProps } from 'react-native';
+import {
+  TextInputProps,
+  View,
+  useWindowDimensions,
+  Platform,
+} from 'react-native';
 
-//Components
-import { View } from 'react-native';
 import { SearchBarInput } from './SearchBar.styles';
-
-//React Native
-import { useWindowDimensions, Platform } from 'react-native';
 
 export default function SearchBar(props: TextInputProps): ReactElement {
   const { width } = useWindowDimensions();

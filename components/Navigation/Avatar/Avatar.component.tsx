@@ -1,7 +1,4 @@
-//Types
 import { ReactElement } from 'react';
-
-//React Native
 import { Pressable, Image } from 'react-native';
 
 // Interface for Props

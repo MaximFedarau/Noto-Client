@@ -1,35 +1,22 @@
-//Types
 import React, { ReactElement } from 'react';
-import { NavigationProps, SignUpFormData } from '@app-types/types';
-
-//Constants
-import { NAVIGATION_NAMES, NAVIGATION_AUTH_NAMES } from '@app-types/enum';
-import { signUpFormValidationSchema } from '@constants/validationSchemas';
-import { showingSubmitError } from '@utils/showingSubmitError';
-
-//Expo
 import * as SecureStore from 'expo-secure-store';
+import { Formik } from 'formik';
+import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
 
-//Components
 import FormField from '@components/Auth/Defaults/FormField/FormField.component';
 import Spinner from '@components/Auth/Defaults/Spinner/Spinner.component';
 import FormButtons from '@components/Auth/Defaults/FormButtons/FormButtons.component';
-
 import {
   AuthFormContainer,
   AuthFormFieldsContainer,
   AuthFormContentContainer,
 } from '@components/Default/View/View.component';
 import { AuthNavigationText } from '@components/Default/Text/Text.component';
-
-//Formik
-import { Formik } from 'formik';
-
-//React Navigation
-import { useNavigation } from '@react-navigation/native';
-
-//axios
-import axios from 'axios';
+import { NavigationProps, SignUpFormData } from '@app-types/types';
+import { NAVIGATION_NAMES, NAVIGATION_AUTH_NAMES } from '@app-types/enum';
+import { signUpFormValidationSchema } from '@constants/validationSchemas';
+import { showingSubmitError } from '@utils/showingSubmitError';
 
 export default function Form(): ReactElement {
   const navigation = useNavigation<NavigationProps>();

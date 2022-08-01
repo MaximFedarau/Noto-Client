@@ -1,11 +1,7 @@
-//Styled componets
 import styled from 'styled-components/native';
-
-//Constants
-import { SPRING_WOOD } from '@constants/colors';
-
-//React Native
 import { Platform, StatusBar } from 'react-native';
+
+import { SPRING_WOOD } from '@constants/colors';
 
 // ! Default
 

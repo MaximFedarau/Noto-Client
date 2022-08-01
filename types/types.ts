@@ -1,13 +1,11 @@
-//Types
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RouteProp } from '@react-navigation/native';
+
 import {
   NAVIGATION_NAMES,
   NAVIGATION_NOTES_NAMES,
   NAVIGATION_AUTH_NAMES,
 } from './enum';
-
-//React Navigation
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RouteProp } from '@react-navigation/native';
 
 // ! Navigation Props
 

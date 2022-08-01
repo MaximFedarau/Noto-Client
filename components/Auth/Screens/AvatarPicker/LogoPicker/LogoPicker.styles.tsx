@@ -1,7 +1,4 @@
-//Styled Components
 import styled from 'styled-components/native';
-
-//React Native
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({

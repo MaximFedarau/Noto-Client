@@ -1,12 +1,6 @@
-//Types
 import React, { ReactElement } from 'react';
-import { TextInputProps } from 'react-native';
+import { TextInputProps, Platform } from 'react-native';
 import { IconNode } from '@rneui/base';
-
-//React Native
-import { Platform } from 'react-native';
-
-//React Native Elements
 import { Input } from '@rneui/themed';
 
 //Interface for Props

@@ -1,28 +1,17 @@
-//Types
 import React, { ReactElement } from 'react';
-import { NavigationProps, NavigationRouteProp } from '@app-types/types';
-import { NAVIGATION_NAMES } from '@app-types/enum';
-
-//Constants
-import { showingSubmitError } from '@utils/showingSubmitError';
-
-//Expo
 import * as FileSystem from 'expo-file-system';
 import * as SecureStore from 'expo-secure-store';
+import { useRoute, useNavigation } from '@react-navigation/native';
+import axios from 'axios';
 
-//Components
 import ContentScrollView from '@components/Auth/Defaults/ContentScrollView/ContentScrollView.component';
 import LogoPicker from '@components/Auth/Screens/AvatarPicker/LogoPicker/LogoPicker.component';
 import Spinner from '@components/Auth/Defaults/Spinner/Spinner.component';
 import FormButtons from '@components/Auth/Defaults/FormButtons/FormButtons.component';
-
 import { AuthAvatarPickerContainer } from '@components/Default/View/View.component';
-
-//React Navigation
-import { useRoute, useNavigation } from '@react-navigation/native';
-
-//axios
-import axios from 'axios';
+import { NavigationProps, NavigationRouteProp } from '@app-types/types';
+import { NAVIGATION_NAMES } from '@app-types/enum';
+import { showingSubmitError } from '@utils/showingSubmitError';
 
 export default function Content(): ReactElement {
   const navigation = useNavigation<NavigationProps>();

@@ -1,20 +1,11 @@
-//Types
 import React, { ReactElement } from 'react';
-
-//Constants
-import { styles } from './LogoPicker.styles';
-
-//Expo
 import * as ImagePicker from 'expo-image-picker';
+import { View, Alert, Pressable } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 
-//Components
 import { PickedImage } from './LogoPicker.styles';
 
-//React Native
-import { View, Alert, Pressable } from 'react-native';
-
-//React Native SVG
-import Svg, { Path } from 'react-native-svg';
+import { styles } from './LogoPicker.styles';
 
 //Interface for Props
 interface LogoPickerProps {

@@ -1,12 +1,8 @@
-//Styled Components
 import styled from 'styled-components/native';
 
-//Constants
-import { SOFT_BLUE } from '@constants/colors';
-
-//Components
 import Button from '@components/Default/Button/Button.component';
 import IconButton from '@components/Default/IconButton/IconButton.component';
+import { SOFT_BLUE } from '@constants/colors';
 
 export const FormSubmitButton = styled(Button)`
   background-color: ${SOFT_BLUE};

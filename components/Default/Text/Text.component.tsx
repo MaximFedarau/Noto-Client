@@ -1,7 +1,5 @@
-//Styled componets
 import styled from 'styled-components/native';
 
-//Constants
 import { OSLO_GRAY } from '@constants/colors';
 
 // ! Default

@@ -1,24 +1,14 @@
-//Types
 import React, { ReactElement } from 'react';
-import { NAVIGATION_NAMES } from '@app-types/enum';
-
-//Constants
-import { initDbDrafts } from '@utils/db/drafts/init';
-
-//Expo
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
-
-//Navigation
-import MainBottomTabs from '@navigation/MainBottomTabs/MainBottomTabs.navigation';
-import AuthStack from '@navigation/AuthStack/AuthStack.navigation';
-
-//Screens
-import Error from '@screens/Error/Error.screen';
-
-//React Navigation
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+import MainBottomTabs from '@navigation/MainBottomTabs/MainBottomTabs.navigation';
+import AuthStack from '@navigation/AuthStack/AuthStack.navigation';
+import Error from '@screens/Error/Error.screen';
+import { initDbDrafts } from '@utils/db/drafts/init';
+import { NAVIGATION_NAMES } from '@app-types/enum';
 
 const Stack = createNativeStackNavigator();
 

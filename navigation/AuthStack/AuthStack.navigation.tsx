@@ -1,17 +1,11 @@
-//Types
 import { ReactElement } from 'react';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-//Constants
-import { NAVIGATION_AUTH_NAMES } from '@app-types/enum';
-import { SPRING_WOOD } from '@constants/colors';
-
-//Screens
 import SignIn from '@screens/SignIn/SignIn.screen';
 import SignUp from '@screens/SignUp/SignUp.screen';
 import AvatarPicker from '@screens/AvatarPicker/AvatarPicker.screen';
-
-//React Navigation
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { NAVIGATION_AUTH_NAMES } from '@app-types/enum';
+import { SPRING_WOOD } from '@constants/colors';
 
 const Stack = createNativeStackNavigator();
 

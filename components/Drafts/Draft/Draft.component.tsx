@@ -1,31 +1,17 @@
-//Types
 import React, { ReactElement } from 'react';
-import { DraftSchema } from '@app-types/types';
-import { NavigationProps } from '@app-types/types';
-import { NAVIGATION_NOTES_NAMES } from '@app-types/enum';
+import { useWindowDimensions } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { RenderHTML } from 'react-native-render-html';
+import * as showdown from 'showdown';
 
-//Components
 import { DraftContainer } from './Draft.styles';
-
 import {
   DraftTitle,
   NoDraftText,
 } from '@components/Default/Text/Text.component';
-
-//Constants
+import { DraftSchema, NavigationProps } from '@app-types/types';
+import { NAVIGATION_NOTES_NAMES } from '@app-types/enum';
 import { contentFormat } from '@utils/contentFormat';
-
-//React Native
-import { useWindowDimensions } from 'react-native';
-
-//React Navigation
-import { useNavigation } from '@react-navigation/native';
-
-//React Render HTML
-import { RenderHTML } from 'react-native-render-html';
-
-//Showdown
-import * as showdown from 'showdown';
 
 //Interface for Props
 interface DraftProps {
