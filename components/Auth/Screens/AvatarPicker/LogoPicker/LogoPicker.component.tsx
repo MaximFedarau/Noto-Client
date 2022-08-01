@@ -23,11 +23,8 @@ export default function LogoPicker({
   image,
   setImage,
 }: LogoPickerProps): ReactElement {
-  // * Variables
   const [cameraPermission, requestPermission] =
     ImagePicker.useMediaLibraryPermissions();
-
-  // * Methods
 
   //checking permissions
   async function verifyPermissions() {

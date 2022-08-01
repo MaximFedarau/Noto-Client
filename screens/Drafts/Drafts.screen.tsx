@@ -24,8 +24,6 @@ import { NoItemsText } from '@components/Default/Text/Text.component';
 import { useNavigation } from '@react-navigation/native';
 
 export default function Drafts(): ReactElement {
-  // * States
-
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [isError, setIsError] = React.useState<boolean>(false);
 
@@ -34,7 +32,6 @@ export default function Drafts(): ReactElement {
 
   const [drafts, setDrafts] = React.useState<DraftSchema[]>([]);
 
-  // * React Navigation
   const navigation = useNavigation<NavigationProps>();
 
   React.useEffect(() => {

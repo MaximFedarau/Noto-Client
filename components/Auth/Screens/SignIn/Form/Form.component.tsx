@@ -32,18 +32,13 @@ import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 
 export default function Form(): ReactElement {
-  // * Variables
-
   const navigation = useNavigation<NavigationProps>();
   const fontInitialValues: SignInFormData = {
     nickname: '',
     password: '',
   };
 
-  // * States
   const [isLoading, setIsLoading] = React.useState(false);
-
-  // * Methods
 
   // go to the sign up screen
   function onNavigationTextHandler() {

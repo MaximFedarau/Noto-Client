@@ -25,16 +25,12 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 
 export default function Content(): ReactElement {
-  // * Variables
-
   const navigation = useNavigation<NavigationProps>();
   const route = useRoute<NavigationRouteProp>();
 
-  // * States
   const [image, setImage] = React.useState<string>();
   const [isLoading, setIsLoading] = React.useState(false);
 
-  // * Methods
   // image uploading
   async function onSubmitHandler() {
     if (!route.params || !image) return; // if there is no id or image, then function hadnling is cancelled

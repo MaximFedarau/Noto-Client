@@ -35,14 +35,12 @@ interface DraftProps {
 const Draft = React.memo(function Draft({
   children,
 }: DraftProps): ReactElement {
-  // * Variables
   const { title, content, id } = children;
   const converter = new showdown.Converter();
   const modifiedContent = converter.makeHtml(contentFormat(content || ''));
 
   const { width } = useWindowDimensions();
 
-  // * React Navigation
   const navigation = useNavigation<NavigationProps>();
 
   // going to the notes overview screen passing route.id as a prop

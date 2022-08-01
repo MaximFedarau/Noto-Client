@@ -38,17 +38,14 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 const BottomTab = createBottomTabNavigator();
 
 export default function MainBottomTabs(): ReactElement {
-  // * Variables
   const navigation = useNavigation<NavigationProps>();
 
-  // * States
   const [isAuth, setIsAuth] = React.useState(false);
   const [publicData, setPublicData] = React.useState<
     PublicUserData | undefined
   >(undefined);
   const [isLoading, setIsLoading] = React.useState(true);
 
-  // * Methods
   function navigateToAuth() {
     navigation.navigate(NAVIGATION_NAMES.AUTH);
   }
@@ -60,7 +57,6 @@ export default function MainBottomTabs(): ReactElement {
     setPublicData(undefined);
   }
 
-  // * Effects
   React.useEffect(() => {
     const backHandler = BackHandler.addEventListener(
       'hardwareBackPress',

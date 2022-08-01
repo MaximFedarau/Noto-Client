@@ -33,11 +33,9 @@ const MarkdownField = React.memo(function MarkdownField({
   value,
   ...props
 }: MarkdownFieldProps): ReactElement {
-  // * Variables
   const window = useWindowDimensions();
   const converter = new showdown.Converter();
 
-  // * States
   const [renderedHTML, setRenderdHTML] = React.useState<string>('');
   const [tabIndex, setTabIndex] = React.useState<number>(0);
 

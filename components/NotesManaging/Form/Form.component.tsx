@@ -36,13 +36,9 @@ import { Formik, FormikProps } from 'formik';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
 export default function Form(): ReactElement {
-  // * Variables
-
-  // * Navigation
   const navigation = useNavigation<NavigationProps>();
   const route = useRoute<NavigationRouteProp>();
 
-  // * States
   const [isLoading, setIsLoading] = React.useState(false);
   const [isError, setIsError] = React.useState<boolean>(false);
   const [noteId, setNoteId] = React.useState<string | null>(null);
@@ -52,13 +48,10 @@ export default function Form(): ReactElement {
       content: '',
     });
 
-  // * Refs
   const appState = React.useRef(AppState.currentState);
   const formRef = React.useRef<FormikProps<NotesManagingFormData> | undefined>(
     undefined,
   ) as React.MutableRefObject<FormikProps<NotesManagingFormData>>;
-
-  // * Effects
 
   React.useEffect(() => {
     if (route.params) return;
@@ -137,8 +130,6 @@ export default function Form(): ReactElement {
 
     appState.current = nextAppState;
   };
-
-  // * Methods
 
   // fetching draft info
   function fetchingDraft(): void {

@@ -32,8 +32,6 @@ import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
 
 export default function Form(): ReactElement {
-  // * Variables
-
   const navigation = useNavigation<NavigationProps>();
 
   const formInitialValues: SignUpFormData = {
@@ -42,10 +40,7 @@ export default function Form(): ReactElement {
     confirmPassword: '',
   };
 
-  // * States
   const [isLoading, setIsLoading] = React.useState(false);
-
-  // * Methods
 
   //going to the sign in screen
   function onNavigationTextHandler() {
