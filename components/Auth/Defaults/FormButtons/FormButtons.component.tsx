@@ -8,8 +8,8 @@ import { FormSubmitButton, HomeButton } from './FormButtons.styles';
 //Interface for Props
 interface FormButtonsProps {
   children: string;
-  onSubmit(): void;
-  onHomeReturn(): void;
+  onSubmit: () => void;
+  onHomeReturn: () => void;
 }
 
 export default function FormButtons({

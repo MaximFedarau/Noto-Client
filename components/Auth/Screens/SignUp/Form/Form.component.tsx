@@ -109,7 +109,7 @@ export default function Form(): ReactElement {
   }
 
   // returning to the main screen
-  function onHomeReturnHandler() {
+  function handleReturnToHome() {
     navigation.replace(NAVIGATION_NAMES.NOTES_OVERVIEW);
   }
 
@@ -159,7 +159,7 @@ export default function Form(): ReactElement {
             ) : (
               <FormButtons
                 onSubmit={handleSubmit}
-                onHomeReturn={onHomeReturnHandler}
+                onHomeReturn={handleReturnToHome}
               >
                 Sign Up
               </FormButtons>

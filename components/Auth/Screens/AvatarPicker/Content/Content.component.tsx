@@ -31,7 +31,7 @@ export default function Content(): ReactElement {
   const route = useRoute<NavigationRouteProp>();
 
   // * States
-  const [image, setImage] = React.useState<string | undefined>(undefined);
+  const [image, setImage] = React.useState<string>();
   const [isLoading, setIsLoading] = React.useState(false);
 
   // * Methods
@@ -67,7 +67,7 @@ export default function Content(): ReactElement {
         );
       }
       // in other case, we need to refresh the access token
-      await axios
+      axios
         .post(
           `${process.env.API_URL}/auth/token/refresh`,
           {},
@@ -88,17 +88,17 @@ export default function Content(): ReactElement {
             // making our tokens nullable
             await SecureStore.deleteItemAsync('accessToken');
             await SecureStore.deleteItemAsync('refreshToken');
-            onHomeReturnHandler(); // returning home
+            handleReturnToHome(); // returning home
           }
         });
     } else {
       // if everyting is successful, then we need to go home
-      onHomeReturnHandler();
+      handleReturnToHome();
     }
   }
 
   //returning home handler
-  function onHomeReturnHandler() {
+  function handleReturnToHome() {
     navigation.replace(NAVIGATION_NAMES.NOTES_OVERVIEW);
   }
 
@@ -111,7 +111,7 @@ export default function Content(): ReactElement {
         ) : (
           <FormButtons
             onSubmit={onSubmitHandler}
-            onHomeReturn={onHomeReturnHandler}
+            onHomeReturn={handleReturnToHome}
           >
             Submit
           </FormButtons>

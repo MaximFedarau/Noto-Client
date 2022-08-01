@@ -51,14 +51,14 @@ export default function Form(): ReactElement {
   }
 
   // submitting (log in)
-  async function onFormSubmitHandler(values: SignInFormData) {
+  async function onFormSubmitHandler({ nickname, password }: SignInFormData) {
     setIsLoading(true);
     await axios
       .post<{ accessToken: string; refreshToken: string }>(
         `${process.env.API_URL}/auth/login`,
         {
-          nickname: values.nickname,
-          password: values.password,
+          nickname,
+          password,
         },
       )
       .catch((error) => {
@@ -77,12 +77,12 @@ export default function Form(): ReactElement {
         if (!res || !res.data) return; //checking is the response is undefined - type checking
         await SecureStore.setItemAsync('accessToken', res.data.accessToken); // saving access token to secure store
         await SecureStore.setItemAsync('refreshToken', res.data.refreshToken); // saving refresh token to secure store
-        onHomeReturnHandler(); // going to the home screen
+        handleReturnToHome(); // going to the home screen
       });
   }
 
   // returning home
-  function onHomeReturnHandler() {
+  function handleReturnToHome() {
     navigation.replace(NAVIGATION_NAMES.NOTES_OVERVIEW);
   }
 
@@ -122,7 +122,7 @@ export default function Form(): ReactElement {
             ) : (
               <FormButtons
                 onSubmit={handleSubmit}
-                onHomeReturn={onHomeReturnHandler}
+                onHomeReturn={handleReturnToHome}
               >
                 Sign In
               </FormButtons>
