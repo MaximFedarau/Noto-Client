@@ -13,13 +13,11 @@ import { Platform } from 'react-native';
 interface FormFieldProps extends TextInputProps {
   children: string;
   error?: string;
-  forceErrorShowing?: boolean;
 }
 
 export default function FormField({
   children,
   error,
-  forceErrorShowing,
   ...props
 }: FormFieldProps): ReactElement {
   const formSelectionColor = {
@@ -28,9 +26,7 @@ export default function FormField({
   return (
     <>
       <AuthInput value={children} {...props} {...formSelectionColor} />
-      {forceErrorShowing
-        ? error && <AuthFormErrorText>{error}</AuthFormErrorText>
-        : error && !children && <AuthFormErrorText>{error}</AuthFormErrorText>}
+      {error && <AuthFormErrorText>{error}</AuthFormErrorText>}
       {/* Statement above means, that if forceErrorShowing is true, then we check existence of an error and then show this error.
       Else, we show error only if error exists and input is not empty. */}
     </>

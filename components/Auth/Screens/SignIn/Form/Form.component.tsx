@@ -96,14 +96,14 @@ export default function Form(): ReactElement {
               <FormField
                 onChangeText={handleChange('nickname')}
                 placeholder="Nickname:"
-                error={errors.nickname}
+                error={!values.nickname ? errors.nickname : undefined}
               >
                 {values.nickname}
               </FormField>
               <FormField
                 onChangeText={handleChange('password')}
                 placeholder="Password:"
-                error={errors.password}
+                error={!values.password ? errors.password : undefined}
                 secureTextEntry
               >
                 {values.password}

@@ -124,7 +124,7 @@ export default function Form(): ReactElement {
               <FormField
                 onChangeText={handleChange('nickname')}
                 placeholder="Nickname:"
-                error={errors.nickname}
+                error={!values.nickname ? errors.nickname : undefined}
               >
                 {values.nickname}
               </FormField>
@@ -132,7 +132,6 @@ export default function Form(): ReactElement {
                 onChangeText={handleChange('password')}
                 placeholder="Password:"
                 error={errors.password}
-                forceErrorShowing
                 secureTextEntry
               >
                 {values.password}
@@ -141,7 +140,6 @@ export default function Form(): ReactElement {
                 onChangeText={handleChange('confirmPassword')}
                 placeholder="Confirm password:"
                 error={errors.confirmPassword}
-                forceErrorShowing
                 secureTextEntry
               >
                 {values.confirmPassword}
