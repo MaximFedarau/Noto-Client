@@ -20,7 +20,7 @@ export default function Button({
   return (
     <ButtonContainer
       type={type}
-      style={({ pressed }) => [pressed ? { opacity: 0.8 } : {}]}
+      style={({ pressed }) => (pressed ? { opacity: 0.8 } : {})}
       {...props}
     >
       <ButtonText style={textStyle} type={type}>

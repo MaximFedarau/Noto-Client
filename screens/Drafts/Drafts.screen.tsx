@@ -7,6 +7,7 @@ import IconButton from '@components/Default/IconButton/IconButton.component';
 import SearchBar from '@components/Default/SearchBar/SearchBar.component';
 import DraftsList from '@components/Drafts/DraftsList/DraftsList.component';
 import { fetchDrafts } from '@utils/db/drafts/fetch';
+import { stringSearch } from '@utils/stringSearch';
 import { LeftHeaderView } from '@components/Default/View/View.component';
 import { DraftsView } from '@components/Default/View/View.component';
 import { NoItemsText } from '@components/Default/Text/Text.component';
@@ -25,7 +26,6 @@ export default function Drafts(): ReactElement {
   const navigation = useNavigation<NavigationProps>();
 
   React.useEffect(() => {
-    // fetching drafts
     fetchDrafts()
       .then((result) => {
         setDrafts(result);
@@ -77,7 +77,10 @@ export default function Drafts(): ReactElement {
 
   // filtering drafts, depending on search pattern
   const filteredDrafts = drafts.filter((draft) => {
-    return (draft.title || '').toLowerCase().includes(searchText.toLowerCase());
+    return (
+      stringSearch(draft.title || '', searchText) ||
+      stringSearch(draft.content || '', searchText)
+    );
   });
 
   if (isError) return <Error />;
@@ -85,10 +88,14 @@ export default function Drafts(): ReactElement {
 
   return (
     <DraftsView>
-      {drafts.length > 0 ? (
-        <DraftsList>{filteredDrafts}</DraftsList>
+      {drafts.length ? (
+        filteredDrafts.length ? (
+          <DraftsList>{filteredDrafts}</DraftsList>
+        ) : (
+          <NoItemsText>Nothing found</NoItemsText>
+        )
       ) : (
-        <NoItemsText>No drafts</NoItemsText>
+        <NoItemsText>No Drafts</NoItemsText>
       )}
     </DraftsView>
   );

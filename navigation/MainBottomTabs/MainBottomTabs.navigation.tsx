@@ -45,13 +45,7 @@ export default function MainBottomTabs(): ReactElement {
   }
 
   React.useEffect(() => {
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      () => true,
-    ); // subscribing to the hardware back button
     const checkIsAuth = async () => {
-      // await SecureStore.deleteItemAsync('accessToken');
-      // await SecureStore.deleteItemAsync('refreshToken');
       const accessToken = await SecureStore.getItemAsync('accessToken');
       const refreshToken = await SecureStore.getItemAsync('refreshToken');
       if (accessToken && refreshToken) {
@@ -74,8 +68,16 @@ export default function MainBottomTabs(): ReactElement {
     checkIsAuth().finally(() => {
       setIsLoading(false);
     });
-    return () => backHandler.remove(); // unsubscribing from the hardware back button (blocking effect of the hardware back button)
   }, []);
+
+  // removing the hardware back button functionality (Android) on the first screen
+  React.useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      () => true,
+    ); // subscribing to the hardware back button
+    return () => backHandler.remove(); // unsubscribing from the hardware back button (blocking effect of the hardware back button)
+  });
 
   if (isLoading) return <Loading />;
 
@@ -108,23 +110,22 @@ export default function MainBottomTabs(): ReactElement {
             const { avatar } = publicData || {};
             return (
               <RightHeaderView>
-                {!avatar ? (
+                {avatar ? (
+                  <Avatar size={32} image={avatar} onPress={logOut} />
+                ) : (
                   <IconButton
                     iconName="person"
                     size={32}
-                    color={!isAuth ? tintColor : SOFT_BLUE}
-                    onPress={!isAuth ? navigateToAuth : logOut}
+                    color={isAuth ? SOFT_BLUE : tintColor}
+                    onPress={isAuth ? logOut : navigateToAuth}
                   />
-                ) : (
-                  <Avatar size={32} image={avatar} onPress={logOut} />
                 )}
               </RightHeaderView>
             );
           },
-          title:
-            publicData && publicData.nickname
-              ? `${publicData.nickname}'s Notes`
-              : 'Notes',
+          title: publicData?.nickname
+            ? `${publicData.nickname}'s Notes`
+            : 'Notes',
         }}
       />
       <BottomTab.Screen
@@ -166,15 +167,15 @@ export default function MainBottomTabs(): ReactElement {
             const { avatar } = publicData || {};
             return (
               <RightHeaderView>
-                {!avatar ? (
+                {avatar ? (
+                  <Avatar size={32} image={avatar} onPress={logOut} />
+                ) : (
                   <IconButton
                     iconName="person"
                     size={32}
-                    color={!isAuth ? tintColor : SOFT_BLUE}
-                    onPress={!isAuth ? navigateToAuth : logOut}
+                    color={isAuth ? SOFT_BLUE : tintColor}
+                    onPress={isAuth ? logOut : navigateToAuth}
                   />
-                ) : (
-                  <Avatar size={32} image={avatar} onPress={logOut} />
                 )}
               </RightHeaderView>
             );

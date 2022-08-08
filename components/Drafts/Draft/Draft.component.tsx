@@ -40,18 +40,18 @@ const Draft = React.memo(function Draft({
   return (
     <DraftContainer
       onPress={onDraftPressHandler}
-      style={({ pressed }) => [pressed ? { opacity: 0.75 } : {}]}
+      style={({ pressed }) => (pressed ? { opacity: 0.8 } : {})}
     >
       <DraftTitle>{title || ''}</DraftTitle>
-      {!content ? (
-        <NoDraftText>-</NoDraftText>
-      ) : (
+      {content ? (
         <RenderHTML
           contentWidth={width}
           source={{
             html: modifiedContent,
           }}
         />
+      ) : (
+        <NoDraftText>-</NoDraftText>
       )}
     </DraftContainer>
   );

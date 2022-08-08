@@ -23,6 +23,7 @@ export default function SearchBar(props: TextInputProps): ReactElement {
       <SearchBarInput
         {...props}
         {...(OS === 'ios' && { selectionColor: 'black' })}
+        autoCapitalize="none"
       />
     </View>
   );
