@@ -43,18 +43,7 @@ export default function Form(): ReactElement {
 
   React.useEffect(() => {
     if (route.params) return;
-    addDraft('', '')
-      .then((result) => {
-        setIsError(false);
-        setNoteId((prevNoteId) => {
-          if (prevNoteId) return prevNoteId;
-          return String(result.insertId);
-        });
-      })
-      .catch((error) => {
-        setIsError(true);
-        console.error(error, 'Adding Draft');
-      });
+    createEmptyDraft('Adding Draft');
   }, []); // when open this screen, then automatically new draft is created
 
   React.useLayoutEffect(() => {
@@ -68,8 +57,7 @@ export default function Form(): ReactElement {
     return () => {
       if (!noteId) return;
       deleteDraftIfEmpty(noteId).catch((error) => {
-        console.error(error, 'Deleting empty Draft');
-        setIsError(true);
+        errorHandling(error, 'Deleting empty Draft');
       });
     };
   }, [noteId]); //  deleteing empty draft, when exiting screen
@@ -98,20 +86,7 @@ export default function Form(): ReactElement {
       nextAppState === 'active'
     ) {
       const { title, content } = formRef.current?.values ?? {};
-      if (!title && !content) {
-        addDraft('', '')
-          .then((result) => {
-            setIsError(false);
-            setNoteId((prevNoteId) => {
-              if (prevNoteId) return prevNoteId;
-              return String(result.insertId);
-            });
-          })
-          .catch((error) => {
-            setIsError(true);
-            console.error(error, 'Adding Draft after deletion');
-          });
-      }
+      if (!title && !content) createEmptyDraft('Adding Draft after deletion');
     }
 
     appState.current = nextAppState;
@@ -128,11 +103,24 @@ export default function Form(): ReactElement {
         setIsError(false);
       })
       .catch((error) => {
-        console.error(error, 'Fetching Draft');
-        setIsError(true);
+        errorHandling(error, 'Fetching Draft');
       })
       .finally(() => {
         setIsLoading(false);
+      });
+  };
+
+  const createEmptyDraft = (errorMessage: string) => {
+    addDraft('', '')
+      .then((result) => {
+        setIsError(false);
+        setNoteId((prevNoteId) => {
+          if (prevNoteId) return prevNoteId;
+          return String(result.insertId);
+        });
+      })
+      .catch((error) => {
+        errorHandling(error, errorMessage);
       });
   };
 
@@ -148,8 +136,7 @@ export default function Form(): ReactElement {
         setIsError(false);
       })
       .catch((error) => {
-        setIsError(true);
-        console.error(error, 'Updating Draft');
+        errorHandling(error, 'Updating Draft');
       });
   };
 
@@ -157,10 +144,14 @@ export default function Form(): ReactElement {
   const onDraftDeleteHandler = async () => {
     if (!noteId) return;
     await deleteDraftById(noteId).catch((error) => {
-      console.error(error, 'Deleting Draft');
-      setIsError(true);
+      errorHandling(error, 'Deleting Draft');
     });
     navigation.goBack();
+  };
+
+  const errorHandling = (error: string, message: string) => {
+    setIsError(true);
+    console.error(error, message);
   };
 
   // * Cases handlers
