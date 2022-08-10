@@ -114,12 +114,9 @@ export default function Form(): ReactElement {
       }
     }
 
-    console.log(appState.current, nextAppState, 'app state');
-
     appState.current = nextAppState;
   };
 
-  // fetching draft info
   const fetchingDraft = () => {
     if (!route.params || !route.params.id) return;
     fetchDraftById(route.params.id)
@@ -139,7 +136,6 @@ export default function Form(): ReactElement {
       });
   };
 
-  // on form submit method
   const onFormSubmitHandler = (values: NotesManagingFormData) => {
     console.log(values);
   };
