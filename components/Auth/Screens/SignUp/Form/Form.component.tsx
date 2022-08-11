@@ -2,7 +2,6 @@ import React, { ReactElement } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { Formik } from 'formik';
 import { useNavigation } from '@react-navigation/native';
-import axios from 'axios';
 
 import FormField from '@components/Auth/Defaults/FormField/FormField.component';
 import Spinner from '@components/Auth/Defaults/Spinner/Spinner.component';
@@ -17,6 +16,7 @@ import { NavigationProps, SignUpFormData } from '@app-types/types';
 import { NAVIGATION_NAMES, NAVIGATION_AUTH_NAMES } from '@app-types/enum';
 import { signUpFormValidationSchema } from '@constants/validationSchemas';
 import { showingSubmitError } from '@utils/showingSubmitError';
+import { createAPIInstance } from '@utils/requests/instance';
 
 export default function Form(): ReactElement {
   const navigation = useNavigation<NavigationProps>();
@@ -34,14 +34,15 @@ export default function Form(): ReactElement {
     navigation.replace(NAVIGATION_AUTH_NAMES.SIGN_IN);
   };
 
-  // submit hanlder (sign up + (optional?) image upload + log in)
+  // submit hanlder (sign up  + log in)
   async function onFormSubmitHandler({ nickname, password }: SignUpFormData) {
     setIsLoading(true); // setting that the form is loading
+    const instance = createAPIInstance();
     const trimmedNickname = nickname.trim(); // trimming the nickname
 
     // * section: sign up
-    const signUpResponse = await axios
-      .post<{ id: string }>(`${process.env.API_URL}/auth/signup`, {
+    const signUpResponse = await instance
+      .post<{ id: string }>(`/auth/signup`, {
         nickname: trimmedNickname,
         password,
       }) // signing up the user
@@ -61,14 +62,11 @@ export default function Form(): ReactElement {
     const userId = signUpResponse.data.id;
 
     // * section: login
-    axios // in any case we login user
-      .post<{ accessToken: string; refreshToken: string }>(
-        `${process.env.API_URL}/auth/login`,
-        {
-          nickname: trimmedNickname,
-          password,
-        },
-      )
+    instance // in any case we login user
+      .post<{ accessToken: string; refreshToken: string }>(`/auth/login`, {
+        nickname: trimmedNickname,
+        password,
+      })
       .then(async (res) => {
         if (!res || !res.data) return; //checking is the response is undefined - type checking
         await SecureStore.setItemAsync('accessToken', res.data.accessToken); // saving access token to secure store
@@ -151,7 +149,3 @@ export default function Form(): ReactElement {
     </AuthFormContainer>
   );
 }
-
-Form.defaultProps = {
-  API_URL: (process.env.API_URL = 'http://localhost:5000'),
-};

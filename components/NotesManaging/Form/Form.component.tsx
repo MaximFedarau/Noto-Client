@@ -168,12 +168,13 @@ export default function Form(): ReactElement {
     >
       {({ values, handleChange, handleSubmit, errors }) => {
         React.useLayoutEffect(() => {
-          const title =
-            values.title && values.title.length > 16
-              ? values.title.substring(0, 16) + '...'
-              : values.title || 'Manage Note';
+          const { title } = values;
+          const convertedTitle =
+            title && title.length > 16
+              ? title?.substring(0, 16) + '...'
+              : title || 'Manage Note';
           navigation.setOptions({
-            headerTitle: title,
+            headerTitle: convertedTitle,
           });
         }, [values.title]);
 

@@ -2,7 +2,6 @@ import React, { ReactElement } from 'react';
 import * as FileSystem from 'expo-file-system';
 import * as SecureStore from 'expo-secure-store';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import axios from 'axios';
 
 import ContentScrollView from '@components/Auth/Defaults/ContentScrollView/ContentScrollView.component';
 import LogoPicker from '@components/Auth/Screens/AvatarPicker/LogoPicker/LogoPicker.component';
@@ -12,6 +11,7 @@ import { AuthAvatarPickerContainer } from '@components/Default/View/View.compone
 import { NavigationProps, NavigationRouteProp } from '@app-types/types';
 import { NAVIGATION_NAMES } from '@app-types/enum';
 import { showingSubmitError } from '@utils/showingSubmitError';
+import { createAPIRefreshInstance } from '@utils/requests/instance';
 
 export default function Content(): ReactElement {
   const navigation = useNavigation<NavigationProps>();
@@ -26,7 +26,6 @@ export default function Content(): ReactElement {
     setIsLoading(true);
     // image uploading
     const accessToken = await SecureStore.getItemAsync('accessToken'); // getting access token with goal to access API
-    const refreshToken = await SecureStore.getItemAsync('refreshToken'); // getting refresh token with goal to refresh access token
     const data = await FileSystem.uploadAsync(
       `${process.env.API_URL}/auth/image/upload/${route.params.id}`,
       image,
@@ -52,29 +51,16 @@ export default function Content(): ReactElement {
         );
       }
       // in other case, we need to refresh the access token
-      axios
-        .post(
-          `${process.env.API_URL}/auth/token/refresh`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${refreshToken}`,
-            },
-          },
-        )
+      const instance = createAPIRefreshInstance(handleReturnToHome);
+      instance
+        .post(`/auth/token/refresh`, {})
         .then(async (res) => {
           await SecureStore.setItemAsync('accessToken', res.data.accessToken); // setting new access token
           await SecureStore.setItemAsync('refreshToken', res.data.refreshToken); // setting new refresh token
           await onSubmitHandler(); // uploading image again
         })
-        .catch(async (error) => {
-          // if the refresh token is expired, then we need to logout
-          if (error.response.data.statusCode === 401) {
-            // making our tokens nullable
-            await SecureStore.deleteItemAsync('accessToken');
-            await SecureStore.deleteItemAsync('refreshToken');
-            handleReturnToHome(); // returning home
-          }
+        .catch((error) => {
+          console.error(error, 'image uploading error');
         });
     } else {
       // if everyting is successful, then we need to go home

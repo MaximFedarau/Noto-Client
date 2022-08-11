@@ -50,7 +50,7 @@ export default function MainBottomTabs(): ReactElement {
       const refreshToken = await SecureStore.getItemAsync('refreshToken');
       if (accessToken && refreshToken) {
         setIsAuth(true);
-        const data = await getPublicData(accessToken, refreshToken);
+        const data = await getPublicData();
         if (data) {
           // if there is a data we set it
           setPublicData(data);

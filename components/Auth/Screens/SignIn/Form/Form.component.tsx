@@ -2,7 +2,6 @@ import React, { ReactElement } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { Formik } from 'formik';
 import { useNavigation } from '@react-navigation/native';
-import axios from 'axios';
 
 import FormField from '@components/Auth/Defaults/FormField/FormField.component';
 import FormButtons from '@components/Auth/Defaults/FormButtons/FormButtons.component';
@@ -17,6 +16,7 @@ import { NAVIGATION_NAMES, NAVIGATION_AUTH_NAMES } from '@app-types/enum';
 import { NavigationProps, SignInFormData } from '@app-types/types';
 import { signInFormValidationSchema } from '@constants/validationSchemas';
 import { showingSubmitError } from '@utils/showingSubmitError';
+import { createAPIInstance } from '@utils/requests/instance';
 
 export default function Form(): ReactElement {
   const navigation = useNavigation<NavigationProps>();
@@ -35,14 +35,12 @@ export default function Form(): ReactElement {
   // submitting (log in)
   const onFormSubmitHandler = ({ nickname, password }: SignInFormData) => {
     setIsLoading(true);
-    axios
-      .post<{ accessToken: string; refreshToken: string }>(
-        `${process.env.API_URL}/auth/login`,
-        {
-          nickname: nickname.trim(),
-          password,
-        },
-      )
+    const instance = createAPIInstance();
+    instance
+      .post<{ accessToken: string; refreshToken: string }>('/auth/login', {
+        nickname: nickname.trim(),
+        password,
+      })
       .then(async (res) => {
         if (!res || !res.data) return; //checking is the response is undefined - type checking
         await SecureStore.setItemAsync('accessToken', res.data.accessToken); // saving access token to secure store
@@ -115,7 +113,3 @@ export default function Form(): ReactElement {
     </AuthFormContainer>
   );
 }
-
-Form.defaultProps = {
-  API_URL: (process.env.API_URL = 'http://localhost:5000'),
-};
