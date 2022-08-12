@@ -63,7 +63,7 @@ export default function Form(): ReactElement {
 
   // returning home
   const handleReturnToHome = () => {
-    navigation.replace(NAVIGATION_NAMES.NOTES_OVERVIEW);
+    navigation.navigate(NAVIGATION_NAMES.NOTES_OVERVIEW);
   };
 
   return (

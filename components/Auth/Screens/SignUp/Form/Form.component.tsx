@@ -91,7 +91,7 @@ export default function Form(): ReactElement {
 
   // returning to the main screen
   const handleReturnToHome = () => {
-    navigation.replace(NAVIGATION_NAMES.NOTES_OVERVIEW);
+    navigation.navigate(NAVIGATION_NAMES.NOTES_OVERVIEW);
   };
 
   return (

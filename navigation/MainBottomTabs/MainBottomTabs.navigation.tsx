@@ -1,9 +1,9 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import { NavigationProps, PublicUserData } from '@app-types/types';
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
-import { Pressable, BackHandler } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { Pressable } from 'react-native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import Loading from '@screens/Loading/Loading.screen';
@@ -26,12 +26,13 @@ const BottomTab = createBottomTabNavigator();
 
 export default function MainBottomTabs(): ReactElement {
   const navigation = useNavigation<NavigationProps>();
+  const focus = useIsFocused();
 
   const [isAuth, setIsAuth] = React.useState(false);
   const [publicData, setPublicData] = React.useState<
     PublicUserData | undefined
   >(undefined);
-  const [isLoading, setIsLoading] = React.useState(true);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   function navigateToAuth() {
     navigation.navigate(NAVIGATION_NAMES.AUTH);
@@ -44,7 +45,7 @@ export default function MainBottomTabs(): ReactElement {
     setPublicData(undefined);
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     const checkIsAuth = async () => {
       const accessToken = await SecureStore.getItemAsync('accessToken');
       const refreshToken = await SecureStore.getItemAsync('refreshToken');
@@ -65,19 +66,12 @@ export default function MainBottomTabs(): ReactElement {
         setPublicData(undefined);
       }
     };
-    checkIsAuth().finally(() => {
-      setIsLoading(false);
-    });
-  }, []);
-
-  // removing the hardware back button functionality (Android) on the first screen
-  React.useEffect(() => {
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      () => true,
-    ); // subscribing to the hardware back button
-    return () => backHandler.remove(); // unsubscribing from the hardware back button (blocking effect of the hardware back button)
-  });
+    if (focus) {
+      checkIsAuth().finally(() => {
+        setIsLoading(false);
+      });
+    }
+  }, [focus]);
 
   if (isLoading) return <Loading />;
 
