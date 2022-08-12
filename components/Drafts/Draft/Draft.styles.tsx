@@ -1,4 +1,3 @@
-//Styled components
 import styled from 'styled-components/native';
 
 export const DraftContainer = styled.Pressable`

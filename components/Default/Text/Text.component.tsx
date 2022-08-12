@@ -1,7 +1,5 @@
-//Styled componets
 import styled from 'styled-components/native';
 
-//Constants
 import { OSLO_GRAY } from '@constants/colors';
 
 // ! Default
@@ -30,4 +28,19 @@ export const NoDraftText = styled(DefaultText)`
   text-align: center;
   font-size: 22px;
   align-self: center;
+`;
+
+// ! Auth Screens
+
+export const AuthFormErrorText = styled(DefaultText)`
+  color: red;
+  font-size: 14px;
+  margin-horizontal: 12px;
+  margin-bottom: 12px;
+`;
+
+export const AuthNavigationText = styled(DefaultText)`
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
 `;

@@ -3,7 +3,7 @@
   "compilerOptions": {
     "strict": true,
     "jsx": "react-native",
-    "types": ["styled-components-react-native"],
+    "types": ["styled-components-react-native", "node"],
     "baseUrl": "./",
     "paths": {
       "@components/*": ["./components/*"],

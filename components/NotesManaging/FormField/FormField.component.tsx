@@ -1,9 +1,6 @@
-//Types
 import React, { ReactElement } from 'react';
-import { TextInputProps } from 'react-native';
+import { TextInputProps, Platform } from 'react-native';
 import { IconNode } from '@rneui/base';
-
-//React Native Elements
 import { Input } from '@rneui/themed';
 
 //Interface for Props
@@ -20,7 +17,7 @@ const FormField = React.memo(function FormField({
 }: FormFieldProps): ReactElement {
   return (
     <Input
-      selectionColor="black"
+      {...(Platform.OS === 'ios' && { selectionColor: 'black' })}
       label={children}
       {...props}
       labelStyle={{ fontWeight: '400' }}

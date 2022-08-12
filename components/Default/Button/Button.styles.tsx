@@ -1,18 +1,15 @@
-//Types
-import { BUTTON_TYPES } from '@app-types/enum';
-
-//Constants
-import { BUNTING } from '@constants/colors';
-
-//Styled Components
 import styled from 'styled-components/native';
+import { Pressable } from 'react-native';
+
+import { BUTTON_TYPES } from '@app-types/enum';
+import { BUNTING } from '@constants/colors';
 
 //Interface for Props
 interface ButtonStylingProps {
   type?: BUTTON_TYPES;
 }
 
-export const ButtonContainer = styled.Pressable<ButtonStylingProps>`
+export const ButtonContainer = styled(Pressable)<ButtonStylingProps>`
   display: flex;
   justify-content: center;
   background-color: ${({ type }) =>

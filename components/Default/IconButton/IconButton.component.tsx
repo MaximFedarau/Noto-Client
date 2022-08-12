@@ -1,11 +1,6 @@
-//Types
 import { ReactElement } from 'react';
 import { PressableProps } from 'react-native';
-
-//Expo
 import { Ionicons } from '@expo/vector-icons';
-
-//React Native
 import { Pressable } from 'react-native';
 
 //Interface for Props
@@ -24,7 +19,7 @@ export default function IconButton({
   return (
     <Pressable
       {...props}
-      style={({ pressed }) => [pressed ? { opacity: 0.5 } : {}]}
+      style={({ pressed }) => [pressed ? { opacity: 0.5 } : {}, props.style]}
     >
       <Ionicons name={iconName} size={size} color={color} />
     </Pressable>

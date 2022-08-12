@@ -28,8 +28,25 @@
       },
       "package": "com.maximfedarau.noto"
     },
+    "androidStatusBar": {
+      "barStyle": "dark-content",
+      "backgroundColor": "#F1EFE4"
+    },
     "web": {
       "favicon": "./assets/images/favicon.png"
-    }
+    },
+    "jsEngine": "hermes",
+    "androidNavigationBar": {
+      "barStyle": "dark-content",
+      "backgroundColor": "#F1EFE4"
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to let you use them with account."
+        }
+      ]
+    ]
   }
 }

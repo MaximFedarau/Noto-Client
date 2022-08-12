@@ -1,31 +1,17 @@
-//Types
 import React, { ReactElement } from 'react';
-import { DraftSchema } from '@app-types/types';
-import { NavigationProps } from '@app-types/types';
-import { NAVIGATION_NAMES } from '@app-types/enum';
+import { useWindowDimensions } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { RenderHTML } from 'react-native-render-html';
+import * as showdown from 'showdown';
 
-//Components
 import { DraftContainer } from './Draft.styles';
-
 import {
   DraftTitle,
   NoDraftText,
 } from '@components/Default/Text/Text.component';
-
-//Constants
+import { DraftSchema, NavigationProps } from '@app-types/types';
+import { NAVIGATION_NOTES_NAMES } from '@app-types/enum';
 import { contentFormat } from '@utils/contentFormat';
-
-//React Native
-import { useWindowDimensions } from 'react-native';
-
-//React Navigation
-import { useNavigation } from '@react-navigation/native';
-
-//React Render HTML
-import { RenderHTML } from 'react-native-render-html';
-
-//Showdown
-import * as showdown from 'showdown';
 
 //Interface for Props
 interface DraftProps {
@@ -37,33 +23,35 @@ const Draft = React.memo(function Draft({
 }: DraftProps): ReactElement {
   const { title, content, id } = children;
   const converter = new showdown.Converter();
-  const modifiedContent = converter.makeHtml(contentFormat(content!));
+  const modifiedContent = converter.makeHtml(contentFormat(content || ''));
 
   const { width } = useWindowDimensions();
 
   const navigation = useNavigation<NavigationProps>();
 
-  function onDraftPressHandler() {
-    navigation.navigate(NAVIGATION_NAMES.NOTES_MANAGING, {
+  // going to the notes overview screen passing route.id as a prop
+  const onDraftPressHandler = () => {
+    if (!title && !content) return;
+    navigation.navigate(NAVIGATION_NOTES_NAMES.NOTES_MANAGING, {
       id,
     });
-  }
+  };
 
   return (
     <DraftContainer
       onPress={onDraftPressHandler}
-      style={({ pressed }) => [pressed ? { opacity: 0.75 } : {}]}
+      style={({ pressed }) => (pressed ? { opacity: 0.8 } : {})}
     >
-      <DraftTitle>{title}</DraftTitle>
-      {!content ? (
-        <NoDraftText>-</NoDraftText>
-      ) : (
+      <DraftTitle>{title || ''}</DraftTitle>
+      {content ? (
         <RenderHTML
           contentWidth={width}
           source={{
-            html: modifiedContent!,
+            html: modifiedContent,
           }}
         />
+      ) : (
+        <NoDraftText>-</NoDraftText>
       )}
     </DraftContainer>
   );

@@ -1,12 +1,10 @@
-//Types
-import { DraftSchema } from '@app-types/types';
-
-//Expo
 import * as SQLite from 'expo-sqlite';
+
+import { DraftSchema } from '@app-types/types';
 
 const db = SQLite.openDatabase('drafts.db');
 
-export function fetchDrafts() {
+export const fetchDrafts = () => {
   const promise = new Promise<DraftSchema[]>((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
@@ -23,9 +21,9 @@ export function fetchDrafts() {
     });
   });
   return promise;
-}
+};
 
-export function fetchDraftById(id: string) {
+export const fetchDraftById = (id: string) => {
   const promise = new Promise<DraftSchema>((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
@@ -42,4 +40,4 @@ export function fetchDraftById(id: string) {
     });
   });
   return promise;
-}
+};

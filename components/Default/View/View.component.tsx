@@ -1,7 +1,6 @@
-//Styled componets
 import styled from 'styled-components/native';
+import { Platform, StatusBar } from 'react-native';
 
-//Constants
 import { SPRING_WOOD } from '@constants/colors';
 
 // ! Default
@@ -30,6 +29,7 @@ export const ErrorView = styled(DefaultView)`
 // ! Loading
 export const LoadingView = styled(DefaultView)`
   flex: 1;
+  background-color: ${SPRING_WOOD};
   align-items: center;
   justify-content: center;
 `;
@@ -64,4 +64,32 @@ export const FormView = styled(DefaultScrollView)`
 export const DraftsView = styled.SafeAreaView`
   flex: 1;
   justify-content: center;
+`;
+
+// ! Auth Screens
+
+export const AuthScreenContainer = styled.SafeAreaView`
+  flex: 1;
+  margin-top: ${Platform.OS === 'android' ? StatusBar.currentHeight : 24}px;
+`;
+
+export const AuthFormContainer = styled.View`
+  padding-vertical: 16px;
+`;
+
+export const AuthFormContentContainer = styled.View`
+  align-items: center;
+`;
+
+export const AuthFormFieldsContainer = styled.View``;
+
+export const AuthFormButtonsContainer = styled.View`
+  margin-top: 32px;
+  align-items: center;
+`;
+
+export const AuthAvatarPickerContainer = styled.View`
+  justify-content: center;
+  align-items: center;
+  padding-vertical: 16px;
 `;

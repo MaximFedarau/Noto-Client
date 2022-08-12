@@ -1,25 +1,16 @@
-//Types
 import React, { ReactElement } from 'react';
 import { TextInputProps, useWindowDimensions } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import RenderHtml from 'react-native-render-html';
+import * as showdown from 'showdown';
 
-//Components
 import FormField from '@components/NotesManaging/FormField/FormField.component';
-
 import {
   MarkdownFieldContainer,
   TabContainer,
   TabText,
   MarkdownContainer,
 } from './MarkdownField.styles';
-
-//Expo
-import { Ionicons } from '@expo/vector-icons';
-
-//React Render HTML
-import RenderHtml from 'react-native-render-html';
-
-// Showdown
-import * as showdown from 'showdown';
 
 //Interface for Props
 interface MarkdownFieldProps extends TextInputProps {
@@ -34,14 +25,11 @@ const MarkdownField = React.memo(function MarkdownField({
   ...props
 }: MarkdownFieldProps): ReactElement {
   const window = useWindowDimensions();
+  const converter = new showdown.Converter();
 
   const [renderedHTML, setRenderdHTML] = React.useState<string>('');
   const [tabIndex, setTabIndex] = React.useState<number>(0);
 
-  const converter = new showdown.Converter();
-  React.useEffect(() => {
-    setRenderdHTML(converter.makeHtml(value || ''));
-  }, [value]);
   return (
     <>
       <MarkdownFieldContainer>
@@ -56,6 +44,7 @@ const MarkdownField = React.memo(function MarkdownField({
         <TabContainer
           isActive={tabIndex === 1}
           onPress={() => {
+            setRenderdHTML(converter.makeHtml(value || '')); // when we switch to markdown (html) tab, then we convert our value to html
             setTabIndex(1);
           }}
         >
@@ -65,7 +54,6 @@ const MarkdownField = React.memo(function MarkdownField({
       {tabIndex === 0 && (
         <FormField
           {...props}
-          selectionColor="black"
           value={value}
           errorMessage={errorMessage}
           multiline
@@ -83,10 +71,10 @@ const MarkdownField = React.memo(function MarkdownField({
             ignoredDomTags={['script', 'img', 'svg', 'button']}
             renderersProps={{
               ul: {
-                enableExperimentalRtl: true,
+                enableExperimentalRtl: true, // enabling feature
               },
               ol: {
-                enableExperimentalRtl: true,
+                enableExperimentalRtl: true, // enabling feature
               },
             }}
           />

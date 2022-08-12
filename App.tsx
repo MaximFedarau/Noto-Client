@@ -1,25 +1,14 @@
-//Types
 import React, { ReactElement } from 'react';
-import { NAVIGATION_NAMES } from '@app-types/enum';
-
-//Constants
-import { OSLO_GRAY, SPRING_WOOD } from '@constants/colors';
-import { initDbDrafts } from '@utils/db/drafts/init';
-
-//Expo
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
-
-//Navigation
-import MainBottomTabs from '@navigation/MainBottomTabs/MainBottomTabs.navigation';
-
-//Screens
-import NotesManaging from '@screens/NotesManaging/NotesManaging.screen';
-import Error from '@screens/Error/Error.screen';
-
-//React Navigation
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+import MainBottomTabs from '@navigation/MainBottomTabs/MainBottomTabs.navigation';
+import AuthStack from '@navigation/AuthStack/AuthStack.navigation';
+import Error from '@screens/Error/Error.screen';
+import { initDbDrafts } from '@utils/db/drafts/init';
+import { NAVIGATION_NAMES } from '@app-types/enum';
 
 const Stack = createNativeStackNavigator();
 
@@ -30,10 +19,10 @@ export default function App(): ReactElement | null {
     initDbDrafts()
       .then((message) => {
         setIsSetupError(false);
-        console.log(message);
+        console.info(message);
       })
       .catch((error) => {
-        console.log(error, 'App setup');
+        console.error(error, 'App setup');
         setIsSetupError(true);
       });
   }, []);
@@ -50,29 +39,16 @@ export default function App(): ReactElement | null {
     <>
       <StatusBar style="dark" animated />
       <NavigationContainer>
-        <Stack.Navigator>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+          }}
+        >
           <Stack.Screen
             name={NAVIGATION_NAMES.NOTES_OVERVIEW}
             component={MainBottomTabs}
-            options={{ headerShown: false }}
           />
-          <Stack.Screen
-            name={NAVIGATION_NAMES.NOTES_MANAGING}
-            component={NotesManaging}
-            options={{
-              title: 'Manage Note',
-              headerTitleAlign: 'center',
-              headerTintColor: OSLO_GRAY,
-              headerTitleStyle: {
-                fontFamily: 'Roboto-Regular',
-              },
-              headerStyle: { backgroundColor: SPRING_WOOD },
-              headerShadowVisible: false,
-              contentStyle: {
-                backgroundColor: SPRING_WOOD,
-              },
-            }}
-          />
+          <Stack.Screen name={NAVIGATION_NAMES.AUTH} component={AuthStack} />
         </Stack.Navigator>
       </NavigationContainer>
     </>
