@@ -14,6 +14,7 @@ module.exports = function (api) {
             '@navigation': './navigation',
             '@app-types': './types',
             '@utils': './utils',
+            '@store': './store',
           },
         },
         'transform-inline-environment-variables',
