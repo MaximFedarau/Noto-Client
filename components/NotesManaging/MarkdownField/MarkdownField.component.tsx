@@ -9,6 +9,7 @@ import {
   MarkdownFieldContainer,
   TabContainer,
   TabText,
+  FieldContainer,
   MarkdownContainer,
 } from './MarkdownField.styles';
 
@@ -52,14 +53,16 @@ const MarkdownField = React.memo(function MarkdownField({
         </TabContainer>
       </MarkdownFieldContainer>
       {tabIndex === 0 && (
-        <FormField
-          {...props}
-          value={value}
-          errorMessage={errorMessage}
-          multiline
-          autoComplete="off"
-          leftIcon={<Ionicons name="logo-markdown" size={20} />}
-        />
+        <FieldContainer>
+          <FormField
+            {...props}
+            value={value}
+            errorMessage={errorMessage}
+            multiline
+            autoComplete="off"
+            leftIcon={<Ionicons name="logo-markdown" size={20} />}
+          />
+        </FieldContainer>
       )}
       {tabIndex === 1 && (
         <MarkdownContainer>

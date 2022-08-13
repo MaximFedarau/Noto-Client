@@ -8,12 +8,10 @@ interface TabProps {
 }
 
 export const MarkdownFieldContainer = styled.View`
-  flex: 1;
   flex-direction: row;
   margin-horizontal: 8px;
   border-bottom-color: ${BUNTING};
   border-bottom-width: 1px;
-  justify-content: space-between;
 `;
 
 export const TabContainer = styled.Pressable<TabProps>`
@@ -31,6 +29,10 @@ export const TabContainer = styled.Pressable<TabProps>`
 export const TabText = styled.Text<TabProps>`
   color: ${({ isActive }) => (isActive ? 'white' : BUNTING)};
   font-size: 17px;
+`;
+
+export const FieldContainer = styled.View`
+  flex: 1;
 `;
 
 export const MarkdownContainer = styled.View`

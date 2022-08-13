@@ -31,6 +31,8 @@ import { showingSuccess } from '@utils/toastInteraction/showingSuccess';
 import { publicDataInitialState } from '@store/publicData/publicData.slice';
 import { setPublicData } from '@store/publicData/publicData.slice';
 
+import { styles } from './Form.styles';
+
 export default function Form(): ReactElement {
   const dispatch = useDispatch();
 
@@ -166,8 +168,8 @@ export default function Form(): ReactElement {
       });
     if (!data) return;
     showingSuccess(
-      'Note Uploading Success',
-      'Note was successfully uploaded.',
+      'Congratulations!',
+      'Note was successfully uploaded and draft was deleted.',
       0,
       async () => {
         if (route.params) {
@@ -258,7 +260,7 @@ export default function Form(): ReactElement {
         }, [values, isPendingRequest]);
 
         return (
-          <FormView>
+          <FormView contentContainerStyle={styles.contentContainer}>
             <FormField
               onChangeText={handleChange('title')}
               value={values.title}
