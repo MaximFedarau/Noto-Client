@@ -15,7 +15,7 @@ import { AuthNavigationText } from '@components/Default/Text/Text.component';
 import { NavigationProps, SignUpFormData } from '@app-types/types';
 import { NAVIGATION_NAMES, NAVIGATION_AUTH_NAMES } from '@app-types/enum';
 import { signUpFormValidationSchema } from '@constants/validationSchemas';
-import { showingSubmitError } from '@utils/showingSubmitError';
+import { showingSubmitError } from '@utils/toastInteraction/showingSubmitError';
 import { createAPIInstance } from '@utils/requests/instance';
 
 export default function Form(): ReactElement {
@@ -53,6 +53,7 @@ export default function Form(): ReactElement {
           error.response.data
             ? error.response.data.message
             : 'Something went wrong:(',
+          undefined,
           () => {
             setIsLoading(false);
           },
@@ -82,6 +83,7 @@ export default function Form(): ReactElement {
           error.response.data
             ? error.response.data.message
             : 'Something went wrong:(',
+          undefined,
           () => {
             setIsLoading(false);
           },

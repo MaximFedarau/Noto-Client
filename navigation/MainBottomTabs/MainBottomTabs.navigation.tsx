@@ -1,10 +1,11 @@
 import React, { ReactElement, useEffect } from 'react';
-import { NavigationProps, PublicUserData } from '@app-types/types';
+import { NavigationProps } from '@app-types/types';
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
 import { Pressable } from 'react-native';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Loading from '@screens/Loading/Loading.screen';
 import Notes from '@screens/Notes/Notes.screen';
@@ -21,18 +22,26 @@ import {
 } from '@constants/colors';
 import { NAVIGATION_NAMES, NAVIGATION_NOTES_NAMES } from '@app-types/enum';
 import { getPublicData } from '@utils/auth/get/publicData';
+import {
+  publicDataInitialState,
+  setPublicData,
+} from '@store/publicData/publicData.slice';
+import {
+  publicDataAvatarSelector,
+  publicDataNicknameSelector,
+} from '@store/publicData/publicData.selector';
 
 const BottomTab = createBottomTabNavigator();
 
 export default function MainBottomTabs(): ReactElement {
+  const dispatch = useDispatch();
+  const nickname = useSelector(publicDataNicknameSelector);
+
   const navigation = useNavigation<NavigationProps>();
   const focus = useIsFocused();
 
   const [isAuth, setIsAuth] = React.useState(false);
-  const [publicData, setPublicData] = React.useState<
-    PublicUserData | undefined
-  >(undefined);
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
 
   function navigateToAuth() {
     navigation.navigate(NAVIGATION_NAMES.AUTH);
@@ -42,7 +51,7 @@ export default function MainBottomTabs(): ReactElement {
     await SecureStore.deleteItemAsync('accessToken');
     await SecureStore.deleteItemAsync('refreshToken');
     setIsAuth(false);
-    setPublicData(undefined);
+    dispatch(setPublicData(publicDataInitialState));
   }
 
   useEffect(() => {
@@ -54,24 +63,33 @@ export default function MainBottomTabs(): ReactElement {
         const data = await getPublicData();
         if (data) {
           // if there is a data we set it
-          setPublicData(data);
+          dispatch(setPublicData(data));
         } else {
-          // if there is no data we delete the tokens (in function) and remove all states
+          // if there is no data we delete the tokens (in function) and change all data
           setIsAuth(false);
-          setPublicData(undefined);
+          dispatch(setPublicData(publicDataInitialState));
         }
       } else {
-        //if there is no tokens we remove all states
+        //if there is no tokens we change all data
         setIsAuth(false);
-        setPublicData(undefined);
+        dispatch(setPublicData(publicDataInitialState));
       }
     };
     if (focus) {
       checkIsAuth().finally(() => {
         setIsLoading(false);
       });
+      return;
     }
+    setIsLoading(false);
   }, [focus]);
+
+  // as authenthicated user always has a nickname, then when it is empty, we can say, that user is logged out
+  useEffect(() => {
+    if (!nickname) {
+      setIsAuth(false);
+    }
+  }, [nickname]);
 
   if (isLoading) return <Loading />;
 
@@ -101,7 +119,7 @@ export default function MainBottomTabs(): ReactElement {
           },
           tabBarLabel: () => null,
           headerRight: ({ tintColor }) => {
-            const { avatar } = publicData || {};
+            const avatar = useSelector(publicDataAvatarSelector);
             return (
               <RightHeaderView>
                 {avatar ? (
@@ -117,9 +135,7 @@ export default function MainBottomTabs(): ReactElement {
               </RightHeaderView>
             );
           },
-          title: publicData?.nickname
-            ? `${publicData.nickname}'s Notes`
-            : 'Notes',
+          title: nickname ? `${nickname}'s Notes` : 'Notes',
         }}
       />
       <BottomTab.Screen
@@ -158,7 +174,7 @@ export default function MainBottomTabs(): ReactElement {
           },
           tabBarLabel: () => null,
           headerRight: ({ tintColor }) => {
-            const { avatar } = publicData || {};
+            const avatar = useSelector(publicDataAvatarSelector);
             return (
               <RightHeaderView>
                 {avatar ? (

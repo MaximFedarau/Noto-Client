@@ -1,7 +1,9 @@
 import React, { ReactElement } from 'react';
-import { AppState, AppStateStatus } from 'react-native';
+import { AppState, AppStateStatus, Alert } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
 import { Formik, FormikProps } from 'formik';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
 
 import Error from '@screens/Error/Error.screen';
 import Loading from '@screens/Loading/Loading.screen';
@@ -9,6 +11,7 @@ import IconButton from '@components/Default/IconButton/IconButton.component';
 import Button from '@components/Default/Button/Button.component';
 import FormField from '@components/NotesManaging/FormField/FormField.component';
 import MarkdownField from '@components/NotesManaging/MarkdownField/MarkdownField.component';
+import Spinner from '@components/Auth/Defaults/Spinner/Spinner.component';
 import { FormView } from '@components/Default/View/View.component';
 import { RightHeaderView } from '@components/Default/View/View.component';
 import { notesManagingFormValidationSchema } from '@constants/validationSchemas';
@@ -22,13 +25,21 @@ import {
   NavigationRouteProp,
 } from '@app-types/types';
 import { BUTTON_TYPES } from '@app-types/enum';
+import { createAPIInstance } from '@utils/requests/instance';
+import { showingSubmitError } from '@utils/toastInteraction/showingSubmitError';
+import { showingSuccess } from '@utils/toastInteraction/showingSuccess';
+import { publicDataInitialState } from '@store/publicData/publicData.slice';
+import { setPublicData } from '@store/publicData/publicData.slice';
 
 export default function Form(): ReactElement {
+  const dispatch = useDispatch();
+
   const navigation = useNavigation<NavigationProps>();
   const route = useRoute<NavigationRouteProp>();
 
   const [isLoading, setIsLoading] = React.useState(false);
   const [isError, setIsError] = React.useState<boolean>(false);
+  const [isPendingRequest, setIsPendingRequest] = React.useState(false);
   const [noteId, setNoteId] = React.useState<string | null>(null);
   const [formInitialValues, setFormInitialValues] =
     React.useState<NotesManagingFormData>({
@@ -124,14 +135,60 @@ export default function Form(): ReactElement {
       });
   };
 
-  const onFormSubmitHandler = (values: NotesManagingFormData) => {
-    console.log(values);
+  const onFormSubmitHandler = async (values: NotesManagingFormData) => {
+    setIsPendingRequest(true);
+    const accessToken = await SecureStore.getItemAsync('accessToken');
+    const refreshToken = await SecureStore.getItemAsync('refreshToken');
+    if (!accessToken || !refreshToken) {
+      unauthHandler();
+      return;
+    }
+    const instance = createAPIInstance(() => {
+      dispatch(setPublicData(publicDataInitialState));
+      unauthHandler();
+    });
+    const data = await instance
+      .post('/notes/', {
+        title: values.title?.trim() || undefined, // because if title is empty, then it is undefined, intead of empty string
+        content: values.content?.trim() || undefined, // because if content is empty, then it is undefined, intead of empty string
+      })
+      .catch((error) => {
+        showingSubmitError(
+          'Note Uploading Error',
+          error.response.data
+            ? error.response.data.message
+            : 'Something went wrong:(',
+          0,
+          () => {
+            setIsPendingRequest(false);
+          },
+        );
+      });
+    if (!data) return;
+    showingSuccess(
+      'Note Uploading Success',
+      'Note was successfully uploaded.',
+      0,
+      async () => {
+        if (route.params) {
+          await onDraftDeleteHandler();
+          return;
+        }
+        formRef.current.resetForm();
+        setIsPendingRequest(false);
+      },
+    );
+  };
+
+  const unauthHandler = () => {
+    setIsPendingRequest(false);
+    Alert.alert('Oops...', 'You are not logged in:(');
   };
 
   // saving to Drafts section
   const saveToDrafts = (values: NotesManagingFormData) => {
     if (!noteId) return;
-    updateDraft(noteId, values.title || '', values.content)
+    updateDraft(noteId, values.title?.trim() || '', values.content?.trim())
       .then(() => {
         setIsError(false);
       })
@@ -191,13 +248,14 @@ export default function Form(): ReactElement {
                           size={32}
                           color="red"
                           onPress={onDraftDeleteHandler}
+                          disabled={isPendingRequest}
                         />
                       </RightHeaderView>
                     );
                   }
                 : () => null,
           });
-        }, [values]);
+        }, [values, isPendingRequest]);
 
         return (
           <FormView>
@@ -205,6 +263,8 @@ export default function Form(): ReactElement {
               onChangeText={handleChange('title')}
               value={values.title}
               errorMessage={errors.title}
+              editable={!isPendingRequest}
+              selectTextOnFocus={!isPendingRequest}
             >
               Title
             </FormField>
@@ -212,12 +272,18 @@ export default function Form(): ReactElement {
               onChangeText={handleChange('content')}
               value={values.content}
               errorMessage={errors.content}
+              editable={!isPendingRequest}
+              selectTextOnFocus={!isPendingRequest}
             >
               Content
             </MarkdownField>
-            <Button type={BUTTON_TYPES.CONTAINED} onPress={handleSubmit}>
-              Submit
-            </Button>
+            {isPendingRequest ? (
+              <Spinner />
+            ) : (
+              <Button type={BUTTON_TYPES.CONTAINED} onPress={handleSubmit}>
+                Submit
+              </Button>
+            )}
             {/* ! Formik behaviour */}
           </FormView>
         );

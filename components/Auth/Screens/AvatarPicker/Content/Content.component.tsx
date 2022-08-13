@@ -10,7 +10,7 @@ import FormButtons from '@components/Auth/Defaults/FormButtons/FormButtons.compo
 import { AuthAvatarPickerContainer } from '@components/Default/View/View.component';
 import { NavigationProps, NavigationRouteProp } from '@app-types/types';
 import { NAVIGATION_NAMES } from '@app-types/enum';
-import { showingSubmitError } from '@utils/showingSubmitError';
+import { showingSubmitError } from '@utils/toastInteraction/showingSubmitError';
 import { createAPIRefreshInstance } from '@utils/requests/instance';
 
 export default function Content(): ReactElement {
@@ -45,6 +45,7 @@ export default function Content(): ReactElement {
         showingSubmitError(
           'Avatar Uploading Error',
           'Something went wrong:( Try again later',
+          undefined,
           () => {
             setIsLoading(false);
           },
