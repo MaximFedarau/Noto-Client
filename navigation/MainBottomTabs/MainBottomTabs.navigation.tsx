@@ -25,8 +25,10 @@ import { getPublicData } from '@utils/auth/get/publicData';
 import {
   publicDataInitialState,
   setPublicData,
+  setIsAuth,
 } from '@store/publicData/publicData.slice';
 import {
+  publicDataAuthSelector,
   publicDataAvatarSelector,
   publicDataNicknameSelector,
 } from '@store/publicData/publicData.selector';
@@ -36,11 +38,11 @@ const BottomTab = createBottomTabNavigator();
 export default function MainBottomTabs(): ReactElement {
   const dispatch = useDispatch();
   const nickname = useSelector(publicDataNicknameSelector);
+  const isAuth = useSelector(publicDataAuthSelector);
 
   const navigation = useNavigation<NavigationProps>();
   const focus = useIsFocused();
 
-  const [isAuth, setIsAuth] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
 
   function navigateToAuth() {
@@ -50,7 +52,7 @@ export default function MainBottomTabs(): ReactElement {
   async function logOut() {
     await SecureStore.deleteItemAsync('accessToken');
     await SecureStore.deleteItemAsync('refreshToken');
-    setIsAuth(false);
+    dispatch(setIsAuth(false));
     dispatch(setPublicData(publicDataInitialState));
   }
 
@@ -59,19 +61,19 @@ export default function MainBottomTabs(): ReactElement {
       const accessToken = await SecureStore.getItemAsync('accessToken');
       const refreshToken = await SecureStore.getItemAsync('refreshToken');
       if (accessToken && refreshToken) {
-        setIsAuth(true);
         const data = await getPublicData();
         if (data) {
           // if there is a data we set it
+          dispatch(setIsAuth(true));
           dispatch(setPublicData(data));
         } else {
           // if there is no data we delete the tokens (in function) and change all data
-          setIsAuth(false);
+          dispatch(setIsAuth(false));
           dispatch(setPublicData(publicDataInitialState));
         }
       } else {
         //if there is no tokens we change all data
-        setIsAuth(false);
+        dispatch(setIsAuth(false));
         dispatch(setPublicData(publicDataInitialState));
       }
     };
@@ -83,13 +85,6 @@ export default function MainBottomTabs(): ReactElement {
     }
     setIsLoading(false);
   }, [focus]);
-
-  // as authenthicated user always has a nickname, then when it is empty, we can say, that user is logged out
-  useEffect(() => {
-    if (!nickname) {
-      setIsAuth(false);
-    }
-  }, [nickname]);
 
   if (isLoading) return <Loading />;
 

@@ -48,8 +48,8 @@ export const LeftHeaderView = styled(DefaultView)`
 
 // ! Notes Screen
 
-export const NotesView = styled(DefaultView)`
-  align-items: center;
+export const NotesView = styled.SafeAreaView`
+  flex: 1;
   justify-content: center;
 `;
 

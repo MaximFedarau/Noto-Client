@@ -30,6 +30,19 @@ export const NoDraftText = styled(DefaultText)`
   align-self: center;
 `;
 
+// ! Notes
+export const NoteTitle = styled(DefaultText)`
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+`;
+
+export const NoNoteText = styled(DefaultText)`
+  text-align: center;
+  font-size: 22px;
+  align-self: center;
+`;
+
 // ! Auth Screens
 
 export const AuthFormErrorText = styled(DefaultText)`

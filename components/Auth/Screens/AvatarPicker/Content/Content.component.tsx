@@ -8,14 +8,14 @@ import LogoPicker from '@components/Auth/Screens/AvatarPicker/LogoPicker/LogoPic
 import Spinner from '@components/Auth/Defaults/Spinner/Spinner.component';
 import FormButtons from '@components/Auth/Defaults/FormButtons/FormButtons.component';
 import { AuthAvatarPickerContainer } from '@components/Default/View/View.component';
-import { NavigationProps, NavigationRouteProp } from '@app-types/types';
+import { NavigationProps, AvatarPickerRouteProp } from '@app-types/types';
 import { NAVIGATION_NAMES } from '@app-types/enum';
 import { showingSubmitError } from '@utils/toastInteraction/showingSubmitError';
 import { createAPIRefreshInstance } from '@utils/requests/instance';
 
 export default function Content(): ReactElement {
   const navigation = useNavigation<NavigationProps>();
-  const route = useRoute<NavigationRouteProp>();
+  const route = useRoute<AvatarPickerRouteProp>();
 
   const [image, setImage] = React.useState<string>();
   const [isLoading, setIsLoading] = React.useState(false);

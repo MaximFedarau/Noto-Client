@@ -1,5 +1,10 @@
 import React, { ReactElement } from 'react';
-import { AppState, AppStateStatus, Alert } from 'react-native';
+import {
+  AppState,
+  AppStateStatus,
+  Alert,
+  ActivityIndicator,
+} from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { Formik, FormikProps } from 'formik';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -11,7 +16,6 @@ import IconButton from '@components/Default/IconButton/IconButton.component';
 import Button from '@components/Default/Button/Button.component';
 import FormField from '@components/NotesManaging/FormField/FormField.component';
 import MarkdownField from '@components/NotesManaging/MarkdownField/MarkdownField.component';
-import Spinner from '@components/Auth/Defaults/Spinner/Spinner.component';
 import { FormView } from '@components/Default/View/View.component';
 import { RightHeaderView } from '@components/Default/View/View.component';
 import { notesManagingFormValidationSchema } from '@constants/validationSchemas';
@@ -22,13 +26,16 @@ import { deleteDraftById, deleteDraftIfEmpty } from '@utils/db/drafts/delete';
 import {
   NotesManagingFormData,
   NavigationProps,
-  NavigationRouteProp,
+  NotesManagingRouteProp,
 } from '@app-types/types';
 import { BUTTON_TYPES } from '@app-types/enum';
 import { createAPIInstance } from '@utils/requests/instance';
 import { showingSubmitError } from '@utils/toastInteraction/showingSubmitError';
 import { showingSuccess } from '@utils/toastInteraction/showingSuccess';
-import { publicDataInitialState } from '@store/publicData/publicData.slice';
+import {
+  publicDataInitialState,
+  setIsAuth,
+} from '@store/publicData/publicData.slice';
 import { setPublicData } from '@store/publicData/publicData.slice';
 
 import { styles } from './Form.styles';
@@ -37,7 +44,7 @@ export default function Form(): ReactElement {
   const dispatch = useDispatch();
 
   const navigation = useNavigation<NavigationProps>();
-  const route = useRoute<NavigationRouteProp>();
+  const route = useRoute<NotesManagingRouteProp>();
 
   const [isLoading, setIsLoading] = React.useState(false);
   const [isError, setIsError] = React.useState<boolean>(false);
@@ -60,10 +67,10 @@ export default function Form(): ReactElement {
   }, []); // when open this screen, then automatically new draft is created
 
   React.useLayoutEffect(() => {
-    if (!route.params || !route.params.id) return;
+    if (!route.params || !route.params.draftId) return;
     setIsLoading(true);
     fetchingDraft();
-    setNoteId(route.params.id);
+    setNoteId(route.params.draftId);
   }, []); // setting info, depending on params
 
   React.useLayoutEffect(() => {
@@ -106,8 +113,8 @@ export default function Form(): ReactElement {
   };
 
   const fetchingDraft = () => {
-    if (!route.params || !route.params.id) return;
-    fetchDraftById(route.params.id)
+    if (!route.params || !route.params.draftId) return;
+    fetchDraftById(route.params.draftId)
       .then((draft) => {
         setFormInitialValues({
           title: draft.title,
@@ -147,6 +154,7 @@ export default function Form(): ReactElement {
     }
     const instance = createAPIInstance(() => {
       dispatch(setPublicData(publicDataInitialState));
+      dispatch(setIsAuth(false));
       unauthHandler();
     });
     const data = await instance
@@ -155,6 +163,7 @@ export default function Form(): ReactElement {
         content: values.content?.trim() || undefined, // because if content is empty, then it is undefined, intead of empty string
       })
       .catch((error) => {
+        if (error.response.status === 401) return;
         showingSubmitError(
           'Note Uploading Error',
           error.response.data
@@ -280,7 +289,7 @@ export default function Form(): ReactElement {
               Content
             </MarkdownField>
             {isPendingRequest ? (
-              <Spinner />
+              <ActivityIndicator size="large" />
             ) : (
               <Button type={BUTTON_TYPES.CONTAINED} onPress={handleSubmit}>
                 Submit

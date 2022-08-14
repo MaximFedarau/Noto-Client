@@ -6,6 +6,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export const publicDataInitialState: PublicUserData = {
   nickname: '',
+  isAuth: false,
   avatar: undefined,
 };
 
@@ -20,7 +21,10 @@ export const publicDataSlice = createSlice({
       state.avatar = action.payload.avatar;
       state.nickname = action.payload.nickname;
     },
+    setIsAuth: (state: PublicUserData, action: PayloadAction<boolean>) => {
+      state.isAuth = action.payload;
+    },
   },
 });
 
-export const { setPublicData } = publicDataSlice.actions;
+export const { setPublicData, setIsAuth } = publicDataSlice.actions;

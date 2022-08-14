@@ -15,3 +15,8 @@ export const publicDataNicknameSelector = createSelector(
   publicDataReducerSelector,
   (state) => state.nickname,
 );
+
+export const publicDataAuthSelector = createSelector(
+  publicDataReducerSelector,
+  (state) => state.isAuth,
+);

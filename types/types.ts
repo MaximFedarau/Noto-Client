@@ -20,7 +20,10 @@ type AuthNavigationRootStackParamList = {
 type NotesRootStackParamList = {
   [NAVIGATION_NOTES_NAMES.NOTES]?: undefined;
   [NAVIGATION_NOTES_NAMES.DRAFTS]?: undefined;
-  [NAVIGATION_NOTES_NAMES.NOTES_MANAGING]?: { id?: string };
+  [NAVIGATION_NOTES_NAMES.NOTES_MANAGING]?: {
+    draftId?: string;
+    noteId?: string;
+  };
 };
 
 // General routes
@@ -31,7 +34,14 @@ type RootStackParamList = {
   NotesRootStackParamList;
 
 export type NavigationProps = NativeStackNavigationProp<RootStackParamList>; // for navigation object (React Navigation)
-export type NavigationRouteProp = RouteProp<RootStackParamList>; // for route object (React Navigation)
+export type AvatarPickerRouteProp = RouteProp<
+  AuthNavigationRootStackParamList,
+  NAVIGATION_AUTH_NAMES.AVATAR_PICKER
+>; // for route object (React Navigation) - Avatar Picker screen
+export type NotesManagingRouteProp = RouteProp<
+  NotesRootStackParamList,
+  NAVIGATION_NOTES_NAMES.NOTES_MANAGING
+>; // for route object (React Navigation) - Notes Managing screen
 
 // ! Notes Managing Form Data Interface
 
@@ -45,6 +55,14 @@ export interface NotesManagingFormData {
 
 // Draft schema for local DB
 export interface DraftSchema {
+  id: string;
+  title?: string;
+  content?: string;
+}
+
+// ! Note Schema
+
+export interface NoteSchema {
   id: string;
   title?: string;
   content?: string;
@@ -72,5 +90,6 @@ export interface SignUpFormData {
 // Public Data (like Avatar, for example) Interface - for fetching, setting as data and etc.
 export interface PublicUserData {
   nickname: string;
+  isAuth: boolean;
   avatar?: string;
 }
