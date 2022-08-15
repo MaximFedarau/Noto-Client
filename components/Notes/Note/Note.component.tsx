@@ -8,7 +8,8 @@ import { NoteContainer } from './Note.styles';
 import { NoteTitle, NoNoteText } from '@components/Default/Text/Text.component';
 import { NavigationProps, NoteSchema } from '@app-types/types';
 import { NAVIGATION_NOTES_NAMES } from '@app-types/enum';
-import { contentFormat } from '@utils/contentFormat';
+import { titleFormat } from '@utils/stringInteraction/titleFormat';
+import { contentFormat } from '@utils/stringInteraction/contentFormat';
 
 //Interface for Props
 interface NoteProps {
@@ -17,8 +18,8 @@ interface NoteProps {
 
 const Note = React.memo(function Note({ children }: NoteProps): ReactElement {
   const { title, content, id } = children;
-  const converter = new showdown.Converter();
-  const modifiedContent = converter.makeHtml(contentFormat(content || ''));
+  const converter = new showdown.Converter({ noHeaderId: true });
+  const modifiedContent = contentFormat(converter.makeHtml(content || ''));
 
   const { width } = useWindowDimensions();
 
@@ -37,7 +38,7 @@ const Note = React.memo(function Note({ children }: NoteProps): ReactElement {
       onPress={onNotePressHandler}
       style={({ pressed }) => (pressed ? { opacity: 0.8 } : {})}
     >
-      <NoteTitle>{title || ''}</NoteTitle>
+      <NoteTitle>{titleFormat(title || '')}</NoteTitle>
       {content ? (
         <RenderHTML
           contentWidth={width}

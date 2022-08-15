@@ -13,7 +13,7 @@ import NotesList from '@components/Notes/NotesList/NotesList.component';
 import { NoItemsText } from '@components/Default/Text/Text.component';
 import { NoteSchema, NavigationProps } from '@app-types/types';
 import { createAPIInstance } from '@utils/requests/instance';
-import { stringSearch } from '@utils/stringSearch';
+import { stringSearch } from '@utils/stringInteraction/stringSearch';
 import {
   setIsAuth,
   setPublicData,
@@ -38,9 +38,21 @@ export default function Notes(): ReactElement {
 
   const [notes, setNotes] = React.useState<NoteSchema[]>([]);
 
+  function logOutHandler() {
+    setNotes([]);
+    navigation.setOptions({
+      headerLeft: () => null,
+      headerTitle: ({ tintColor, children }) => (
+        <Text style={[{ color: tintColor }, styles.title]}>{children}</Text>
+      ),
+    });
+    setOpenSearchBar(false);
+    setSearchText('');
+  }
+
   React.useEffect(() => {
     if (!focus) {
-      if (!isAuth) setNotes([]);
+      if (!isAuth) logOutHandler();
       return;
     }
     const instance = createAPIInstance(() => {
@@ -104,7 +116,7 @@ export default function Notes(): ReactElement {
           setIsLoading(false);
         });
     } else {
-      setNotes([]);
+      logOutHandler();
       setIsLoading(false);
     }
   }, [isAuth, focus, openSearchBar]);

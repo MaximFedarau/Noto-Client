@@ -7,7 +7,8 @@ export const NoteContainer = styled.Pressable`
   border-color: black;
   border-width: 2px;
   border-radius: 8px;
-  max-height: 418px;
+  max-height: 696px;
+  overflow: hidden;
   padding-horizontal: 16px;
   padding-vertical: 16px;
 `;

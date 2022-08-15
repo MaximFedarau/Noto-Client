@@ -60,6 +60,7 @@ const MarkdownField = React.memo(function MarkdownField({
             errorMessage={errorMessage}
             multiline
             autoComplete="off"
+            scrollEnabled={false}
             leftIcon={<Ionicons name="logo-markdown" size={20} />}
           />
         </FieldContainer>

@@ -32,7 +32,6 @@ import {
   publicDataAvatarSelector,
   publicDataNicknameSelector,
 } from '@store/publicData/publicData.selector';
-import Toast from 'react-native-toast-message';
 
 const BottomTab = createBottomTabNavigator();
 
@@ -194,7 +193,6 @@ export default function MainBottomTabs(): ReactElement {
           }}
         />
       </BottomTab.Navigator>
-      <Toast />
     </>
   );
 }

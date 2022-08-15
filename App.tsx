@@ -4,6 +4,7 @@ import { useFonts } from 'expo-font';
 import { Provider } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Toast from 'react-native-toast-message';
 
 import MainBottomTabs from '@navigation/MainBottomTabs/MainBottomTabs.navigation';
 import AuthStack from '@navigation/AuthStack/AuthStack.navigation';
@@ -55,6 +56,7 @@ export default function App(): ReactElement | null {
           </Stack.Navigator>
         </NavigationContainer>
       </Provider>
+      <Toast />
     </>
   );
 }

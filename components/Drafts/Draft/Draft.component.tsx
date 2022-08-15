@@ -11,7 +11,8 @@ import {
 } from '@components/Default/Text/Text.component';
 import { DraftSchema, NavigationProps } from '@app-types/types';
 import { NAVIGATION_NOTES_NAMES } from '@app-types/enum';
-import { contentFormat } from '@utils/contentFormat';
+import { titleFormat } from '@utils/stringInteraction/titleFormat';
+import { contentFormat } from '@utils/stringInteraction/contentFormat';
 
 //Interface for Props
 interface DraftProps {
@@ -22,9 +23,8 @@ const Draft = React.memo(function Draft({
   children,
 }: DraftProps): ReactElement {
   const { title, content, id } = children;
-  const converter = new showdown.Converter();
-  const modifiedContent = converter.makeHtml(contentFormat(content || ''));
-
+  const converter = new showdown.Converter({ noHeaderId: true });
+  const modifiedContent = contentFormat(converter.makeHtml(content || ''));
   const { width } = useWindowDimensions();
 
   const navigation = useNavigation<NavigationProps>();
@@ -42,7 +42,7 @@ const Draft = React.memo(function Draft({
       onPress={onDraftPressHandler}
       style={({ pressed }) => (pressed ? { opacity: 0.8 } : {})}
     >
-      <DraftTitle>{title || ''}</DraftTitle>
+      <DraftTitle>{titleFormat(title || '')}</DraftTitle>
       {content ? (
         <RenderHTML
           contentWidth={width}

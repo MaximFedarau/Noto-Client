@@ -1,10 +1,5 @@
 import React, { ReactElement } from 'react';
-import {
-  AppState,
-  AppStateStatus,
-  Alert,
-  ActivityIndicator,
-} from 'react-native';
+import { AppState, AppStateStatus, Alert } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { Formik, FormikProps } from 'formik';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -48,7 +43,6 @@ export default function Form(): ReactElement {
 
   const [isLoading, setIsLoading] = React.useState(false);
   const [isError, setIsError] = React.useState<boolean>(false);
-  const [isPendingRequest, setIsPendingRequest] = React.useState(false);
   const [noteId, setNoteId] = React.useState<string | null>(null);
   const [formInitialValues, setFormInitialValues] =
     React.useState<NotesManagingFormData>({
@@ -145,17 +139,21 @@ export default function Form(): ReactElement {
   };
 
   const onFormSubmitHandler = async (values: NotesManagingFormData) => {
-    setIsPendingRequest(true);
+    if (!noteId) return;
+    setIsLoading(true);
+    await deleteDraftById(noteId).catch((error) => {
+      errorHandling(error, 'Deleting Draft while uploading');
+    });
     const accessToken = await SecureStore.getItemAsync('accessToken');
     const refreshToken = await SecureStore.getItemAsync('refreshToken');
     if (!accessToken || !refreshToken) {
-      unauthHandler();
+      await unauthHandler(values);
       return;
     }
-    const instance = createAPIInstance(() => {
+    const instance = createAPIInstance(async () => {
       dispatch(setPublicData(publicDataInitialState));
       dispatch(setIsAuth(false));
-      unauthHandler();
+      await unauthHandler(values);
     });
     const data = await instance
       .post('/notes/', {
@@ -170,8 +168,8 @@ export default function Form(): ReactElement {
             ? error.response.data.message
             : 'Something went wrong:(',
           40,
-          () => {
-            setIsPendingRequest(false);
+          async () => {
+            await submittingFailureHandler(values);
           },
         );
       });
@@ -185,14 +183,25 @@ export default function Form(): ReactElement {
           await onDraftDeleteHandler();
           return;
         }
-        formRef.current.resetForm();
-        setIsPendingRequest(false);
+        setIsLoading(false);
+        if (formRef.current) formRef.current.resetForm();
       },
     );
   };
 
-  const unauthHandler = () => {
-    setIsPendingRequest(false);
+  const submittingFailureHandler = async (values: NotesManagingFormData) => {
+    setIsLoading(false);
+    await addDraft(
+      values.title?.trim() || '',
+      values.content?.trim() || '',
+    ).catch((error) => {
+      errorHandling(error, 'Adding Draft while uploading');
+    });
+    if (formRef.current) formRef.current.setValues(values);
+  };
+
+  const unauthHandler = async (values: NotesManagingFormData) => {
+    await submittingFailureHandler(values);
     Alert.alert('Oops...', 'You are not logged in:(');
   };
 
@@ -259,23 +268,28 @@ export default function Form(): ReactElement {
                           size={32}
                           color="red"
                           onPress={onDraftDeleteHandler}
-                          disabled={isPendingRequest}
                         />
                       </RightHeaderView>
                     );
                   }
                 : () => null,
           });
-        }, [values, isPendingRequest]);
+          return () => {
+            navigation.setOptions({
+              headerRight: () => null,
+            });
+          };
+        }, [values]);
 
         return (
-          <FormView contentContainerStyle={styles.contentContainer}>
+          <FormView
+            bounces={false}
+            contentContainerStyle={styles.contentContainer}
+          >
             <FormField
               onChangeText={handleChange('title')}
               value={values.title}
               errorMessage={errors.title}
-              editable={!isPendingRequest}
-              selectTextOnFocus={!isPendingRequest}
             >
               Title
             </FormField>
@@ -283,18 +297,12 @@ export default function Form(): ReactElement {
               onChangeText={handleChange('content')}
               value={values.content}
               errorMessage={errors.content}
-              editable={!isPendingRequest}
-              selectTextOnFocus={!isPendingRequest}
             >
               Content
             </MarkdownField>
-            {isPendingRequest ? (
-              <ActivityIndicator size="large" />
-            ) : (
-              <Button type={BUTTON_TYPES.CONTAINED} onPress={handleSubmit}>
-                Submit
-              </Button>
-            )}
+            <Button type={BUTTON_TYPES.CONTAINED} onPress={handleSubmit}>
+              Submit
+            </Button>
             {/* ! Formik behaviour */}
           </FormView>
         );
