@@ -22,6 +22,7 @@ import {
   NotesManagingFormData,
   NavigationProps,
   NotesManagingRouteProp,
+  NoteSchema,
 } from '@app-types/types';
 import { BUTTON_TYPES } from '@app-types/enum';
 import { createAPIInstance } from '@utils/requests/instance';
@@ -55,16 +56,29 @@ export default function Form(): ReactElement {
     undefined,
   ) as React.MutableRefObject<FormikProps<NotesManagingFormData>>;
 
+  const defaultInstance = createAPIInstance(() => {
+    dispatch(setPublicData(publicDataInitialState));
+    dispatch(setIsAuth(false));
+    navigation.goBack();
+  });
+
   React.useEffect(() => {
     if (route.params) return;
     createEmptyDraft('Adding Draft');
   }, []); // when open this screen, then automatically new draft is created
 
   React.useLayoutEffect(() => {
-    if (!route.params || !route.params.draftId) return;
+    if (!route.params) return;
+    if (route.params.noteId) {
+      setIsLoading(true);
+      fetchNote();
+      return;
+    }
+    const { draftId } = route.params;
+    if (!draftId) return;
     setIsLoading(true);
     fetchingDraft();
-    setNoteId(route.params.draftId);
+    setNoteId(draftId);
   }, []); // setting info, depending on params
 
   React.useLayoutEffect(() => {
@@ -118,6 +132,26 @@ export default function Form(): ReactElement {
       })
       .catch((error) => {
         errorHandling(error, 'Fetching Draft');
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  const fetchNote = () => {
+    if (!route.params || !route.params.noteId) return;
+    defaultInstance
+      .get<NoteSchema>(`/notes/${route.params.noteId}`)
+      .then((response) => {
+        setIsError(false);
+        const note = response.data;
+        setFormInitialValues({
+          title: note.title,
+          content: note.content,
+        });
+      })
+      .catch((error) => {
+        errorHandling(error, 'Fetching Note');
       })
       .finally(() => {
         setIsLoading(false);
@@ -226,6 +260,21 @@ export default function Form(): ReactElement {
     navigation.goBack();
   };
 
+  const onNoteDeleteHandler = async () => {
+    if (!route.params || !route.params.noteId) return;
+    setIsLoading(true);
+    const { noteId } = route.params;
+    defaultInstance
+      .delete(`/notes/${noteId}`)
+      .then(() => {
+        navigation.goBack();
+      })
+      .catch((error) => {
+        setIsLoading(false);
+        errorHandling(error, 'Fetching Note');
+      });
+  };
+
   const errorHandling = (error: string, message: string) => {
     setIsError(true);
     console.error(error, message);
@@ -267,7 +316,11 @@ export default function Form(): ReactElement {
                           iconName="trash"
                           size={32}
                           color="red"
-                          onPress={onDraftDeleteHandler}
+                          onPress={
+                            route.params?.noteId
+                              ? onNoteDeleteHandler
+                              : onDraftDeleteHandler
+                          }
                         />
                       </RightHeaderView>
                     );
@@ -301,7 +354,7 @@ export default function Form(): ReactElement {
               Content
             </MarkdownField>
             <Button type={BUTTON_TYPES.CONTAINED} onPress={handleSubmit}>
-              Submit
+              {route.params?.noteId ? 'Update' : 'Upload'}
             </Button>
             {/* ! Formik behaviour */}
           </FormView>
