@@ -31,7 +31,7 @@ export default function Form(): ReactElement {
 
   //going to the sign in screen
   const onNavigationTextHandler = () => {
-    navigation.replace(NAVIGATION_AUTH_NAMES.SIGN_IN);
+    if (!isLoading) navigation.replace(NAVIGATION_AUTH_NAMES.SIGN_IN);
   };
 
   // submit hanlder (sign up  + log in)

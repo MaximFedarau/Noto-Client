@@ -169,7 +169,7 @@ export default function Form(): ReactElement {
           error.response.data
             ? error.response.data.message
             : 'Something went wrong:(',
-          0,
+          40,
           () => {
             setIsPendingRequest(false);
           },
@@ -179,7 +179,7 @@ export default function Form(): ReactElement {
     showingSuccess(
       'Congratulations!',
       'Note was successfully uploaded and draft was deleted.',
-      0,
+      40,
       async () => {
         if (route.params) {
           await onDraftDeleteHandler();

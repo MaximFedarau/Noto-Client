@@ -16,11 +16,9 @@ export default function SearchBar(props: TextInputProps): ReactElement {
   return (
     <View
       style={{
-        width: width - 112,
+        width: width - 112 - insets.left - insets.right,
         alignSelf: 'center',
         height: 36,
-        paddingRight: insets.right,
-        paddingLeft: insets.left,
       }}
     >
       <SearchBarInput

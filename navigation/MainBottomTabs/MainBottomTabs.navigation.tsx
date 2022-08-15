@@ -21,7 +21,7 @@ import {
   SOFT_BLUE,
 } from '@constants/colors';
 import { NAVIGATION_NAMES, NAVIGATION_NOTES_NAMES } from '@app-types/enum';
-import { getPublicData } from '@utils/auth/get/publicData';
+import { getPublicData } from '@utils/requests/get/publicData';
 import {
   publicDataInitialState,
   setPublicData,
@@ -32,6 +32,7 @@ import {
   publicDataAvatarSelector,
   publicDataNicknameSelector,
 } from '@store/publicData/publicData.selector';
+import Toast from 'react-native-toast-message';
 
 const BottomTab = createBottomTabNavigator();
 
@@ -89,55 +90,9 @@ export default function MainBottomTabs(): ReactElement {
   if (isLoading) return <Loading />;
 
   return (
-    <BottomTab.Navigator
-      screenOptions={{
-        headerTitleAlign: 'center',
-        headerTintColor: OSLO_GRAY,
-        headerTitleStyle: {
-          fontFamily: 'Roboto-Regular',
-        },
-        headerStyle: { backgroundColor: SPRING_WOOD },
-        headerShadowVisible: false,
-        tabBarStyle: { backgroundColor: SPRING_WOOD, justifyContent: 'center' },
-        tabBarActiveTintColor: CYBER_YELLOW,
-      }}
-      sceneContainerStyle={{
-        backgroundColor: SPRING_WOOD,
-      }}
-    >
-      <BottomTab.Screen
-        name={NAVIGATION_NOTES_NAMES.NOTES}
-        component={Notes}
-        options={{
-          tabBarIcon: ({ color, size }) => {
-            return <Ionicons name="document" size={size} color={color} />;
-          },
-          tabBarLabel: () => null,
-          headerRight: ({ tintColor }) => {
-            const avatar = useSelector(publicDataAvatarSelector);
-            return (
-              <RightHeaderView>
-                {avatar ? (
-                  <Avatar size={32} image={avatar} onPress={logOut} />
-                ) : (
-                  <IconButton
-                    iconName="person"
-                    size={32}
-                    color={isAuth ? SOFT_BLUE : tintColor}
-                    onPress={isAuth ? logOut : navigateToAuth}
-                  />
-                )}
-              </RightHeaderView>
-            );
-          },
-          title: nickname ? `${nickname}'s Notes` : 'Notes',
-        }}
-      />
-      <BottomTab.Screen
-        name={NAVIGATION_NOTES_NAMES.NOTES_MANAGING}
-        component={NotesManaging}
-        options={{
-          title: 'Manage Note',
+    <>
+      <BottomTab.Navigator
+        screenOptions={{
           headerTitleAlign: 'center',
           headerTintColor: OSLO_GRAY,
           headerTitleStyle: {
@@ -145,49 +100,101 @@ export default function MainBottomTabs(): ReactElement {
           },
           headerStyle: { backgroundColor: SPRING_WOOD },
           headerShadowVisible: false,
-          unmountOnBlur: true,
-          tabBarLabel: () => null,
-          tabBarIcon: ({ color, size }) => {
-            return (
-              <Ionicons name="add-circle-sharp" size={size} color={color} />
-            );
+          tabBarStyle: {
+            backgroundColor: SPRING_WOOD,
+            justifyContent: 'center',
           },
-          tabBarButton: (props) => {
-            function onButtonClickHandler() {
-              navigation.navigate(NAVIGATION_NOTES_NAMES.NOTES_MANAGING);
-            }
-            return <Pressable {...props} onPress={onButtonClickHandler} />;
-          },
+          tabBarActiveTintColor: CYBER_YELLOW,
         }}
-      />
-      <BottomTab.Screen
-        name={NAVIGATION_NOTES_NAMES.DRAFTS}
-        component={Drafts}
-        options={{
-          tabBarIcon: ({ color, size }) => {
-            return <Ionicons name="archive" size={size} color={color} />;
-          },
-          tabBarLabel: () => null,
-          headerRight: ({ tintColor }) => {
-            const avatar = useSelector(publicDataAvatarSelector);
-            return (
-              <RightHeaderView>
-                {avatar ? (
-                  <Avatar size={32} image={avatar} onPress={logOut} />
-                ) : (
-                  <IconButton
-                    iconName="person"
-                    size={32}
-                    color={isAuth ? SOFT_BLUE : tintColor}
-                    onPress={isAuth ? logOut : navigateToAuth}
-                  />
-                )}
-              </RightHeaderView>
-            );
-          },
-          title: 'Loading...',
+        sceneContainerStyle={{
+          backgroundColor: SPRING_WOOD,
         }}
-      />
-    </BottomTab.Navigator>
+      >
+        <BottomTab.Screen
+          name={NAVIGATION_NOTES_NAMES.NOTES}
+          component={Notes}
+          options={{
+            tabBarIcon: ({ color, size }) => {
+              return <Ionicons name="document" size={size} color={color} />;
+            },
+            tabBarLabel: () => null,
+            headerRight: ({ tintColor }) => {
+              const avatar = useSelector(publicDataAvatarSelector);
+              return (
+                <RightHeaderView>
+                  {avatar ? (
+                    <Avatar size={32} image={avatar} onPress={logOut} />
+                  ) : (
+                    <IconButton
+                      iconName="person"
+                      size={32}
+                      color={isAuth ? SOFT_BLUE : tintColor}
+                      onPress={isAuth ? logOut : navigateToAuth}
+                    />
+                  )}
+                </RightHeaderView>
+              );
+            },
+            title: nickname ? `${nickname}'s Notes` : 'Notes',
+          }}
+        />
+        <BottomTab.Screen
+          name={NAVIGATION_NOTES_NAMES.NOTES_MANAGING}
+          component={NotesManaging}
+          options={{
+            title: 'Manage Note',
+            headerTitleAlign: 'center',
+            headerTintColor: OSLO_GRAY,
+            headerTitleStyle: {
+              fontFamily: 'Roboto-Regular',
+            },
+            headerStyle: { backgroundColor: SPRING_WOOD },
+            headerShadowVisible: false,
+            unmountOnBlur: true,
+            tabBarLabel: () => null,
+            tabBarIcon: ({ color, size }) => {
+              return (
+                <Ionicons name="add-circle-sharp" size={size} color={color} />
+              );
+            },
+            tabBarButton: (props) => {
+              function onButtonClickHandler() {
+                navigation.navigate(NAVIGATION_NOTES_NAMES.NOTES_MANAGING);
+              }
+              return <Pressable {...props} onPress={onButtonClickHandler} />;
+            },
+          }}
+        />
+        <BottomTab.Screen
+          name={NAVIGATION_NOTES_NAMES.DRAFTS}
+          component={Drafts}
+          options={{
+            tabBarIcon: ({ color, size }) => {
+              return <Ionicons name="archive" size={size} color={color} />;
+            },
+            tabBarLabel: () => null,
+            headerRight: ({ tintColor }) => {
+              const avatar = useSelector(publicDataAvatarSelector);
+              return (
+                <RightHeaderView>
+                  {avatar ? (
+                    <Avatar size={32} image={avatar} onPress={logOut} />
+                  ) : (
+                    <IconButton
+                      iconName="person"
+                      size={32}
+                      color={isAuth ? SOFT_BLUE : tintColor}
+                      onPress={isAuth ? logOut : navigateToAuth}
+                    />
+                  )}
+                </RightHeaderView>
+              );
+            },
+            title: 'Loading...',
+          }}
+        />
+      </BottomTab.Navigator>
+      <Toast />
+    </>
   );
 }
