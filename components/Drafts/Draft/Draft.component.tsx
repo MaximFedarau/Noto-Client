@@ -5,10 +5,7 @@ import { RenderHTML } from 'react-native-render-html';
 import * as showdown from 'showdown';
 
 import { DraftContainer } from './Draft.styles';
-import {
-  DraftTitle,
-  NoDraftText,
-} from '@components/Default/Text/Text.component';
+import { DraftTitle } from '@components/Default/Text/Text.component';
 import { DraftSchema, NavigationProps } from '@app-types/types';
 import { NAVIGATION_NOTES_NAMES } from '@app-types/enum';
 import { titleFormat } from '@utils/stringInteraction/titleFormat';
@@ -24,7 +21,9 @@ const Draft = React.memo(function Draft({
 }: DraftProps): ReactElement {
   const { title, content, id } = children;
   const converter = new showdown.Converter({ noHeaderId: true });
-  const modifiedContent = contentFormat(converter.makeHtml(content || ''));
+  const modifiedContent = contentFormat(
+    converter.makeHtml(content || '<h2 style="text-align: center;">-</h2>'),
+  );
   const { width } = useWindowDimensions();
 
   const navigation = useNavigation<NavigationProps>();
@@ -42,17 +41,13 @@ const Draft = React.memo(function Draft({
       onPress={onDraftPressHandler}
       style={({ pressed }) => (pressed ? { opacity: 0.8 } : {})}
     >
-      <DraftTitle>{titleFormat(title || '')}</DraftTitle>
-      {content ? (
-        <RenderHTML
-          contentWidth={width}
-          source={{
-            html: modifiedContent,
-          }}
-        />
-      ) : (
-        <NoDraftText>-</NoDraftText>
-      )}
+      <DraftTitle>{titleFormat(title || '-')}</DraftTitle>
+      <RenderHTML
+        contentWidth={width}
+        source={{
+          html: modifiedContent,
+        }}
+      />
     </DraftContainer>
   );
 });

@@ -5,7 +5,7 @@ import { RenderHTML } from 'react-native-render-html';
 import * as showdown from 'showdown';
 
 import { NoteContainer } from './Note.styles';
-import { NoteTitle, NoNoteText } from '@components/Default/Text/Text.component';
+import { NoteTitle } from '@components/Default/Text/Text.component';
 import { NavigationProps, NoteSchema } from '@app-types/types';
 import { NAVIGATION_NOTES_NAMES } from '@app-types/enum';
 import { titleFormat } from '@utils/stringInteraction/titleFormat';
@@ -19,7 +19,9 @@ interface NoteProps {
 const Note = React.memo(function Note({ children }: NoteProps): ReactElement {
   const { title, content, id } = children;
   const converter = new showdown.Converter({ noHeaderId: true });
-  const modifiedContent = contentFormat(converter.makeHtml(content || ''));
+  const modifiedContent = contentFormat(
+    converter.makeHtml(content || '<h2 style="text-align: center;">-</h2>'),
+  );
 
   const { width } = useWindowDimensions();
 
@@ -38,17 +40,13 @@ const Note = React.memo(function Note({ children }: NoteProps): ReactElement {
       onPress={onNotePressHandler}
       style={({ pressed }) => (pressed ? { opacity: 0.8 } : {})}
     >
-      <NoteTitle>{titleFormat(title || '')}</NoteTitle>
-      {content ? (
-        <RenderHTML
-          contentWidth={width}
-          source={{
-            html: modifiedContent,
-          }}
-        />
-      ) : (
-        <NoNoteText>-</NoNoteText>
-      )}
+      <NoteTitle>{titleFormat(title || '-')}</NoteTitle>
+      <RenderHTML
+        contentWidth={width}
+        source={{
+          html: modifiedContent,
+        }}
+      />
     </NoteContainer>
   );
 });

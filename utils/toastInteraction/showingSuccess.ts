@@ -12,6 +12,5 @@ export const showingSuccess = (
     text1: title,
     text2: text,
     topOffset: topOffset,
-    visibilityTime: 5000,
   });
 };

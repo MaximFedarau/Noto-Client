@@ -11,6 +11,7 @@ import { AuthAvatarPickerContainer } from '@components/Default/View/View.compone
 import { NavigationProps, AvatarPickerRouteProp } from '@app-types/types';
 import { NAVIGATION_NAMES } from '@app-types/enum';
 import { showingSubmitError } from '@utils/toastInteraction/showingSubmitError';
+import { showingSuccess } from '@utils/toastInteraction/showingSuccess';
 import { createAPIRefreshInstance } from '@utils/requests/instance';
 
 export default function Content(): ReactElement {
@@ -65,6 +66,10 @@ export default function Content(): ReactElement {
         });
     } else {
       // if everyting is successful, then we need to go home
+      showingSuccess(
+        'Congratulatons!',
+        'Your avatar was uploaded successfully.',
+      );
       handleReturnToHome();
     }
   };

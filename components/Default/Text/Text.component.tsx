@@ -24,23 +24,11 @@ export const DraftTitle = styled(DefaultText)`
   font-weight: bold;
 `;
 
-export const NoDraftText = styled(DefaultText)`
-  text-align: center;
-  font-size: 22px;
-  align-self: center;
-`;
-
 // ! Notes
 export const NoteTitle = styled(DefaultText)`
   text-align: center;
   font-size: 22px;
   font-weight: bold;
-`;
-
-export const NoNoteText = styled(DefaultText)`
-  text-align: center;
-  font-size: 22px;
-  align-self: center;
 `;
 
 // ! Auth Screens
