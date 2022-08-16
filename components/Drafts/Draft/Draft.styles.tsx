@@ -8,6 +8,7 @@ export const DraftContainer = styled.Pressable`
   border-width: 2px;
   border-radius: 8px;
   max-height: 696px;
+  min-height: 104px;
   overflow: hidden;
   padding-horizontal: 16px;
   padding-vertical: 16px;

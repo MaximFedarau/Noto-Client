@@ -1,5 +1,6 @@
 import React, { ReactElement } from 'react';
-import { FlatList, SafeAreaView } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
+import { SafeAreaView } from 'react-native';
 
 import Draft from '@components/Drafts/Draft/Draft.component';
 import IconButton from '@components/Default/IconButton/IconButton.component';
@@ -20,7 +21,7 @@ export default function DraftsList({
   const [layoutHeight, setLayoutHeight] = React.useState<number>(0);
   const [offset, setOffset] = React.useState<number>(0);
 
-  const ref = React.useRef<FlatList<DraftSchema>>(null);
+  const ref = React.useRef<FlashList<DraftSchema>>(null);
 
   React.useEffect(() => {
     // setting threshold for scroll to the latest note button
@@ -29,13 +30,13 @@ export default function DraftsList({
 
   function scrollToEndHandler() {
     if (ref.current) {
-      ref.current.scrollToEnd({ animated: true });
+      ref.current.scrollToOffset({ animated: true, offset: threshold });
     }
   }
 
   return (
     <>
-      <FlatList
+      <FlashList
         data={children}
         renderItem={(item) => <Draft>{item.item}</Draft>}
         scrollsToTop
@@ -55,6 +56,7 @@ export default function DraftsList({
             setContentHeight(height);
           }
         }}
+        estimatedItemSize={302}
       />
       {Math.trunc(offset) < Math.trunc(threshold) && offset >= 0 && (
         <SafeAreaView>
