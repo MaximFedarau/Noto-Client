@@ -1,6 +1,6 @@
 import React, { ReactElement } from 'react';
 import { Text } from 'react-native';
-import { useIsFocused, useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
 
 import Error from '@screens/Error/Error.screen';
@@ -11,7 +11,7 @@ import SearchBar from '@components/Default/SearchBar/SearchBar.component';
 import { NotesView } from '@components/Default/View/View.component';
 import NotesList from '@components/Notes/NotesList/NotesList.component';
 import { NoItemsText } from '@components/Default/Text/Text.component';
-import { NoteSchema, NavigationProps } from '@app-types/types';
+import { NavigationProps } from '@app-types/types';
 import { createAPIInstance } from '@utils/requests/instance';
 import { stringSearch } from '@utils/stringInteraction/stringSearch';
 import {
@@ -20,12 +20,13 @@ import {
   publicDataInitialState,
 } from '@store/publicData/publicData.slice';
 import { publicDataAuthSelector } from '@store/publicData/publicData.selector';
+import { notesSelector } from '@store/notes/notes.selector';
+import { clearNotes, assignNotes } from '@store/notes/notes.slice';
 
 import { styles } from './Notes.styles';
 
 export default function Notes(): ReactElement {
   const navigation = useNavigation<NavigationProps>();
-  const focus = useIsFocused();
 
   const dispatch = useDispatch();
   const isAuth = useSelector(publicDataAuthSelector);
@@ -36,92 +37,85 @@ export default function Notes(): ReactElement {
   const [openSearchBar, setOpenSearchBar] = React.useState<boolean>(false);
   const [searchText, setSearchText] = React.useState<string>('');
 
-  const [notes, setNotes] = React.useState<NoteSchema[]>([]);
-
-  function logOutHandler() {
-    setNotes([]);
-    navigation.setOptions({
-      headerLeft: () => null,
-      headerTitle: ({ tintColor, children }) => (
-        <Text style={[{ color: tintColor }, styles.title]}>{children}</Text>
-      ),
-    });
-    setOpenSearchBar(false);
-    setSearchText('');
-  }
+  const notes = useSelector(notesSelector);
 
   React.useEffect(() => {
-    if (!focus) {
-      if (!isAuth) logOutHandler();
-      return;
-    }
     const instance = createAPIInstance(() => {
-      setNotes([]);
+      dispatch(clearNotes());
       dispatch(setPublicData(publicDataInitialState));
       dispatch(setIsAuth(false));
       setIsLoading(false);
     });
     const fetchNotes = async () => {
       const res = await instance.get('/notes');
-      if (res.data) setNotes(res.data);
+      if (res.data) dispatch(assignNotes(res.data));
     };
     if (isAuth) {
       fetchNotes()
-        .then(() => {
-          setIsError(false);
-          navigation.setOptions({
-            //Implement search bar
-            headerTitle: ({ children, tintColor }) => {
-              function onSearchBarChange(text: string) {
-                setSearchText(text);
-              }
-              if (openSearchBar)
-                return (
-                  <SearchBar
-                    placeholder="Search in Notes:"
-                    onChangeText={onSearchBarChange}
-                  />
-                );
-              return (
-                <Text style={[{ color: tintColor }, styles.title]}>
-                  {children}
-                </Text>
-              );
-            },
-            headerTitleAlign: 'center',
-            // open search bar button
-            headerLeft: ({ tintColor }) => {
-              function onButtonClickHandler() {
-                setOpenSearchBar(!openSearchBar);
-                setSearchText('');
-              }
-              return (
-                <LeftHeaderView>
-                  <IconButton
-                    iconName="search"
-                    size={32}
-                    color={tintColor}
-                    onPress={onButtonClickHandler}
-                  />
-                </LeftHeaderView>
-              );
-            },
-          });
-        })
         .catch((error) => {
-          console.error(error, 'Notes setup');
-          if (error.response.status != 401) setIsError(true);
+          if (error.response.status === 401) return;
+          setIsError(true);
         })
         .finally(() => {
           setIsLoading(false);
         });
     } else {
-      logOutHandler();
+      dispatch(clearNotes());
       setIsLoading(false);
     }
-  }, [isAuth, focus, openSearchBar]);
+  }, [isAuth]);
 
-  // as authenthicated user always has a nickname, then when it is empty, we can say, that user is logged out
+  React.useEffect(() => {
+    if (notes.length >= 1) {
+      navigation.setOptions({
+        //Implement search bar
+        headerTitle: ({ children, tintColor }) => {
+          function onSearchBarChange(text: string) {
+            setSearchText(text);
+          }
+          if (openSearchBar)
+            return (
+              <SearchBar
+                placeholder="Search in Notes:"
+                onChangeText={onSearchBarChange}
+              />
+            );
+          return (
+            <Text style={[{ color: tintColor }, styles.title]}>{children}</Text>
+          );
+        },
+        headerTitleAlign: 'center',
+        // open search bar button
+        headerLeft: ({ tintColor }) => {
+          function onButtonClickHandler() {
+            setOpenSearchBar(!openSearchBar);
+            setSearchText('');
+          }
+          return (
+            <LeftHeaderView>
+              <IconButton
+                iconName="search"
+                size={32}
+                color={tintColor}
+                onPress={onButtonClickHandler}
+              />
+            </LeftHeaderView>
+          );
+        },
+      });
+    } else {
+      setOpenSearchBar(false);
+      setSearchText('');
+      navigation.setOptions({
+        headerTitle: ({ children, tintColor }) => {
+          return (
+            <Text style={[{ color: tintColor }, styles.title]}>{children}</Text>
+          );
+        },
+        headerLeft: () => null,
+      });
+    }
+  }, [notes.length, openSearchBar]);
 
   if (isError) return <Error />;
   if (isLoading) return <Loading />;

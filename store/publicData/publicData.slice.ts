@@ -1,8 +1,6 @@
-//Types
-import { PublicUserData } from '@app-types/types';
-
-//RTK
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+import { PublicUserData } from '@app-types/types';
 
 export const publicDataInitialState: PublicUserData = {
   nickname: '',

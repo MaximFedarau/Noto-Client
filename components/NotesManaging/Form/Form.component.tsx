@@ -1,5 +1,10 @@
 import React, { ReactElement } from 'react';
-import { AppState, AppStateStatus, Alert } from 'react-native';
+import {
+  AppState,
+  AppStateStatus,
+  Alert,
+  GestureResponderEvent,
+} from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { Formik, FormikProps } from 'formik';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -33,6 +38,7 @@ import {
   setIsAuth,
 } from '@store/publicData/publicData.slice';
 import { setPublicData } from '@store/publicData/publicData.slice';
+import { addNote, removeNote } from '@store/notes/notes.slice';
 
 import { styles } from './Form.styles';
 
@@ -190,7 +196,7 @@ export default function Form(): ReactElement {
       await unauthHandler(values);
     });
     const data = await instance
-      .post('/notes/', {
+      .post<NoteSchema>('/notes/', {
         title: values.title?.trim() || undefined, // because if title is empty, then it is undefined, intead of empty string
         content: values.content?.trim() || undefined, // because if content is empty, then it is undefined, intead of empty string
       })
@@ -213,6 +219,7 @@ export default function Form(): ReactElement {
       'Note was successfully uploaded and draft was deleted.',
       40,
       async () => {
+        dispatch(addNote(data.data));
         if (route.params) {
           await onDraftDeleteHandler();
           return;
@@ -267,6 +274,7 @@ export default function Form(): ReactElement {
     defaultInstance
       .delete(`/notes/${noteId}`)
       .then(() => {
+        dispatch(removeNote(noteId));
         navigation.goBack();
       })
       .catch((error) => {
@@ -353,10 +361,17 @@ export default function Form(): ReactElement {
             >
               Content
             </MarkdownField>
-            <Button type={BUTTON_TYPES.CONTAINED} onPress={handleSubmit}>
+            <Button
+              type={BUTTON_TYPES.CONTAINED}
+              onPress={
+                // ! formik docs
+                handleSubmit as unknown as (
+                  event: GestureResponderEvent,
+                ) => void
+              }
+            >
               {route.params?.noteId ? 'Update' : 'Upload'}
             </Button>
-            {/* ! Formik behaviour */}
           </FormView>
         );
       }}

@@ -1,8 +1,6 @@
-//Types
-import { RootState } from '@store/store';
-
-//RTK
 import { createSelector } from '@reduxjs/toolkit';
+
+import { RootState } from '@store/store';
 
 const publicDataReducerSelector = (state: RootState) => state.publicData;
 
