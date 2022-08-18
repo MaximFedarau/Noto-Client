@@ -13,6 +13,7 @@ import NotesList from '@components/Notes/NotesList/NotesList.component';
 import { NoItemsText } from '@components/Default/Text/Text.component';
 import { NavigationProps } from '@app-types/types';
 import { createAPIInstance } from '@utils/requests/instance';
+import { showingSubmitError } from '@utils/toastInteraction/showingSubmitError';
 import { stringSearch } from '@utils/stringInteraction/stringSearch';
 import {
   setIsAuth,
@@ -41,6 +42,7 @@ export default function Notes(): ReactElement {
 
   React.useEffect(() => {
     const instance = createAPIInstance(() => {
+      showingSubmitError('Logout', 'Your session has expired', undefined);
       dispatch(clearNotes());
       dispatch(setPublicData(publicDataInitialState));
       dispatch(setIsAuth(false));

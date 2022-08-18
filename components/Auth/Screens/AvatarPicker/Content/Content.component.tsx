@@ -53,7 +53,10 @@ export default function Content(): ReactElement {
         );
       }
       // in other case, we need to refresh the access token
-      const instance = createAPIRefreshInstance(handleReturnToHome);
+      const instance = createAPIRefreshInstance(() => {
+        showingSubmitError('Logout', 'Your session has expired', undefined);
+        handleReturnToHome();
+      });
       instance
         .post(`/auth/token/refresh`, {})
         .then(async (res) => {
@@ -62,6 +65,7 @@ export default function Content(): ReactElement {
           await onSubmitHandler(); // uploading image again
         })
         .catch((error) => {
+          if (error.response.status === 401) return;
           console.error(error, 'image uploading error');
         });
     } else {
