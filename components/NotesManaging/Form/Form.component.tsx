@@ -21,7 +21,7 @@ import { RightHeaderView } from '@components/Default/View/View.component';
 import { notesManagingFormValidationSchema } from '@constants/validationSchemas';
 import { addDraft } from '@utils/db/drafts/add';
 import { fetchDraftById } from '@utils/db/drafts/fetch';
-import { updateDraft } from '@utils/db/drafts/update';
+import { updateDraftById } from '@utils/db/drafts/update';
 import { deleteDraftById } from '@utils/db/drafts/delete';
 import {
   NotesManagingFormData,
@@ -39,6 +39,11 @@ import {
 } from '@store/publicData/publicData.slice';
 import { setPublicData } from '@store/publicData/publicData.slice';
 import { addNote, removeNote } from '@store/notes/notes.slice';
+import {
+  updateDraft,
+  addDraft as appendDraft,
+  removeDraft,
+} from '@store/drafts/drafts.slice';
 
 import { styles } from './Form.styles';
 
@@ -79,31 +84,48 @@ export default function Form(): ReactElement {
     }
     return () => {
       if (route.params?.noteId) return;
+      const { title, content } = formRef.current?.values || {};
+      const trimmedTitle = (title || '').trim();
+      const trimmedContent = (content || '').trim();
       if (route.params?.draftId) {
-        if (
-          (formRef.current?.values.title || '').trim() === '' &&
-          (formRef.current?.values.content || '').trim() === ''
-        ) {
-          deleteDraftById(route.params?.draftId);
+        if (trimmedTitle === '' && trimmedContent === '') {
+          deleteDraftById(route.params?.draftId).then(() => {
+            if (route.params?.draftId)
+              dispatch(removeDraft(route.params?.draftId));
+          });
         } else {
-          updateDraft(
+          const date = new Date().toISOString();
+          updateDraftById(
             route.params?.draftId,
-            new Date().toISOString(),
-            (formRef.current?.values.title || '').trim(),
-            (formRef.current?.values.content || '').trim(),
-          );
+            date,
+            trimmedTitle,
+            trimmedContent,
+          ).then(() => {
+            if (route.params?.draftId)
+              dispatch(
+                updateDraft({
+                  id: route.params?.draftId,
+                  date,
+                  title: trimmedTitle,
+                  content: trimmedContent,
+                }),
+              );
+          });
         }
         return;
       }
-      if (
-        (formRef.current?.values.title || '').trim() !== '' ||
-        (formRef.current?.values.content || '').trim() !== ''
-      ) {
-        addDraft(
-          new Date().toISOString(),
-          (formRef.current?.values.title || '').trim(),
-          (formRef.current?.values.content || '').trim(),
-        );
+      if (trimmedTitle !== '' || trimmedContent !== '') {
+        const date = new Date().toISOString();
+        addDraft(date, trimmedTitle, trimmedContent).then(({ insertId }) => {
+          dispatch(
+            appendDraft({
+              id: String(insertId),
+              date,
+              title: trimmedTitle,
+              content: trimmedContent,
+            }),
+          );
+        });
       }
     };
   }, [route]);
@@ -130,9 +152,9 @@ export default function Form(): ReactElement {
       if (!route.params?.draftId) {
         if (trimmedTitle === '' && trimmedContent === '') return;
         addDraft(new Date().toISOString(), trimmedTitle, trimmedContent)
-          .then((result) => {
+          .then(({ insertId }) => {
             setIsError(false);
-            navigation.setParams({ draftId: result.insertId });
+            navigation.setParams({ draftId: insertId });
           })
           .catch((error) => {
             errorHandling(
@@ -151,7 +173,7 @@ export default function Form(): ReactElement {
         });
         return;
       }
-      updateDraft(
+      updateDraftById(
         draftId,
         new Date().toISOString(),
         trimmedTitle,
@@ -279,6 +301,7 @@ export default function Form(): ReactElement {
     }
     deleteDraftById(route.params.draftId)
       .then(() => {
+        if (route.params?.draftId) dispatch(removeDraft(route.params?.draftId));
         navigation.setParams({ draftId: null });
         formRef.current.resetForm({
           values: {

@@ -2,7 +2,7 @@ import * as SQLite from 'expo-sqlite';
 
 const db = SQLite.openDatabase('drafts.db');
 
-export const updateDraft = (
+export const updateDraftById = (
   id: string,
   date: string,
   title?: string,
