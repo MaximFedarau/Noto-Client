@@ -22,7 +22,7 @@ import { notesManagingFormValidationSchema } from '@constants/validationSchemas'
 import { addDraft } from '@utils/db/drafts/add';
 import { fetchDraftById } from '@utils/db/drafts/fetch';
 import { updateDraft } from '@utils/db/drafts/update';
-import { deleteDraftById, deleteDraftIfEmpty } from '@utils/db/drafts/delete';
+import { deleteDraftById } from '@utils/db/drafts/delete';
 import {
   NotesManagingFormData,
   NavigationProps,
@@ -50,7 +50,6 @@ export default function Form(): ReactElement {
 
   const [isLoading, setIsLoading] = React.useState(false);
   const [isError, setIsError] = React.useState<boolean>(false);
-  const [noteId, setNoteId] = React.useState<string | null>(null);
   const [formInitialValues, setFormInitialValues] =
     React.useState<NotesManagingFormData>({
       title: '',
@@ -68,35 +67,49 @@ export default function Form(): ReactElement {
     navigation.goBack();
   });
 
-  React.useEffect(() => {
-    if (route.params) return;
-    createEmptyDraft('Adding Draft');
-  }, []); // when open this screen, then automatically new draft is created
-
   React.useLayoutEffect(() => {
-    if (!route.params) return;
-    if (route.params.noteId) {
+    if (route.params?.noteId) {
       setIsLoading(true);
-      fetchNote();
-      return;
+      fetchingNote();
     }
-    const { draftId } = route.params;
-    if (!draftId) return;
-    setIsLoading(true);
-    fetchingDraft();
-    setNoteId(draftId);
-  }, []); // setting info, depending on params
 
-  React.useLayoutEffect(() => {
+    if (route.params?.draftId) {
+      setIsLoading(true);
+      fetchingDraft();
+    }
     return () => {
-      if (!noteId) return;
-      deleteDraftIfEmpty(noteId).catch((error) => {
-        errorHandling(error, 'Deleting empty Draft');
-      });
+      if (route.params?.noteId) return;
+      if (route.params?.draftId) {
+        if (
+          (formRef.current?.values.title || '').trim() === '' &&
+          (formRef.current?.values.content || '').trim() === ''
+        ) {
+          deleteDraftById(route.params?.draftId);
+        } else {
+          updateDraft(
+            route.params?.draftId,
+            new Date().toISOString(),
+            (formRef.current?.values.title || '').trim(),
+            (formRef.current?.values.content || '').trim(),
+          );
+        }
+        return;
+      }
+      if (
+        (formRef.current?.values.title || '').trim() !== '' ||
+        (formRef.current?.values.content || '').trim() !== ''
+      ) {
+        addDraft(
+          new Date().toISOString(),
+          (formRef.current?.values.title || '').trim(),
+          (formRef.current?.values.content || '').trim(),
+        );
+      }
     };
-  }, [noteId]); //  deleteing empty draft, when exiting screen
+  }, [route]);
 
   React.useEffect(() => {
+    if (route.params?.noteId) return;
     const subscription = AppState.addEventListener(
       'change',
       _handleAppStateChange,
@@ -104,23 +117,46 @@ export default function Form(): ReactElement {
     return () => {
       subscription.remove();
     };
-  }, [noteId]); // handling when app goes to the background
+  }, [route.params]); // handling when app goes to the background
 
   // if current note is empty and app goes to the background, then we delete this note
   const _handleAppStateChange = (nextAppState: AppStateStatus) => {
     if (appState.current === 'active') {
       // deleting draft, when app goes to the background
-      if (!noteId) return;
-      deleteDraftIfEmpty(noteId);
-    }
+      const { title, content } = formRef.current?.values || {};
+      const trimmedTitle = (title || '').trim();
+      const trimmedContent = (content || '').trim();
 
-    // restoring draft when app comes back from the background (including Notification Center and etc. on iOS)
-    if (
-      (appState.current === 'background' || appState.current === 'inactive') &&
-      nextAppState === 'active'
-    ) {
-      const { title, content } = formRef.current?.values ?? {};
-      if (!title && !content) createEmptyDraft('Adding Draft after deletion');
+      if (!route.params?.draftId) {
+        if (trimmedTitle === '' && trimmedContent === '') return;
+        addDraft(new Date().toISOString(), trimmedTitle, trimmedContent)
+          .then((result) => {
+            setIsError(false);
+            navigation.setParams({ draftId: result.insertId });
+          })
+          .catch((error) => {
+            errorHandling(
+              error,
+              'Error while adding draft when app goes to the background',
+            );
+          });
+        return;
+      }
+
+      const { draftId } = route.params;
+
+      if (trimmedTitle === '' && trimmedContent === '') {
+        deleteDraftById(draftId).then(() => {
+          navigation.setParams({ draftId: null });
+        });
+        return;
+      }
+      updateDraft(
+        draftId,
+        new Date().toISOString(),
+        trimmedTitle,
+        trimmedContent,
+      );
     }
 
     appState.current = nextAppState;
@@ -144,7 +180,7 @@ export default function Form(): ReactElement {
       });
   };
 
-  const fetchNote = () => {
+  const fetchingNote = () => {
     if (!route.params || !route.params.noteId) return;
     defaultInstance
       .get<NoteSchema>(`/notes/${route.params.noteId}`)
@@ -152,8 +188,8 @@ export default function Form(): ReactElement {
         setIsError(false);
         const note = response.data;
         setFormInitialValues({
-          title: note.title,
-          content: note.content,
+          title: note.title || '',
+          content: note.content || '',
         });
       })
       .catch((error) => {
@@ -164,36 +200,18 @@ export default function Form(): ReactElement {
       });
   };
 
-  const createEmptyDraft = (errorMessage: string) => {
-    addDraft('', '')
-      .then((result) => {
-        setIsError(false);
-        setNoteId((prevNoteId) => {
-          if (prevNoteId) return prevNoteId;
-          return String(result.insertId);
-        });
-      })
-      .catch((error) => {
-        errorHandling(error, errorMessage);
-      });
-  };
-
   const onFormSubmitHandler = async (values: NotesManagingFormData) => {
-    if (!noteId) return;
     setIsLoading(true);
-    await deleteDraftById(noteId).catch((error) => {
-      errorHandling(error, 'Deleting Draft while uploading');
-    });
     const accessToken = await SecureStore.getItemAsync('accessToken');
     const refreshToken = await SecureStore.getItemAsync('refreshToken');
     if (!accessToken || !refreshToken) {
-      await unauthHandler(values);
+      unauthHandler(values);
       return;
     }
     const instance = createAPIInstance(async () => {
       dispatch(setPublicData(publicDataInitialState));
       dispatch(setIsAuth(false));
-      await unauthHandler(values);
+      unauthHandler(values);
     });
     const data = await instance
       .post<NoteSchema>('/notes/', {
@@ -209,7 +227,7 @@ export default function Form(): ReactElement {
             : 'Something went wrong:(',
           40,
           async () => {
-            await submittingFailureHandler(values);
+            submittingFailureHandler(values);
           },
         );
       });
@@ -221,7 +239,7 @@ export default function Form(): ReactElement {
       async () => {
         dispatch(addNote(data.data));
         if (route.params) {
-          await onDraftDeleteHandler();
+          onDraftDeleteHandler();
           return;
         }
         setIsLoading(false);
@@ -230,44 +248,52 @@ export default function Form(): ReactElement {
     );
   };
 
-  const submittingFailureHandler = async (values: NotesManagingFormData) => {
+  const submittingFailureHandler = (values: NotesManagingFormData) => {
     setIsLoading(false);
-    await addDraft(
-      values.title?.trim() || '',
-      values.content?.trim() || '',
-    ).catch((error) => {
-      errorHandling(error, 'Adding Draft while uploading');
-    });
     if (formRef.current) formRef.current.setValues(values);
   };
 
-  const unauthHandler = async (values: NotesManagingFormData) => {
-    await submittingFailureHandler(values);
+  const unauthHandler = (values: NotesManagingFormData) => {
+    submittingFailureHandler(values);
     Alert.alert('Oops...', 'You are not logged in:(');
   };
 
-  // saving to Drafts section
-  const saveToDrafts = (values: NotesManagingFormData) => {
-    if (!noteId) return;
-    updateDraft(noteId, values.title?.trim() || '', values.content?.trim())
+  const errorHandling = (error: string, message: string) => {
+    setIsError(true);
+    console.error(error, message);
+  };
+
+  // * Cases handlers
+  if (isError) return <Error />;
+  if (isLoading) return <Loading />;
+
+  function onDraftDeleteHandler() {
+    if (!route.params || !route.params.draftId) {
+      formRef.current.resetForm({
+        values: {
+          title: '',
+          content: '',
+        },
+      });
+      return;
+    }
+    deleteDraftById(route.params.draftId)
       .then(() => {
-        setIsError(false);
+        navigation.setParams({ draftId: null });
+        formRef.current.resetForm({
+          values: {
+            title: '',
+            content: '',
+          },
+        });
+        navigation.goBack();
       })
       .catch((error) => {
-        errorHandling(error, 'Updating Draft');
+        errorHandling(error, 'Deleting Draft');
       });
-  };
+  }
 
-  // deleting draft
-  const onDraftDeleteHandler = async () => {
-    if (!noteId) return;
-    await deleteDraftById(noteId).catch((error) => {
-      errorHandling(error, 'Deleting Draft');
-    });
-    navigation.goBack();
-  };
-
-  const onNoteDeleteHandler = async () => {
+  function onNoteDeleteHandler() {
     if (!route.params || !route.params.noteId) return;
     setIsLoading(true);
     const { noteId } = route.params;
@@ -281,16 +307,7 @@ export default function Form(): ReactElement {
         setIsLoading(false);
         errorHandling(error, 'Fetching Note');
       });
-  };
-
-  const errorHandling = (error: string, message: string) => {
-    setIsError(true);
-    console.error(error, message);
-  };
-
-  // * Cases handlers
-  if (isError) return <Error />;
-  if (isLoading) return <Loading />;
+  }
 
   return (
     <Formik
@@ -312,8 +329,7 @@ export default function Form(): ReactElement {
           });
         }, [values.title]);
 
-        React.useEffect(() => {
-          saveToDrafts(values);
+        React.useLayoutEffect(() => {
           navigation.setOptions({
             headerRight:
               values.title || values.content

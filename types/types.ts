@@ -56,6 +56,7 @@ export interface NotesManagingFormData {
 // Draft schema for local DB
 export interface DraftSchema {
   id: string;
+  date: string;
   title?: string;
   content?: string;
 }

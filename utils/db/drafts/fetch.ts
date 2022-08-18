@@ -8,7 +8,7 @@ export const fetchDrafts = () => {
   const promise = new Promise<DraftSchema[]>((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        'SELECT * FROM drafts',
+        'SELECT * FROM drafts ORDER BY datetime(date) ASC',
         [],
         (_, result) => {
           resolve(result.rows._array);
