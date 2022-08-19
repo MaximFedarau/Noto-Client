@@ -4,6 +4,8 @@ import {
   AppStateStatus,
   Alert,
   GestureResponderEvent,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { Formik, FormikProps } from 'formik';
@@ -382,36 +384,41 @@ export default function Form(): ReactElement {
         }, [values]);
 
         return (
-          <FormView
-            bounces={false}
-            contentContainerStyle={styles.contentContainer}
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={styles.contentContainer}
           >
-            <FormField
-              onChangeText={handleChange('title')}
-              value={values.title}
-              errorMessage={errors.title}
+            <FormView
+              bounces={false}
+              contentContainerStyle={styles.contentContainer}
             >
-              Title
-            </FormField>
-            <MarkdownField
-              onChangeText={handleChange('content')}
-              value={values.content}
-              errorMessage={errors.content}
-            >
-              Content
-            </MarkdownField>
-            <Button
-              type={BUTTON_TYPES.CONTAINED}
-              onPress={
-                // ! formik docs
-                handleSubmit as unknown as (
-                  event: GestureResponderEvent,
-                ) => void
-              }
-            >
-              {route.params?.noteId ? 'Update' : 'Upload'}
-            </Button>
-          </FormView>
+              <FormField
+                onChangeText={handleChange('title')}
+                value={values.title}
+                errorMessage={errors.title}
+              >
+                Title
+              </FormField>
+              <MarkdownField
+                onChangeText={handleChange('content')}
+                value={values.content}
+                errorMessage={errors.content}
+              >
+                Content
+              </MarkdownField>
+              <Button
+                type={BUTTON_TYPES.CONTAINED}
+                onPress={
+                  // ! formik docs
+                  handleSubmit as unknown as (
+                    event: GestureResponderEvent,
+                  ) => void
+                }
+              >
+                {route.params?.noteId ? 'Update' : 'Upload'}
+              </Button>
+            </FormView>
+          </KeyboardAvoidingView>
         );
       }}
     </Formik>

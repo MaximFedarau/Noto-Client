@@ -17,6 +17,12 @@ export const draftsSlice = createSlice({
     updateDraft: (state: DraftSchema[], action: PayloadAction<DraftSchema>) => {
       const index = state.findIndex((note) => note.id === action.payload.id);
       if (index !== -1) {
+        const length = state.length;
+        if (length > 1 && index < length - 1) {
+          state.splice(index, 1);
+          state.push(action.payload);
+          return;
+        }
         state[index] = action.payload;
       } else {
         state.push(action.payload);
