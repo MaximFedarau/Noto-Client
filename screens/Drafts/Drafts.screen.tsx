@@ -2,6 +2,7 @@ import React, { ReactElement } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import { Text } from 'react-native';
+import { FAB } from '@rneui/themed';
 
 import Error from '@screens/Error/Error.screen';
 import Loading from '@screens/Loading/Loading.screen';
@@ -10,12 +11,17 @@ import SearchBar from '@components/Default/SearchBar/SearchBar.component';
 import DraftsList from '@components/Drafts/DraftsList/DraftsList.component';
 import { fetchDrafts } from '@utils/db/drafts/fetch';
 import { stringSearch } from '@utils/stringInteraction/stringSearch';
-import { LeftHeaderView } from '@components/Default/View/View.component';
-import { DraftsView } from '@components/Default/View/View.component';
+import {
+  DraftsView,
+  DraftsContentView,
+  LeftHeaderView,
+} from '@components/Default/View/View.component';
 import { NoItemsText } from '@components/Default/Text/Text.component';
 import { NavigationProps } from '@app-types/types';
 import { draftsSelector } from '@store/drafts/drafts.selector';
 import { assignDrafts } from '@store/drafts/drafts.slice';
+import { NAVIGATION_NAMES } from '@app-types/enum';
+import { CYBER_YELLOW } from '@constants/colors';
 
 import { styles } from './Drafts.styles';
 
@@ -103,15 +109,28 @@ export default function Drafts(): ReactElement {
 
   return (
     <DraftsView>
-      {drafts.length ? (
-        filteredDrafts.length ? (
-          <DraftsList>{filteredDrafts}</DraftsList>
+      <DraftsContentView>
+        {drafts.length ? (
+          filteredDrafts.length ? (
+            <DraftsList>{filteredDrafts}</DraftsList>
+          ) : (
+            <NoItemsText>Nothing found</NoItemsText>
+          )
         ) : (
-          <NoItemsText>Nothing found</NoItemsText>
-        )
-      ) : (
-        <NoItemsText>No Drafts</NoItemsText>
-      )}
+          <NoItemsText>No Drafts</NoItemsText>
+        )}
+        <FAB
+          placement="right"
+          color={CYBER_YELLOW}
+          icon={{
+            name: 'add',
+            color: 'white',
+          }}
+          onPress={() => {
+            navigation.navigate(NAVIGATION_NAMES.NOTES_MANAGING);
+          }}
+        />
+      </DraftsContentView>
     </DraftsView>
   );
 }

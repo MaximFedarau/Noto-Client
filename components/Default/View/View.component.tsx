@@ -59,10 +59,22 @@ export const FormView = styled(DefaultScrollView)`
   margin-vertical: 16px;
 `;
 
+export const NotesManagingRightHeaderView = styled.View`
+  margin-right: -4px;
+`;
+
+export const NotesManagingLeftHeaderView = styled.View`
+  margin-left: -4px;
+`;
+
 // ! Drafts Screen
 
 export const DraftsView = styled.SafeAreaView`
   flex: 1;
+  justify-content: center;
+`;
+
+export const DraftsContentView = styled(DefaultView)`
   justify-content: center;
 `;
 

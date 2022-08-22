@@ -2,14 +2,12 @@ import React, { ReactElement, useEffect } from 'react';
 import { NavigationProps } from '@app-types/types';
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
-import { Pressable } from 'react-native';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Loading from '@screens/Loading/Loading.screen';
 import Notes from '@screens/Notes/Notes.screen';
-import NotesManaging from '@screens/NotesManaging/NotesManaging.screen';
 import Drafts from '@screens/Drafts/Drafts.screen';
 import IconButton from '@components/Default/IconButton/IconButton.component';
 import Avatar from '@components/Navigation/Avatar/Avatar.component';
@@ -90,6 +88,7 @@ export default function MainBottomTabs(): ReactElement {
 
   return (
     <BottomTab.Navigator
+      id="bottomTab"
       screenOptions={{
         headerTitleAlign: 'center',
         headerTintColor: OSLO_GRAY,
@@ -137,33 +136,6 @@ export default function MainBottomTabs(): ReactElement {
         }}
       />
       <BottomTab.Screen
-        name={NAVIGATION_NOTES_NAMES.NOTES_MANAGING}
-        component={NotesManaging}
-        options={{
-          title: 'Manage Note',
-          headerTitleAlign: 'center',
-          headerTintColor: OSLO_GRAY,
-          headerTitleStyle: {
-            fontFamily: 'Roboto-Regular',
-          },
-          headerStyle: { backgroundColor: SPRING_WOOD },
-          headerShadowVisible: false,
-          unmountOnBlur: true,
-          tabBarLabel: () => null,
-          tabBarIcon: ({ color, size }) => {
-            return (
-              <Ionicons name="add-circle-sharp" size={size} color={color} />
-            );
-          },
-          tabBarButton: (props) => {
-            function onButtonClickHandler() {
-              navigation.navigate(NAVIGATION_NOTES_NAMES.NOTES_MANAGING);
-            }
-            return <Pressable {...props} onPress={onButtonClickHandler} />;
-          },
-        }}
-      />
-      <BottomTab.Screen
         name={NAVIGATION_NOTES_NAMES.DRAFTS}
         component={Drafts}
         options={{
@@ -188,7 +160,7 @@ export default function MainBottomTabs(): ReactElement {
               </RightHeaderView>
             );
           },
-          title: 'Loading...',
+          title: 'Drafts',
         }}
       />
     </BottomTab.Navigator>

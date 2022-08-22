@@ -7,10 +7,9 @@ export const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 8,
     right: 8,
-    alignSelf: 'center',
     backgroundColor: CYBER_YELLOW,
-    paddingVertical: 8,
+    borderRadius: 30,
     paddingHorizontal: 12,
-    borderRadius: 24,
+    paddingVertical: 11,
   },
 });

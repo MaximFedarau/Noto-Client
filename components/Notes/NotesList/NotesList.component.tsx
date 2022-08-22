@@ -61,7 +61,7 @@ export default function NotesList({ children }: NotesListProps): ReactElement {
           <IconButton
             style={styles.scrollToEndButton}
             iconName="arrow-up"
-            size={24}
+            size={28}
             color="white"
             onPress={scrollToEndHandler}
           >

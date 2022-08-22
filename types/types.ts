@@ -20,15 +20,15 @@ type AuthNavigationRootStackParamList = {
 type NotesRootStackParamList = {
   [NAVIGATION_NOTES_NAMES.NOTES]?: undefined;
   [NAVIGATION_NOTES_NAMES.DRAFTS]?: undefined;
-  [NAVIGATION_NOTES_NAMES.NOTES_MANAGING]?: {
-    draftId?: string;
-    noteId?: string;
-  };
 };
 
 // General routes
 type RootStackParamList = {
   [NAVIGATION_NAMES.NOTES_OVERVIEW]?: undefined;
+  [NAVIGATION_NAMES.NOTES_MANAGING]?: {
+    draftId?: string;
+    noteId?: string;
+  };
   [NAVIGATION_NAMES.AUTH]: undefined;
 } & AuthNavigationRootStackParamList &
   NotesRootStackParamList;
@@ -39,8 +39,8 @@ export type AvatarPickerRouteProp = RouteProp<
   NAVIGATION_AUTH_NAMES.AVATAR_PICKER
 >; // for route object (React Navigation) - Avatar Picker screen
 export type NotesManagingRouteProp = RouteProp<
-  NotesRootStackParamList,
-  NAVIGATION_NOTES_NAMES.NOTES_MANAGING
+  RootStackParamList,
+  NAVIGATION_NAMES.NOTES_MANAGING
 >; // for route object (React Navigation) - Notes Managing screen
 
 // ! Notes Managing Form Data Interface

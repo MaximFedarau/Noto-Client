@@ -18,8 +18,11 @@ import IconButton from '@components/Default/IconButton/IconButton.component';
 import Button from '@components/Default/Button/Button.component';
 import FormField from '@components/NotesManaging/FormField/FormField.component';
 import MarkdownField from '@components/NotesManaging/MarkdownField/MarkdownField.component';
-import { FormView } from '@components/Default/View/View.component';
-import { RightHeaderView } from '@components/Default/View/View.component';
+import {
+  FormView,
+  NotesManagingLeftHeaderView,
+  NotesManagingRightHeaderView,
+} from '@components/Default/View/View.component';
 import { notesManagingFormValidationSchema } from '@constants/validationSchemas';
 import { addDraft } from '@utils/db/drafts/add';
 import { fetchDraftById } from '@utils/db/drafts/fetch';
@@ -75,6 +78,20 @@ export default function Form(): ReactElement {
   });
 
   React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: ({ tintColor }) => (
+        <NotesManagingLeftHeaderView>
+          <IconButton
+            iconName="close-outline"
+            size={32}
+            color={tintColor}
+            onPress={() => {
+              navigation.goBack();
+            }}
+          />
+        </NotesManagingLeftHeaderView>
+      ),
+    });
     if (route.params?.noteId) {
       setIsLoading(true);
       fetchingNote();
@@ -360,7 +377,7 @@ export default function Form(): ReactElement {
               values.title || values.content
                 ? () => {
                     return (
-                      <RightHeaderView>
+                      <NotesManagingRightHeaderView>
                         <IconButton
                           iconName="trash"
                           size={32}
@@ -371,7 +388,7 @@ export default function Form(): ReactElement {
                               : onDraftDeleteHandler
                           }
                         />
-                      </RightHeaderView>
+                      </NotesManagingRightHeaderView>
                     );
                   }
                 : () => null,

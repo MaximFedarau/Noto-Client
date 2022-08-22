@@ -7,7 +7,7 @@ import * as showdown from 'showdown';
 import { DraftContainer } from './Draft.styles';
 import { DraftTitle } from '@components/Default/Text/Text.component';
 import { DraftSchema, NavigationProps } from '@app-types/types';
-import { NAVIGATION_NOTES_NAMES } from '@app-types/enum';
+import { NAVIGATION_NAMES } from '@app-types/enum';
 import { titleFormat } from '@utils/stringInteraction/titleFormat';
 import { contentFormat } from '@utils/stringInteraction/contentFormat';
 
@@ -31,7 +31,7 @@ const Draft = React.memo(function Draft({
   // going to the notes overview screen passing route.id as a prop
   const onDraftPressHandler = () => {
     if (!title && !content) return;
-    navigation.navigate(NAVIGATION_NOTES_NAMES.NOTES_MANAGING, {
+    navigation.navigate(NAVIGATION_NAMES.NOTES_MANAGING, {
       draftId: id,
     });
   };
