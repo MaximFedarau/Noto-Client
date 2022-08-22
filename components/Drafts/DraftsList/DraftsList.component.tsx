@@ -1,12 +1,10 @@
 import React, { ReactElement } from 'react';
 import { FlashList } from '@shopify/flash-list';
-import { SafeAreaView } from 'react-native';
 
 import Draft from '@components/Drafts/Draft/Draft.component';
-import IconButton from '@components/Default/IconButton/IconButton.component';
+import GoUpButton from '@components/Auth/Defaults/GoUpButton/GoUpButton.component';
 import { DraftSchema } from '@app-types/types';
-
-import { styles } from './DraftsList.styles';
+import { CYBER_YELLOW } from '@constants/colors';
 
 //Interface for Props
 interface DraftsListProps {
@@ -59,17 +57,7 @@ export default function DraftsList({
         estimatedItemSize={302}
       />
       {Math.trunc(offset) < Math.trunc(threshold) && offset >= 0 && (
-        <SafeAreaView>
-          <IconButton
-            style={styles.scrollToEndButton}
-            iconName="arrow-up"
-            size={28}
-            color="white"
-            onPress={scrollToEndHandler}
-          >
-            There are new note(-s).
-          </IconButton>
-        </SafeAreaView>
+        <GoUpButton onPress={scrollToEndHandler} color={CYBER_YELLOW} />
       )}
     </>
   );

@@ -1,12 +1,10 @@
 import React, { ReactElement } from 'react';
 import { FlashList } from '@shopify/flash-list';
-import { SafeAreaView } from 'react-native';
 
 import Note from '@components/Notes/Note/Note.component';
-import IconButton from '@components/Default/IconButton/IconButton.component';
+import GoUpButton from '@components/Auth/Defaults/GoUpButton/GoUpButton.component';
 import { NoteSchema } from '@app-types/types';
-
-import { styles } from './NotesList.styles';
+import { SOFT_BLUE } from '@constants/colors';
 
 //Interface for Props
 interface NotesListProps {
@@ -57,17 +55,7 @@ export default function NotesList({ children }: NotesListProps): ReactElement {
         estimatedItemSize={302}
       />
       {Math.trunc(offset) < Math.trunc(threshold) && offset >= 0 && (
-        <SafeAreaView>
-          <IconButton
-            style={styles.scrollToEndButton}
-            iconName="arrow-up"
-            size={28}
-            color="white"
-            onPress={scrollToEndHandler}
-          >
-            There are new note(-s).
-          </IconButton>
-        </SafeAreaView>
+        <GoUpButton color={SOFT_BLUE} onPress={scrollToEndHandler} />
       )}
     </>
   );
