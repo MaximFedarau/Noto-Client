@@ -4,4 +4,7 @@ export const styles = StyleSheet.create({
   contentContainer: {
     flexGrow: 1,
   },
+  submitButton: {
+    height: 36,
+  },
 });

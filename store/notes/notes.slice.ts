@@ -14,6 +14,20 @@ export const notesSlice = createSlice({
     removeNote: (state: NoteSchema[], action: PayloadAction<string>) => {
       return state.filter((note) => note.id !== action.payload);
     },
+    updateNote: (state: NoteSchema[], action: PayloadAction<NoteSchema>) => {
+      const index = state.findIndex((note) => note.id === action.payload.id);
+      if (index !== -1) {
+        const length = state.length;
+        if (length > 1 && index < length - 1) {
+          state.splice(index, 1);
+          state.push(action.payload);
+          return;
+        }
+        state[index] = action.payload;
+      } else {
+        state.push(action.payload);
+      }
+    },
     assignNotes: (_: NoteSchema[], action: PayloadAction<NoteSchema[]>) => {
       return action.payload;
     },
@@ -21,5 +35,5 @@ export const notesSlice = createSlice({
   },
 });
 
-export const { addNote, removeNote, assignNotes, clearNotes } =
+export const { addNote, removeNote, updateNote, assignNotes, clearNotes } =
   notesSlice.actions;

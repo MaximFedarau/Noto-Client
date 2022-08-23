@@ -43,7 +43,7 @@ import {
   setIsAuth,
 } from '@store/publicData/publicData.slice';
 import { setPublicData } from '@store/publicData/publicData.slice';
-import { addNote, removeNote } from '@store/notes/notes.slice';
+import { addNote, removeNote, updateNote } from '@store/notes/notes.slice';
 import {
   updateDraft,
   addDraft as appendDraft,
@@ -76,6 +76,35 @@ export default function Form(): ReactElement {
     dispatch(setIsAuth(false));
     navigation.goBack();
   });
+
+  React.useEffect(
+    () =>
+      navigation.addListener('beforeRemove', (e) => {
+        // if all fields are the same or there is no noteId, then we do not show alert
+        if (!formRef.current?.dirty || !route.params?.noteId) {
+          return;
+        }
+        // Prevent default behavior of leaving the screen
+        e.preventDefault();
+
+        // Prompt the user before leaving the screen
+        Alert.alert(
+          'Discard changes?',
+          'You have unsaved changes. Are you sure to discard them and leave the screen?',
+          [
+            { text: "Don't leave", style: 'cancel' },
+            {
+              text: 'Discard',
+              style: 'destructive',
+              // If the user confirmed, then we dispatch the action we blocked earlier
+              // This will continue the action that had triggered the removal of the screen
+              onPress: () => navigation.dispatch(e.data.action),
+            },
+          ],
+        );
+      }),
+    [navigation],
+  );
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
@@ -241,6 +270,52 @@ export default function Form(): ReactElement {
       });
   };
 
+  const onNoteUpdateHandler = async (values: NotesManagingFormData) => {
+    if (!route.params || !route.params.noteId) return;
+    setIsLoading(true);
+    const accessToken = await SecureStore.getItemAsync('accessToken');
+    const refreshToken = await SecureStore.getItemAsync('refreshToken');
+    if (!accessToken || !refreshToken) {
+      navigation.goBack();
+      return;
+    }
+    const { title, content } = values;
+    const trimmedTitle = (title || '').trim();
+    const trimmedContent = (content || '').trim();
+    defaultInstance
+      .put<NoteSchema>(`/notes/${route.params.noteId}`, {
+        title: trimmedTitle,
+        content: trimmedContent,
+      })
+      .then((response) => {
+        const note = response.data;
+        const { id, title, content, date } = note;
+        dispatch(
+          updateNote({
+            id,
+            title,
+            content,
+            date,
+          }),
+        );
+        navigation.goBack();
+      })
+      .catch((error) => {
+        if (error.response.status === 401) return;
+        setIsLoading(false);
+        showingSubmitError(
+          'Note Updating Error',
+          error.response.data
+            ? error.response.data.message
+            : 'Something went wrong:(',
+          40,
+          () => {
+            submittingFailureHandler(values);
+          },
+        );
+      });
+  };
+
   const onFormSubmitHandler = async (values: NotesManagingFormData) => {
     setIsLoading(true);
     const accessToken = await SecureStore.getItemAsync('accessToken');
@@ -267,7 +342,7 @@ export default function Form(): ReactElement {
             ? error.response.data.message
             : 'Something went wrong:(',
           40,
-          async () => {
+          () => {
             submittingFailureHandler(values);
           },
         );
@@ -277,7 +352,7 @@ export default function Form(): ReactElement {
       'Congratulations!',
       'Note was successfully uploaded and draft was deleted.',
       40,
-      async () => {
+      () => {
         dispatch(addNote(data.data));
         if (route.params) {
           onDraftDeleteHandler();
@@ -354,7 +429,9 @@ export default function Form(): ReactElement {
   return (
     <Formik
       initialValues={formInitialValues}
-      onSubmit={onFormSubmitHandler}
+      onSubmit={
+        route.params?.noteId ? onNoteUpdateHandler : onFormSubmitHandler
+      }
       validationSchema={notesManagingFormValidationSchema}
       innerRef={formRef}
       enableReinitialize={true}
@@ -425,6 +502,7 @@ export default function Form(): ReactElement {
               </MarkdownField>
               <Button
                 type={BUTTON_TYPES.CONTAINED}
+                style={styles.submitButton}
                 onPress={
                   // ! formik docs
                   handleSubmit as unknown as (

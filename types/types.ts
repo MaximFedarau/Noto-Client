@@ -65,6 +65,7 @@ export interface DraftSchema {
 
 export interface NoteSchema {
   id: string;
+  date: string;
   title?: string;
   content?: string;
 }
