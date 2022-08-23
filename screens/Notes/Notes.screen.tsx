@@ -1,14 +1,18 @@
 import React, { ReactElement } from 'react';
-import { Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
+import { Text } from 'react-native';
+import { FAB } from '@rneui/themed';
 
 import Error from '@screens/Error/Error.screen';
 import Loading from '@screens/Loading/Loading.screen';
 import { LeftHeaderView } from '@components/Default/View/View.component';
 import IconButton from '@components/Default/IconButton/IconButton.component';
 import SearchBar from '@components/Default/SearchBar/SearchBar.component';
-import { NotesView } from '@components/Default/View/View.component';
+import {
+  NotesView,
+  NotesContentView,
+} from '@components/Default/View/View.component';
 import NotesList from '@components/Notes/NotesList/NotesList.component';
 import { NoItemsText } from '@components/Default/Text/Text.component';
 import { NavigationProps } from '@app-types/types';
@@ -25,6 +29,8 @@ import { notesSelector } from '@store/notes/notes.selector';
 import { clearNotes, assignNotes } from '@store/notes/notes.slice';
 
 import { styles } from './Notes.styles';
+import { SOFT_BLUE } from '@constants/colors';
+import { NAVIGATION_NAMES } from '@app-types/enum';
 
 export default function Notes(): ReactElement {
   const navigation = useNavigation<NavigationProps>();
@@ -73,7 +79,10 @@ export default function Notes(): ReactElement {
         //Implement search bar
         headerTitle: ({ children, tintColor }) => {
           function onSearchBarChange(text: string) {
-            setSearchText(text);
+            const timer = setTimeout(() => {
+              setSearchText(text);
+            }, 300);
+            return () => clearTimeout(timer);
           }
           if (openSearchBar)
             return (
@@ -132,15 +141,30 @@ export default function Notes(): ReactElement {
 
   return (
     <NotesView>
-      {notes.length ? (
-        filteredNotes.length ? (
-          <NotesList>{filteredNotes}</NotesList>
+      <NotesContentView>
+        {notes.length ? (
+          filteredNotes.length ? (
+            <NotesList>{filteredNotes}</NotesList>
+          ) : (
+            <NoItemsText>Nothing found</NoItemsText>
+          )
         ) : (
-          <NoItemsText>Nothing found</NoItemsText>
-        )
-      ) : (
-        <NoItemsText>No Notes</NoItemsText>
-      )}
+          <NoItemsText>No Notes</NoItemsText>
+        )}
+        {!openSearchBar && isAuth && (
+          <FAB
+            placement="right"
+            color={SOFT_BLUE}
+            icon={{
+              name: 'add',
+              color: 'white',
+            }}
+            onPress={() => {
+              navigation.navigate(NAVIGATION_NAMES.NOTES_MANAGING);
+            }}
+          />
+        )}
+      </NotesContentView>
     </NotesView>
   );
 }

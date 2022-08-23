@@ -132,6 +132,7 @@ export default function MainBottomTabs(): ReactElement {
               </RightHeaderView>
             );
           },
+          tabBarActiveTintColor: isAuth ? SOFT_BLUE : CYBER_YELLOW,
           title: nickname ? `${nickname}'s Notes` : 'Notes',
         }}
       />

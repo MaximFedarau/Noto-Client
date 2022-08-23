@@ -16,7 +16,6 @@
     "@reduxjs/toolkit": "^1.8.4",
     "@rneui/base": "^4.0.0-rc.5",
     "@rneui/themed": "^4.0.0-rc.5",
-    "@shopify/flash-list": "1.1.0",
     "@types/styled-components-react-native": "^5.1.3",
     "axios": "^0.27.2",
     "expo": "^46.0.0",

@@ -1,5 +1,5 @@
 import React, { ReactElement } from 'react';
-import { FlashList } from '@shopify/flash-list';
+import { FlatList } from 'react-native';
 
 import Note from '@components/Notes/Note/Note.component';
 import GoUpButton from '@components/Auth/Defaults/GoUpButton/GoUpButton.component';
@@ -17,11 +17,15 @@ export default function NotesList({ children }: NotesListProps): ReactElement {
   const [layoutHeight, setLayoutHeight] = React.useState<number>(0);
   const [offset, setOffset] = React.useState<number>(0);
 
-  const ref = React.useRef<FlashList<NoteSchema>>(null);
+  const ref = React.useRef<FlatList<NoteSchema>>(null);
 
-  React.useEffect(() => {
-    // setting threshol9d for scroll to the latest note button
-    setThreshold(contentHeight - layoutHeight);
+  // after all content renders
+  React.useLayoutEffect(() => {
+    // setting threshold for scroll to the latest note item + a little timeout, because we should wait for heights to be set
+    const timer = setTimeout(() => {
+      setThreshold(contentHeight - layoutHeight);
+    }, 100);
+    return () => clearTimeout(timer);
   }, [layoutHeight, contentHeight]);
 
   function scrollToEndHandler() {
@@ -32,7 +36,7 @@ export default function NotesList({ children }: NotesListProps): ReactElement {
 
   return (
     <>
-      <FlashList
+      <FlatList
         data={children}
         renderItem={(item) => <Note>{item.item}</Note>}
         scrollsToTop
@@ -43,20 +47,22 @@ export default function NotesList({ children }: NotesListProps): ReactElement {
           setOffset(event.nativeEvent.contentOffset.y);
         }}
         onLayout={(event) => {
-          // setting available height for list
+          // setting available list height
           setLayoutHeight(event.nativeEvent.layout.height);
         }}
         onContentSizeChange={(_, height) => {
-          if (height > 0) {
+          // min height of one item
+          if (height >= 104) {
             // setting required height for list data
             setContentHeight(height);
           }
         }}
-        estimatedItemSize={302}
       />
-      {Math.trunc(offset) < Math.trunc(threshold) && offset >= 0 && (
-        <GoUpButton color={SOFT_BLUE} onPress={scrollToEndHandler} />
-      )}
+      {offset >= 0 && // if user has scrolled (bounced)
+        layoutHeight > 0 && // when list is rendered => layoutHeight (its height) is not 0
+        Math.trunc(offset) < Math.trunc(threshold) && ( // when user has not scrolled to the end
+          <GoUpButton color={SOFT_BLUE} onPress={scrollToEndHandler} />
+        )}
     </>
   );
 }

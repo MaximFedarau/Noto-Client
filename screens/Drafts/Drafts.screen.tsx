@@ -63,7 +63,10 @@ export default function Drafts(): ReactElement {
       // adding search bar
       headerTitle: ({ tintColor }) => {
         function onSearchBarChange(text: string) {
-          setSearchText(text);
+          const timer = setTimeout(() => {
+            setSearchText(text);
+          }, 300);
+          return () => clearTimeout(timer);
         }
         if (openSearchBar && drafts.length)
           return (
@@ -119,17 +122,19 @@ export default function Drafts(): ReactElement {
         ) : (
           <NoItemsText>No Drafts</NoItemsText>
         )}
-        <FAB
-          placement="right"
-          color={CYBER_YELLOW}
-          icon={{
-            name: 'add',
-            color: 'white',
-          }}
-          onPress={() => {
-            navigation.navigate(NAVIGATION_NAMES.NOTES_MANAGING);
-          }}
-        />
+        {!openSearchBar && (
+          <FAB
+            placement="right"
+            color={CYBER_YELLOW}
+            icon={{
+              name: 'add',
+              color: 'white',
+            }}
+            onPress={() => {
+              navigation.navigate(NAVIGATION_NAMES.NOTES_MANAGING);
+            }}
+          />
+        )}
       </DraftsContentView>
     </DraftsView>
   );
