@@ -25,7 +25,7 @@ export const notesSlice = createSlice({
       state.notes.push(action.payload);
     },
     addNotes: (state: NotesState, action: PayloadAction<NoteSchema[]>) => {
-      state.notes = [...state.notes, ...action.payload];
+      state.notes.push(...action.payload);
     },
     removeNote: (state: NotesState, action: PayloadAction<string>) => {
       state.notes = state.notes.filter((note) => note.id !== action.payload);

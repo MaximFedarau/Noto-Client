@@ -142,6 +142,7 @@ export default function Form(): ReactElement {
               dispatch(removeDraft(route.params?.draftId));
           });
         } else {
+          if (!formRef.current?.dirty) return;
           const date = new Date().toISOString();
           updateDraftById(
             route.params?.draftId,
@@ -226,7 +227,9 @@ export default function Form(): ReactElement {
         new Date().toISOString(),
         trimmedTitle,
         trimmedContent,
-      );
+      ).then(() => {
+        setFormInitialValues({ title: trimmedTitle, content: trimmedContent });
+      });
     }
 
     appState.current = nextAppState;

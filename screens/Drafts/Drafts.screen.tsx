@@ -3,14 +3,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 import { Text } from 'react-native';
 import { FAB } from '@rneui/themed';
+import { debounce } from 'lodash';
 
 import Error from '@screens/Error/Error.screen';
 import Loading from '@screens/Loading/Loading.screen';
 import IconButton from '@components/Default/IconButton/IconButton.component';
 import SearchBar from '@components/Default/SearchBar/SearchBar.component';
 import DraftsList from '@components/Drafts/DraftsList/DraftsList.component';
-import { fetchDrafts } from '@utils/db/drafts/fetch';
-import { stringSearch } from '@utils/stringInteraction/stringSearch';
+import Spinner from '@components/Auth/Defaults/Spinner/Spinner.component';
+import { fetchDraftPack } from '@utils/db/drafts/fetch';
 import {
   DraftsView,
   DraftsContentView,
@@ -18,9 +19,14 @@ import {
 } from '@components/Default/View/View.component';
 import { NoItemsText } from '@components/Default/Text/Text.component';
 import { NavigationProps } from '@app-types/types';
-import { draftsSelector } from '@store/drafts/drafts.selector';
-import { assignDrafts } from '@store/drafts/drafts.slice';
-import { NAVIGATION_NAMES } from '@app-types/enum';
+import { draftsSelector, isEndSelector } from '@store/drafts/drafts.selector';
+import {
+  assignDrafts,
+  clearDrafts,
+  addDrafts,
+  setIsEnd,
+} from '@store/drafts/drafts.slice';
+import { FETCH_PACK_TYPES, NAVIGATION_NAMES } from '@app-types/enum';
 import { CYBER_YELLOW } from '@constants/colors';
 
 import { styles } from './Drafts.styles';
@@ -28,8 +34,10 @@ import { styles } from './Drafts.styles';
 export default function Drafts(): ReactElement {
   const dispatch = useDispatch();
   const drafts = useSelector(draftsSelector);
+  const isEnd = useSelector(isEndSelector);
 
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
+  const [isPackLoading, setIsPackLoading] = React.useState<boolean>(false);
   const [isError, setIsError] = React.useState<boolean>(false);
 
   const [openSearchBar, setOpenSearchBar] = React.useState<boolean>(false);
@@ -37,54 +45,54 @@ export default function Drafts(): ReactElement {
 
   const navigation = useNavigation<NavigationProps>();
 
-  React.useEffect(() => {
-    fetchDrafts()
-      .then((result) => {
-        dispatch(assignDrafts(result));
-        setIsError(false);
-      })
-      .catch((error) => {
-        //handling possible errors
-        console.error(error, 'Drafts setup');
-        setIsError(true);
-      })
-      .finally(() => {
-        // in any case - loading is finished :)
-        setIsLoading(false);
-      });
-  }, []);
+  const onSearchBarChange = React.useCallback(
+    debounce((text) => {
+      setSearchText(text);
+      dispatch(setIsEnd(false));
+    }, 300),
+    [],
+  );
+
+  function clearAuthHeader() {
+    setOpenSearchBar(false);
+    setSearchText('');
+    navigation.setOptions({
+      headerTitle: ({ children, tintColor }) => {
+        return (
+          <Text style={[{ color: tintColor }, styles.title]}>{children}</Text>
+        );
+      },
+      headerLeft: () => null,
+    });
+  }
 
   React.useEffect(() => {
-    if (drafts.length === 0) {
-      setSearchText('');
-      setOpenSearchBar(false);
-    }
-    navigation.setOptions({
-      // adding search bar
-      headerTitle: ({ tintColor }) => {
-        function onSearchBarChange(text: string) {
-          const timer = setTimeout(() => {
-            setSearchText(text);
-          }, 300);
-          return () => clearTimeout(timer);
-        }
-        if (openSearchBar && drafts.length)
+    if (drafts.length >= 1 || (drafts.length === 0 && searchText.length >= 1)) {
+      navigation.setOptions({
+        //Implement search bar
+        headerTitle: ({ children, tintColor }) => {
+          if (openSearchBar)
+            return (
+              <SearchBar
+                placeholder="Search in Drafts:"
+                onChangeText={onSearchBarChange}
+              />
+            );
           return (
-            <SearchBar
-              placeholder="Search in Drafts:"
-              onChangeText={onSearchBarChange}
-            />
+            <Text style={[{ color: tintColor }, styles.title]}>{children}</Text>
           );
-        return <Text style={[{ color: tintColor }, styles.title]}>Drafts</Text>;
-      },
-      headerTitleAlign: 'center',
-      // open search bar button
-      headerLeft: ({ tintColor }) => {
-        function onButtonClickHandler() {
-          setOpenSearchBar(!openSearchBar);
-          setSearchText('');
-        }
-        if (drafts.length)
+        },
+        headerTitleAlign: 'center',
+        // open search bar button
+        headerLeft: ({ tintColor }) => {
+          function onButtonClickHandler() {
+            setOpenSearchBar(!openSearchBar);
+            // do not fetch again, when searchText is already empty
+            if (searchText !== '') dispatch(setIsEnd(false));
+            // removing debounce
+            onSearchBarChange.cancel();
+            setSearchText('');
+          }
           return (
             <LeftHeaderView>
               <IconButton
@@ -95,17 +103,46 @@ export default function Drafts(): ReactElement {
               />
             </LeftHeaderView>
           );
-      },
-    });
-  }, [openSearchBar, drafts.length]);
+        },
+      });
+    } else clearAuthHeader();
 
-  // filtering drafts, depending on search pattern
-  const filteredDrafts = drafts.filter((draft) => {
-    return (
-      stringSearch(draft.title || '', searchText) ||
-      stringSearch(draft.content || '', searchText)
-    );
-  });
+    return () => {
+      //removing debounce, when component is unmounted
+      onSearchBarChange.cancel();
+    };
+  }, [drafts.length, openSearchBar]);
+
+  function fetchDraftsPack(type: FETCH_PACK_TYPES = FETCH_PACK_TYPES.INITIAL) {
+    if (isEnd || isPackLoading) return;
+    const isInitial = type === FETCH_PACK_TYPES.INITIAL;
+
+    isInitial ? setIsLoading(true) : setIsPackLoading(true);
+    fetchDraftPack(isInitial ? 0 : drafts.length, searchText.trim())
+      .then((res) => {
+        const { draftsPack } = res;
+        if (draftsPack.length > 0) {
+          dispatch(
+            isInitial ? assignDrafts(draftsPack) : addDrafts(draftsPack),
+          );
+          dispatch(setIsEnd(res.isEnd));
+        } else {
+          isInitial && dispatch(clearDrafts());
+          dispatch(setIsEnd(true));
+        }
+      })
+      .catch((error) => {
+        if (error.response.status === 401) return;
+        setIsError(true);
+      })
+      .finally(() => {
+        isInitial ? setIsLoading(false) : setIsPackLoading(false);
+      });
+  }
+
+  React.useEffect(() => {
+    fetchDraftsPack();
+  }, [isEnd, searchText]);
 
   if (isError) return <Error />;
   if (isLoading) return <Loading />;
@@ -114,13 +151,19 @@ export default function Drafts(): ReactElement {
     <DraftsView>
       <DraftsContentView>
         {drafts.length ? (
-          filteredDrafts.length ? (
-            <DraftsList>{filteredDrafts}</DraftsList>
-          ) : (
-            <NoItemsText>Nothing found</NoItemsText>
-          )
+          <DraftsList
+            onEndReached={() => {
+              fetchDraftsPack(FETCH_PACK_TYPES.LOAD_MORE);
+            }}
+            onEndReachedThreshold={0.3}
+            ListFooterComponent={isPackLoading ? <Spinner /> : null}
+          >
+            {drafts}
+          </DraftsList>
         ) : (
-          <NoItemsText>No Drafts</NoItemsText>
+          <NoItemsText>
+            {searchText ? 'Nothing found' : 'No drafts'}
+          </NoItemsText>
         )}
         {!openSearchBar && (
           <FAB

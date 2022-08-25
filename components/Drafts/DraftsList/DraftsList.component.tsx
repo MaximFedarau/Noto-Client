@@ -1,5 +1,5 @@
 import React, { ReactElement } from 'react';
-import { FlatList } from 'react-native';
+import { FlatList, FlatListProps } from 'react-native';
 
 import Draft from '@components/Drafts/Draft/Draft.component';
 import GoUpButton from '@components/Auth/Defaults/GoUpButton/GoUpButton.component';
@@ -7,12 +7,14 @@ import { DraftSchema } from '@app-types/types';
 import { CYBER_YELLOW } from '@constants/colors';
 
 //Interface for Props
-interface DraftsListProps {
+interface DraftsListProps
+  extends Omit<FlatListProps<DraftSchema>, 'children' | 'data' | 'renderItem'> {
   children: DraftSchema[];
 }
 
 export default function DraftsList({
   children,
+  ...props
 }: DraftsListProps): ReactElement {
   const [threshold, setThreshold] = React.useState<number>(0);
   const [contentHeight, setContentHeight] = React.useState<number>(0);
@@ -23,7 +25,7 @@ export default function DraftsList({
 
   // after all content renders
   React.useLayoutEffect(() => {
-    // setting threshold for scroll to the latest note item + a little timeout, because we should wait for heights to be set
+    // setting threshold for scroll to the latest draft item + a little timeout, because we should wait for heights to be set
     const timer = setTimeout(() => {
       setThreshold(contentHeight - layoutHeight);
     }, 100);
@@ -39,6 +41,7 @@ export default function DraftsList({
   return (
     <>
       <FlatList
+        {...props}
         data={children}
         renderItem={(item) => <Draft>{item.item}</Draft>}
         scrollsToTop

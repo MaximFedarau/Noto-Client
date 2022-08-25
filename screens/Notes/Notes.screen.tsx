@@ -3,7 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
 import { Text } from 'react-native';
 import { FAB } from '@rneui/themed';
-import lodash from 'lodash';
+import { debounce } from 'lodash';
 
 import Error from '@screens/Error/Error.screen';
 import Loading from '@screens/Loading/Loading.screen';
@@ -77,7 +77,7 @@ export default function Notes(): ReactElement {
   }
 
   const onSearchBarChange = React.useCallback(
-    lodash.debounce((text) => {
+    debounce((text) => {
       setSearchText(text);
       dispatch(setIsEnd(false));
     }, 300),
@@ -157,8 +157,8 @@ export default function Notes(): ReactElement {
           setPackNumber(isInitial ? 2 : packNumber + 1);
           dispatch(setIsEnd(JSON.parse(res.data.isEnd)));
         } else {
-          dispatch(setIsEnd(true));
           isInitial && dispatch(clearNotes());
+          dispatch(setIsEnd(true));
         }
       })
       .catch((error) => {
