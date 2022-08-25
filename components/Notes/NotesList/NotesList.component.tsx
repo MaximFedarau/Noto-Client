@@ -1,17 +1,21 @@
 import React, { ReactElement } from 'react';
-import { FlatList } from 'react-native';
+import { FlatList, FlatListProps } from 'react-native';
 
 import Note from '@components/Notes/Note/Note.component';
 import GoUpButton from '@components/Auth/Defaults/GoUpButton/GoUpButton.component';
 import { NoteSchema } from '@app-types/types';
 import { SOFT_BLUE } from '@constants/colors';
 
-//Interface for Props
-interface NotesListProps {
+//Interface for Props (removing standard keys: children, data and renderItem)
+interface NotesListProps
+  extends Omit<FlatListProps<NoteSchema>, 'children' | 'data' | 'renderItem'> {
   children: NoteSchema[];
 }
 
-export default function NotesList({ children }: NotesListProps): ReactElement {
+export default function NotesList({
+  children,
+  ...props
+}: NotesListProps): ReactElement {
   const [threshold, setThreshold] = React.useState<number>(0);
   const [contentHeight, setContentHeight] = React.useState<number>(0);
   const [layoutHeight, setLayoutHeight] = React.useState<number>(0);
@@ -37,6 +41,7 @@ export default function NotesList({ children }: NotesListProps): ReactElement {
   return (
     <>
       <FlatList
+        {...props}
         data={children}
         renderItem={(item) => <Note>{item.item}</Note>}
         scrollsToTop

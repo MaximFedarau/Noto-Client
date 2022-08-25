@@ -23,3 +23,10 @@ export enum BUTTON_TYPES {
   CONTAINED = 'contained',
   OUTLINED = 'outlined',
 }
+
+// Fetch pack of notes/drafts phases
+
+export enum FETCH_PACK_TYPES {
+  INITIAL = 'INITIAL',
+  LOAD_MORE = 'LOAD_MORE',
+}

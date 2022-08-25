@@ -3,6 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
 import { Text } from 'react-native';
 import { FAB } from '@rneui/themed';
+import lodash from 'lodash';
 
 import Error from '@screens/Error/Error.screen';
 import Loading from '@screens/Loading/Loading.screen';
@@ -14,76 +15,85 @@ import {
   NotesContentView,
 } from '@components/Default/View/View.component';
 import NotesList from '@components/Notes/NotesList/NotesList.component';
+import Spinner from '@components/Auth/Defaults/Spinner/Spinner.component';
 import { NoItemsText } from '@components/Default/Text/Text.component';
+import { SOFT_BLUE } from '@constants/colors';
 import { NavigationProps } from '@app-types/types';
+import { NAVIGATION_NAMES, FETCH_PACK_TYPES } from '@app-types/enum';
 import { createAPIInstance } from '@utils/requests/instance';
 import { showingSubmitError } from '@utils/toastInteraction/showingSubmitError';
-import { stringSearch } from '@utils/stringInteraction/stringSearch';
 import {
   setIsAuth,
   setPublicData,
   publicDataInitialState,
 } from '@store/publicData/publicData.slice';
 import { publicDataAuthSelector } from '@store/publicData/publicData.selector';
-import { notesSelector } from '@store/notes/notes.selector';
-import { clearNotes, assignNotes } from '@store/notes/notes.slice';
+import { notesSelector, isEndSelector } from '@store/notes/notes.selector';
+import {
+  clearNotes,
+  addNotes,
+  assignNotes,
+  setIsEnd,
+} from '@store/notes/notes.slice';
 
 import { styles } from './Notes.styles';
-import { SOFT_BLUE } from '@constants/colors';
-import { NAVIGATION_NAMES } from '@app-types/enum';
 
 export default function Notes(): ReactElement {
   const navigation = useNavigation<NavigationProps>();
 
   const dispatch = useDispatch();
   const isAuth = useSelector(publicDataAuthSelector);
+  const notes = useSelector(notesSelector);
+  const isEnd = useSelector(isEndSelector);
 
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
+  const [isPackLoading, setIsPackLoading] = React.useState<boolean>(false);
   const [isError, setIsError] = React.useState<boolean>(false);
 
   const [openSearchBar, setOpenSearchBar] = React.useState<boolean>(false);
   const [searchText, setSearchText] = React.useState<string>('');
 
-  const notes = useSelector(notesSelector);
+  const [packNumber, setPackNumber] = React.useState<number>(1);
 
-  React.useEffect(() => {
-    const instance = createAPIInstance(() => {
-      showingSubmitError('Logout', 'Your session has expired', undefined);
-      dispatch(clearNotes());
-      dispatch(setPublicData(publicDataInitialState));
-      dispatch(setIsAuth(false));
-      setIsLoading(false);
+  const instance = createAPIInstance(() => {
+    showingSubmitError('Logout', 'Your session has expired', undefined);
+    dispatch(clearNotes());
+    dispatch(setPublicData(publicDataInitialState));
+    dispatch(setIsAuth(false));
+    setIsLoading(false);
+  });
+
+  function clearAuthHeader() {
+    setOpenSearchBar(false);
+    setSearchText('');
+    navigation.setOptions({
+      headerTitle: ({ children, tintColor }) => {
+        return (
+          <Text style={[{ color: tintColor }, styles.title]}>{children}</Text>
+        );
+      },
+      headerLeft: () => null,
     });
-    const fetchNotes = async () => {
-      const res = await instance.get('/notes');
-      if (res.data) dispatch(assignNotes(res.data));
-    };
-    if (isAuth) {
-      fetchNotes()
-        .catch((error) => {
-          if (error.response.status === 401) return;
-          setIsError(true);
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    } else {
-      dispatch(clearNotes());
-      setIsLoading(false);
-    }
-  }, [isAuth]);
+  }
+
+  const onSearchBarChange = React.useCallback(
+    lodash.debounce((text) => {
+      setSearchText(text);
+      dispatch(setIsEnd(false));
+    }, 300),
+    [],
+  );
 
   React.useEffect(() => {
-    if (notes.length >= 1) {
+    if (!isAuth) {
+      clearAuthHeader();
+      return;
+    }
+
+    if (notes.length >= 1 || (notes.length === 0 && searchText.length >= 1)) {
       navigation.setOptions({
         //Implement search bar
         headerTitle: ({ children, tintColor }) => {
-          function onSearchBarChange(text: string) {
-            const timer = setTimeout(() => {
-              setSearchText(text);
-            }, 300);
-            return () => clearTimeout(timer);
-          }
           if (openSearchBar)
             return (
               <SearchBar
@@ -100,6 +110,10 @@ export default function Notes(): ReactElement {
         headerLeft: ({ tintColor }) => {
           function onButtonClickHandler() {
             setOpenSearchBar(!openSearchBar);
+            // do not fetch again, when searchText is already empty
+            if (searchText !== '') dispatch(setIsEnd(false));
+            // removing debounce
+            onSearchBarChange.cancel();
             setSearchText('');
           }
           return (
@@ -114,42 +128,75 @@ export default function Notes(): ReactElement {
           );
         },
       });
-    } else {
-      setOpenSearchBar(false);
-      setSearchText('');
-      navigation.setOptions({
-        headerTitle: ({ children, tintColor }) => {
-          return (
-            <Text style={[{ color: tintColor }, styles.title]}>{children}</Text>
+    } else clearAuthHeader();
+
+    return () => {
+      //removing debounce, when component is unmounted
+      onSearchBarChange.cancel();
+    };
+  }, [notes.length, openSearchBar, isAuth]);
+
+  function fetchNotesPack(type: FETCH_PACK_TYPES = FETCH_PACK_TYPES.INITIAL) {
+    if (isEnd || isPackLoading) return;
+    const isInitial = type === FETCH_PACK_TYPES.INITIAL;
+
+    isInitial ? setIsLoading(true) : setIsPackLoading(true);
+    instance
+      .get(
+        `/notes/pack/${
+          isInitial ? 1 : packNumber
+        }?pattern=${searchText.trim()}`,
+      )
+      .then((res) => {
+        if (res.data.notePack.length > 0) {
+          dispatch(
+            isInitial
+              ? assignNotes(res.data.notePack)
+              : addNotes(res.data.notePack),
           );
-        },
-        headerLeft: () => null,
+          setPackNumber(isInitial ? 2 : packNumber + 1);
+          dispatch(setIsEnd(JSON.parse(res.data.isEnd)));
+        } else {
+          dispatch(setIsEnd(true));
+          isInitial && dispatch(clearNotes());
+        }
+      })
+      .catch((error) => {
+        if (error.response.status === 401) return;
+        setIsError(true);
+      })
+      .finally(() => {
+        isInitial ? setIsLoading(false) : setIsPackLoading(false);
       });
+  }
+
+  React.useEffect(() => {
+    if (!isAuth) {
+      dispatch(clearNotes());
+      setIsLoading(false);
+      return;
     }
-  }, [notes.length, openSearchBar]);
+    fetchNotesPack();
+  }, [isAuth, isEnd, searchText]);
 
   if (isError) return <Error />;
   if (isLoading) return <Loading />;
-
-  // filtering notes, depending on search pattern
-  const filteredNotes = notes.filter((note) => {
-    return (
-      stringSearch(note.title || '', searchText) ||
-      stringSearch(note.content || '', searchText)
-    );
-  });
 
   return (
     <NotesView>
       <NotesContentView>
         {notes.length ? (
-          filteredNotes.length ? (
-            <NotesList>{filteredNotes}</NotesList>
-          ) : (
-            <NoItemsText>Nothing found</NoItemsText>
-          )
+          <NotesList
+            onEndReached={() => {
+              fetchNotesPack(FETCH_PACK_TYPES.LOAD_MORE);
+            }}
+            onEndReachedThreshold={0.3}
+            ListFooterComponent={isPackLoading ? <Spinner /> : null}
+          >
+            {notes}
+          </NotesList>
         ) : (
-          <NoItemsText>No Notes</NoItemsText>
+          <NoItemsText>{searchText ? 'Nothing found' : 'No notes'}</NoItemsText>
         )}
         {!openSearchBar && isAuth && (
           <FAB

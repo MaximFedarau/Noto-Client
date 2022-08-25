@@ -354,7 +354,7 @@ export default function Form(): ReactElement {
       40,
       () => {
         dispatch(addNote(data.data));
-        if (route.params) {
+        if (route.params?.draftId) {
           onDraftDeleteHandler();
           return;
         }
@@ -397,12 +397,13 @@ export default function Form(): ReactElement {
       .then(() => {
         if (route.params?.draftId) dispatch(removeDraft(route.params?.draftId));
         navigation.setParams({ draftId: null });
-        formRef.current.resetForm({
-          values: {
-            title: '',
-            content: '',
-          },
-        });
+        if (formRef.current)
+          formRef.current.resetForm({
+            values: {
+              title: '',
+              content: '',
+            },
+          });
         navigation.goBack();
       })
       .catch((error) => {

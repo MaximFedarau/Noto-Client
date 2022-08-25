@@ -2,38 +2,70 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { NoteSchema } from '@app-types/types';
 
-export const notesInitialState: NoteSchema[] = [];
+//Interface for the Initial State
+interface NotesState {
+  notes: NoteSchema[];
+  isEnd: boolean;
+}
+
+export const notesInitialState: NotesState = {
+  notes: [],
+  isEnd: false,
+};
 
 export const notesSlice = createSlice({
   name: 'notesSlice',
   initialState: notesInitialState,
   reducers: {
-    addNote: (state: NoteSchema[], action: PayloadAction<NoteSchema>) => {
-      state.push(action.payload);
+    addNote: (state: NotesState, action: PayloadAction<NoteSchema>) => {
+      // if user does not see the note, then we do not change state - new note will be shown when user scrolls to the end
+      if (!state.isEnd) {
+        return state;
+      }
+      state.notes.push(action.payload);
     },
-    removeNote: (state: NoteSchema[], action: PayloadAction<string>) => {
-      return state.filter((note) => note.id !== action.payload);
+    addNotes: (state: NotesState, action: PayloadAction<NoteSchema[]>) => {
+      state.notes = [...state.notes, ...action.payload];
     },
-    updateNote: (state: NoteSchema[], action: PayloadAction<NoteSchema>) => {
-      const index = state.findIndex((note) => note.id === action.payload.id);
+    removeNote: (state: NotesState, action: PayloadAction<string>) => {
+      state.notes = state.notes.filter((note) => note.id !== action.payload);
+    },
+    updateNote: (state: NotesState, action: PayloadAction<NoteSchema>) => {
+      const { notes } = state;
+      // if user does not see the note, then we just remove it - saved note will be shown when user scrolls to the end
+      if (!state.isEnd) {
+        state.notes = notes.filter((note) => note.id !== action.payload.id);
+        return;
+      }
+      const index = notes.findIndex((note) => note.id === action.payload.id);
       if (index !== -1) {
-        const length = state.length;
+        const length = notes.length;
         if (length > 1 && index < length - 1) {
-          state.splice(index, 1);
-          state.push(action.payload);
+          notes.splice(index, 1);
+          notes.push(action.payload);
           return;
         }
-        state[index] = action.payload;
+        notes[index] = action.payload;
       } else {
-        state.push(action.payload);
+        notes.push(action.payload);
       }
     },
-    assignNotes: (_: NoteSchema[], action: PayloadAction<NoteSchema[]>) => {
-      return action.payload;
+    assignNotes: (state: NotesState, action: PayloadAction<NoteSchema[]>) => {
+      state.notes = action.payload;
     },
     clearNotes: () => notesInitialState,
+    setIsEnd: (state: NotesState, action: PayloadAction<boolean>) => {
+      state.isEnd = action.payload;
+    },
   },
 });
 
-export const { addNote, removeNote, updateNote, assignNotes, clearNotes } =
-  notesSlice.actions;
+export const {
+  addNote,
+  addNotes,
+  removeNote,
+  updateNote,
+  assignNotes,
+  clearNotes,
+  setIsEnd,
+} = notesSlice.actions;
