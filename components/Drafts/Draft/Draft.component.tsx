@@ -43,10 +43,17 @@ const Draft = React.memo(function Draft({
     >
       <DraftTitle>{titleFormat(title || '-')}</DraftTitle>
       <RenderHTML
-        contentWidth={width}
+        contentWidth={width - 32}
         source={{
           html: modifiedContent,
         }}
+        ignoredStyles={[
+          'fontSize',
+          'fontFamily',
+          'fontWeight',
+          'fontStyle',
+          'height',
+        ]}
       />
     </DraftContainer>
   );

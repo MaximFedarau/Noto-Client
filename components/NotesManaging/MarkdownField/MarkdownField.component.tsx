@@ -81,6 +81,13 @@ const MarkdownField = React.memo(function MarkdownField({
                 enableExperimentalRtl: true, // enabling feature
               },
             }}
+            ignoredStyles={[
+              'fontSize',
+              'fontFamily',
+              'fontWeight',
+              'fontStyle',
+              'height',
+            ]}
           />
         </MarkdownContainer>
       )}

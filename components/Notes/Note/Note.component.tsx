@@ -46,6 +46,13 @@ const Note = React.memo(function Note({ children }: NoteProps): ReactElement {
         source={{
           html: modifiedContent,
         }}
+        ignoredStyles={[
+          'fontSize',
+          'fontFamily',
+          'fontWeight',
+          'fontStyle',
+          'height',
+        ]}
       />
     </NoteContainer>
   );
