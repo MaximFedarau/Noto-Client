@@ -149,8 +149,9 @@ export default function Form(): ReactElement {
             title: trimmedTitle,
             content: trimmedContent,
           };
-          dispatch(updateDraft(updateData));
-          updateDraftById(updateData);
+          updateDraftById(updateData).then(() => {
+            dispatch(updateDraft(updateData));
+          });
         }
         return;
       }
@@ -193,14 +194,21 @@ export default function Form(): ReactElement {
 
       if (!route.params?.draftId) {
         if (trimmedTitle === '' && trimmedContent === '') return;
-        addDraft({
+        const draftData = {
           date: new Date().toISOString(),
           title: trimmedTitle,
           content: trimmedContent,
-        })
+        };
+        addDraft(draftData)
           .then(({ insertId }) => {
             setIsError(false);
-            navigation.setParams({ draftId: insertId });
+            navigation.setParams({ draftId: String(insertId) });
+            dispatch(
+              appendDraft({
+                id: String(insertId),
+                ...draftData,
+              }),
+            );
           })
           .catch((error) => {
             errorHandling(
