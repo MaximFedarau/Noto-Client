@@ -143,35 +143,28 @@ export default function Form(): ReactElement {
           });
         } else {
           if (!formRef.current?.dirty) return;
-          const date = new Date().toISOString();
-          updateDraftById(
-            route.params?.draftId,
-            date,
-            trimmedTitle,
-            trimmedContent,
-          ).then(() => {
-            if (route.params?.draftId)
-              dispatch(
-                updateDraft({
-                  id: route.params?.draftId,
-                  date,
-                  title: trimmedTitle,
-                  content: trimmedContent,
-                }),
-              );
-          });
+          const updateData = {
+            id: route.params?.draftId,
+            date: new Date().toISOString(),
+            title: trimmedTitle,
+            content: trimmedContent,
+          };
+          dispatch(updateDraft(updateData));
+          updateDraftById(updateData);
         }
         return;
       }
       if (trimmedTitle !== '' || trimmedContent !== '') {
-        const date = new Date().toISOString();
-        addDraft(date, trimmedTitle, trimmedContent).then(({ insertId }) => {
+        const draftData = {
+          date: new Date().toISOString(),
+          title: trimmedTitle,
+          content: trimmedContent,
+        };
+        addDraft(draftData).then(({ insertId }) => {
           dispatch(
             appendDraft({
               id: String(insertId),
-              date,
-              title: trimmedTitle,
-              content: trimmedContent,
+              ...draftData,
             }),
           );
         });
@@ -200,7 +193,11 @@ export default function Form(): ReactElement {
 
       if (!route.params?.draftId) {
         if (trimmedTitle === '' && trimmedContent === '') return;
-        addDraft(new Date().toISOString(), trimmedTitle, trimmedContent)
+        addDraft({
+          date: new Date().toISOString(),
+          title: trimmedTitle,
+          content: trimmedContent,
+        })
           .then(({ insertId }) => {
             setIsError(false);
             navigation.setParams({ draftId: insertId });
@@ -222,13 +219,16 @@ export default function Form(): ReactElement {
         });
         return;
       }
-      updateDraftById(
-        draftId,
-        new Date().toISOString(),
-        trimmedTitle,
-        trimmedContent,
-      ).then(() => {
+      if (!formRef.current?.dirty) return;
+      const updateData = {
+        id: draftId,
+        date: new Date().toISOString(),
+        title: trimmedTitle,
+        content: trimmedContent,
+      };
+      updateDraftById(updateData).then(() => {
         setFormInitialValues({ title: trimmedTitle, content: trimmedContent });
+        dispatch(updateDraft(updateData));
       });
     }
 
@@ -382,7 +382,6 @@ export default function Form(): ReactElement {
     console.error(error, message);
   };
 
-  // * Cases handlers
   if (isError) return <Error />;
   if (isLoading) return <Loading />;
 

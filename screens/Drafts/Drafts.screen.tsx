@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Text } from 'react-native';
 import { FAB } from '@rneui/themed';
 import { debounce } from 'lodash';
+import { isAnyOf } from '@reduxjs/toolkit';
 
 import Error from '@screens/Error/Error.screen';
 import Loading from '@screens/Loading/Loading.screen';
@@ -25,9 +26,14 @@ import {
   clearDrafts,
   addDrafts,
   setIsEnd,
+  updateDraft,
+  addDraft,
+  removeDraft,
 } from '@store/drafts/drafts.slice';
 import { FETCH_PACK_TYPES, NAVIGATION_NAMES } from '@app-types/enum';
 import { CYBER_YELLOW } from '@constants/colors';
+import { listener } from '@store/store';
+import { stringSearch } from '@utils/stringInteraction/stringSearch';
 
 import { styles } from './Drafts.styles';
 
@@ -143,6 +149,28 @@ export default function Drafts(): ReactElement {
   React.useEffect(() => {
     fetchDraftsPack();
   }, [isEnd, searchText]);
+
+  React.useEffect(() => {
+    listener.startListening({
+      matcher: isAnyOf(updateDraft, addDraft),
+      effect: (action) => {
+        if (
+          searchText.trim().length >= 1 &&
+          drafts.findIndex((draft) => draft.id === action.payload.id) !== -1
+        ) {
+          if (
+            !stringSearch(action.payload.title || '', searchText) &&
+            !stringSearch(action.payload.content || '', searchText)
+          ) {
+            dispatch(removeDraft(action.payload.id));
+          }
+        }
+      },
+    });
+    return () => {
+      listener.clearListeners();
+    };
+  }, [searchText, drafts]);
 
   if (isError) return <Error />;
   if (isLoading) return <Loading />;
