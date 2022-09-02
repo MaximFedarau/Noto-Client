@@ -1,5 +1,7 @@
 import styled from 'styled-components/native';
 
+import { sizes } from '@constants/sizes';
+
 export const NoteContainer = styled.Pressable`
   margin-vertical: 16px;
   background-color: white;
@@ -8,7 +10,7 @@ export const NoteContainer = styled.Pressable`
   border-width: 2px;
   border-radius: 8px;
   max-height: 696px;
-  min-height: 104px;
+  min-height: ${sizes.NOTES_LIST_MINIMUM_ITEM_SIZE}px;
   overflow: hidden;
   padding-horizontal: 16px;
   padding-vertical: 16px;

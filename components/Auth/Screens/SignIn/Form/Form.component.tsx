@@ -46,11 +46,7 @@ export default function Form(): ReactElement {
         if (!res || !res.data) return; //checking is the response is undefined - type checking
         await SecureStore.setItemAsync('accessToken', res.data.accessToken); // saving access token to secure store
         await SecureStore.setItemAsync('refreshToken', res.data.refreshToken); // saving refresh token to secure store
-        showingSuccess(
-          'Congratulations!',
-          'You have successfully signed in.',
-          undefined,
-        );
+        showingSuccess('Congratulations!', 'You have successfully signed in.');
         handleReturnToHome(); // going to the home screen
       })
       .catch((error) => {

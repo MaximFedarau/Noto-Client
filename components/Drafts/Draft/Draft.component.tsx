@@ -43,7 +43,7 @@ const Draft = React.memo(function Draft({
     >
       <DraftTitle>{titleFormat(title || '-')}</DraftTitle>
       <RenderHTML
-        contentWidth={width - 32}
+        contentWidth={width - 32} // 32 is the padding of the container
         source={{
           html: modifiedContent,
         }}

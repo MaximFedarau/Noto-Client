@@ -32,6 +32,7 @@ import {
 } from '@store/drafts/drafts.slice';
 import { FETCH_PACK_TYPES, NAVIGATION_NAMES } from '@app-types/enum';
 import { CYBER_YELLOW } from '@constants/colors';
+import { sizes } from '@constants/sizes';
 import { listener } from '@store/store';
 import { stringSearch } from '@utils/stringInteraction/stringSearch';
 
@@ -73,7 +74,7 @@ export default function Drafts(): ReactElement {
   }
 
   React.useEffect(() => {
-    if (drafts.length >= 1 || (drafts.length === 0 && searchText.length >= 1)) {
+    if (drafts.length || searchText.length) {
       navigation.setOptions({
         //Implement search bar
         headerTitle: ({ children, tintColor }) => {
@@ -103,7 +104,7 @@ export default function Drafts(): ReactElement {
             <LeftHeaderView>
               <IconButton
                 iconName="search"
-                size={32}
+                size={sizes.SIDE_ICON_SIZE}
                 color={tintColor}
                 onPress={onButtonClickHandler}
               />
@@ -127,7 +128,7 @@ export default function Drafts(): ReactElement {
     fetchDraftPack(isInitial ? 0 : drafts.length, searchText.trim())
       .then((res) => {
         const { draftsPack } = res;
-        if (draftsPack.length > 0) {
+        if (draftsPack.length) {
           dispatch(
             isInitial ? assignDrafts(draftsPack) : addDrafts(draftsPack),
           );
@@ -154,14 +155,16 @@ export default function Drafts(): ReactElement {
     listener.startListening({
       matcher: isAnyOf(updateDraft, addDraft),
       effect: (action) => {
+        const trimmedSearchText = searchText.trim();
         if (
-          searchText.trim().length >= 1 &&
+          trimmedSearchText.length &&
           drafts.findIndex((draft) => draft.id === action.payload.id) !== -1
         ) {
           if (
-            !stringSearch(action.payload.title || '', searchText) &&
-            !stringSearch(action.payload.content || '', searchText)
+            !stringSearch(action.payload.title || '', trimmedSearchText) &&
+            !stringSearch(action.payload.content || '', trimmedSearchText)
           ) {
+            // if some draft does not have search text, remove it from list
             dispatch(removeDraft(action.payload.id));
           }
         }

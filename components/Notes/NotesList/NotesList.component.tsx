@@ -5,6 +5,7 @@ import Note from '@components/Notes/Note/Note.component';
 import GoUpButton from '@components/Auth/Defaults/GoUpButton/GoUpButton.component';
 import { NoteSchema } from '@app-types/types';
 import { SOFT_BLUE } from '@constants/colors';
+import { sizes } from '@constants/sizes';
 
 //Interface for Props (removing standard keys: children, data and renderItem)
 interface NotesListProps
@@ -56,8 +57,7 @@ export default function NotesList({
           setLayoutHeight(event.nativeEvent.layout.height);
         }}
         onContentSizeChange={(_, height) => {
-          // min height of one item
-          if (height >= 104) {
+          if (height >= sizes.NOTES_LIST_MINIMUM_ITEM_SIZE) {
             // setting required height for list data
             setContentHeight(height);
           }

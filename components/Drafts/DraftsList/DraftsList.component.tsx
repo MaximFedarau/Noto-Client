@@ -5,6 +5,7 @@ import Draft from '@components/Drafts/Draft/Draft.component';
 import GoUpButton from '@components/Auth/Defaults/GoUpButton/GoUpButton.component';
 import { DraftSchema } from '@app-types/types';
 import { CYBER_YELLOW } from '@constants/colors';
+import { sizes } from '@constants/sizes';
 
 //Interface for Props
 interface DraftsListProps
@@ -56,8 +57,7 @@ export default function DraftsList({
           setLayoutHeight(event.nativeEvent.layout.height);
         }}
         onContentSizeChange={(_, height) => {
-          // min height of one item
-          if (height >= 104) {
+          if (height >= sizes.DRAFTS_LIST_MINIMUM_ITEM_SIZE) {
             // setting required height for list data
             setContentHeight(height);
           }

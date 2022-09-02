@@ -18,6 +18,7 @@ import {
   CYBER_YELLOW,
   SOFT_BLUE,
 } from '@constants/colors';
+import { sizes } from '@constants/sizes';
 import { NAVIGATION_NAMES, NAVIGATION_NOTES_NAMES } from '@app-types/enum';
 import { getPublicData } from '@utils/requests/get/publicData';
 import {
@@ -120,11 +121,15 @@ export default function MainBottomTabs(): ReactElement {
             return (
               <RightHeaderView>
                 {avatar ? (
-                  <Avatar size={32} image={avatar} onPress={logOut} />
+                  <Avatar
+                    size={sizes.SIDE_ICON_SIZE}
+                    image={avatar}
+                    onPress={logOut}
+                  />
                 ) : (
                   <IconButton
                     iconName="person"
-                    size={32}
+                    size={sizes.SIDE_ICON_SIZE}
                     color={isAuth ? SOFT_BLUE : tintColor}
                     onPress={isAuth ? logOut : navigateToAuth}
                   />
@@ -149,11 +154,15 @@ export default function MainBottomTabs(): ReactElement {
             return (
               <RightHeaderView>
                 {avatar ? (
-                  <Avatar size={32} image={avatar} onPress={logOut} />
+                  <Avatar
+                    size={sizes.SIDE_ICON_SIZE}
+                    image={avatar}
+                    onPress={logOut}
+                  />
                 ) : (
                   <IconButton
                     iconName="person"
-                    size={32}
+                    size={sizes.SIDE_ICON_SIZE}
                     color={isAuth ? SOFT_BLUE : tintColor}
                     onPress={isAuth ? logOut : navigateToAuth}
                   />

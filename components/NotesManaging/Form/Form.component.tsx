@@ -24,6 +24,7 @@ import {
   NotesManagingRightHeaderView,
 } from '@components/Default/View/View.component';
 import { notesManagingFormValidationSchema } from '@constants/validationSchemas';
+import { sizes } from '@constants/sizes';
 import { addDraft } from '@utils/db/drafts/add';
 import { fetchDraftById } from '@utils/db/drafts/fetch';
 import { updateDraftById } from '@utils/db/drafts/update';
@@ -112,7 +113,7 @@ export default function Form(): ReactElement {
         <NotesManagingLeftHeaderView>
           <IconButton
             iconName="close-outline"
-            size={32}
+            size={sizes.SIDE_ICON_SIZE}
             color={tintColor}
             onPress={() => {
               navigation.goBack();
@@ -468,7 +469,7 @@ export default function Form(): ReactElement {
                       <NotesManagingRightHeaderView>
                         <IconButton
                           iconName="trash"
-                          size={32}
+                          size={sizes.SIDE_ICON_SIZE}
                           color="red"
                           onPress={
                             route.params?.noteId

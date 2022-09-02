@@ -18,6 +18,7 @@ import NotesList from '@components/Notes/NotesList/NotesList.component';
 import Spinner from '@components/Auth/Defaults/Spinner/Spinner.component';
 import { NoItemsText } from '@components/Default/Text/Text.component';
 import { SOFT_BLUE } from '@constants/colors';
+import { sizes } from '@constants/sizes';
 import { NavigationProps } from '@app-types/types';
 import { NAVIGATION_NAMES, FETCH_PACK_TYPES } from '@app-types/enum';
 import { createAPIInstance } from '@utils/requests/instance';
@@ -90,7 +91,7 @@ export default function Notes(): ReactElement {
       return;
     }
 
-    if (notes.length >= 1 || (notes.length === 0 && searchText.length >= 1)) {
+    if (notes.length || searchText.length) {
       navigation.setOptions({
         //Implement search bar
         headerTitle: ({ children, tintColor }) => {
@@ -120,7 +121,7 @@ export default function Notes(): ReactElement {
             <LeftHeaderView>
               <IconButton
                 iconName="search"
-                size={32}
+                size={sizes.SIDE_ICON_SIZE}
                 color={tintColor}
                 onPress={onButtonClickHandler}
               />
@@ -148,7 +149,7 @@ export default function Notes(): ReactElement {
         }?pattern=${searchText.trim()}`,
       )
       .then((res) => {
-        if (res.data.notePack.length > 0) {
+        if (res.data.notePack.length) {
           dispatch(
             isInitial
               ? assignNotes(res.data.notePack)
