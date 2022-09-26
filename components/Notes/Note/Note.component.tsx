@@ -8,7 +8,6 @@ import { NoteContainer } from './Note.styles';
 import { NoteTitle } from '@components/Default/Text/Text.component';
 import { NavigationProps, NoteSchema } from '@app-types/types';
 import { NAVIGATION_NAMES } from '@app-types/enum';
-import { titleFormat } from '@utils/stringInteraction/titleFormat';
 import { contentFormat } from '@utils/stringInteraction/contentFormat';
 
 //Interface for Props
@@ -40,7 +39,9 @@ const Note = React.memo(function Note({ children }: NoteProps): ReactElement {
       onPress={onNotePressHandler}
       style={({ pressed }) => (pressed ? { opacity: 0.8 } : {})}
     >
-      <NoteTitle>{titleFormat(title || '-')}</NoteTitle>
+      <NoteTitle ellipsizeMode="tail" numberOfLines={3}>
+        {title || '-'}
+      </NoteTitle>
       <RenderHTML
         contentWidth={width}
         source={{

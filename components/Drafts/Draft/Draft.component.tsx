@@ -8,7 +8,6 @@ import { DraftContainer } from './Draft.styles';
 import { DraftTitle } from '@components/Default/Text/Text.component';
 import { DraftSchema, NavigationProps } from '@app-types/types';
 import { NAVIGATION_NAMES } from '@app-types/enum';
-import { titleFormat } from '@utils/stringInteraction/titleFormat';
 import { contentFormat } from '@utils/stringInteraction/contentFormat';
 
 //Interface for Props
@@ -41,7 +40,9 @@ const Draft = React.memo(function Draft({
       onPress={onDraftPressHandler}
       style={({ pressed }) => (pressed ? { opacity: 0.8 } : {})}
     >
-      <DraftTitle>{titleFormat(title || '-')}</DraftTitle>
+      <DraftTitle ellipsizeMode="tail" numberOfLines={3}>
+        {title || '-'}
+      </DraftTitle>
       <RenderHTML
         contentWidth={width - 32} // 32 is the padding of the container
         source={{

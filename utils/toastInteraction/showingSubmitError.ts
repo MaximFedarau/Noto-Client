@@ -12,7 +12,7 @@ export const showingSubmitError = (
     position: 'top',
     text1: title,
     text2: text,
-    topOffset: topOffset,
+    topOffset,
   });
   console.error(`${title}\n`, text); // logging
 };

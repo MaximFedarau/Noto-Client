@@ -11,6 +11,6 @@ export const showingSuccess = (
     position: 'top',
     text1: title,
     text2: text,
-    topOffset: topOffset,
+    topOffset,
   });
 };
