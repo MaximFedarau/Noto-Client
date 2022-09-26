@@ -1,11 +1,11 @@
 import React, { ReactElement } from 'react';
 import { useWindowDimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { RenderHTML } from 'react-native-render-html';
 import * as showdown from 'showdown';
 
 import { NoteContainer } from './Note.styles';
 import { NoteTitle } from '@components/Default/Text/Text.component';
+import CustomRenderHTML from '@components/Default/CustomRenderHTML/CustomRenderHTML.component';
 import { NavigationProps, NoteSchema } from '@app-types/types';
 import { NAVIGATION_NAMES } from '@app-types/enum';
 import { contentFormat } from '@utils/stringInteraction/contentFormat';
@@ -42,19 +42,10 @@ const Note = React.memo(function Note({ children }: NoteProps): ReactElement {
       <NoteTitle ellipsizeMode="tail" numberOfLines={3}>
         {title || '-'}
       </NoteTitle>
-      <RenderHTML
-        contentWidth={width}
-        source={{
-          html: modifiedContent,
-        }}
-        ignoredStyles={[
-          'fontSize',
-          'fontFamily',
-          'fontWeight',
-          'fontStyle',
-          'height',
-        ]}
-      />
+      <CustomRenderHTML contentWidth={width - 32}>
+        {/* 32 is the padding of the container */}
+        {modifiedContent}
+      </CustomRenderHTML>
     </NoteContainer>
   );
 });
