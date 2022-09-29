@@ -1,5 +1,7 @@
-import { ReactElement } from 'react';
-import { Pressable, Image } from 'react-native';
+import React, { ReactElement } from 'react';
+import { Pressable, Image, ActivityIndicator } from 'react-native';
+
+import { styles } from './Avatar.styles';
 
 // Interface for Props
 interface AvatarProps {
@@ -13,6 +15,12 @@ export default function Avatar({
   image,
   onPress,
 }: AvatarProps): ReactElement {
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  function onImageLoaded() {
+    setIsLoading(false);
+  }
+
   return (
     <Pressable
       style={({ pressed }) => [
@@ -22,16 +30,17 @@ export default function Avatar({
           height: size,
           borderRadius: size / 2,
           overflow: 'hidden',
+          alignItems: 'center',
+          justifyContent: 'center',
         },
       ]}
       onPress={onPress}
     >
+      {isLoading && <ActivityIndicator size="small" style={styles.spinner} />}
       <Image
         source={{ uri: image }}
-        style={{
-          width: '100%',
-          height: '100%',
-        }}
+        onLoadEnd={onImageLoaded}
+        style={styles.image}
       />
     </Pressable>
   );

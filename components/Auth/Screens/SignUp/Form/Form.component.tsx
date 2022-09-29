@@ -15,7 +15,8 @@ import { AuthNavigationText } from '@components/Default/Text/Text.component';
 import { NavigationProps, SignUpFormData } from '@app-types/types';
 import { NAVIGATION_NAMES, NAVIGATION_AUTH_NAMES } from '@app-types/enum';
 import { signUpFormValidationSchema } from '@constants/validationSchemas';
-import { showingSubmitError } from '@utils/showingSubmitError';
+import { showingSubmitError } from '@utils/toastInteraction/showingSubmitError';
+import { showingSuccess } from '@utils/toastInteraction/showingSuccess';
 import { createAPIInstance } from '@utils/requests/instance';
 
 export default function Form(): ReactElement {
@@ -31,7 +32,7 @@ export default function Form(): ReactElement {
 
   //going to the sign in screen
   const onNavigationTextHandler = () => {
-    navigation.replace(NAVIGATION_AUTH_NAMES.SIGN_IN);
+    if (!isLoading) navigation.replace(NAVIGATION_AUTH_NAMES.SIGN_IN);
   };
 
   // submit hanlder (sign up  + log in)
@@ -53,6 +54,7 @@ export default function Form(): ReactElement {
           error.response.data
             ? error.response.data.message
             : 'Something went wrong:(',
+          undefined,
           () => {
             setIsLoading(false);
           },
@@ -71,6 +73,7 @@ export default function Form(): ReactElement {
         if (!res || !res.data) return; //checking is the response is undefined - type checking
         await SecureStore.setItemAsync('accessToken', res.data.accessToken); // saving access token to secure store
         await SecureStore.setItemAsync('refreshToken', res.data.refreshToken); // saving refresh token to secure store
+        showingSuccess('Congratulations!', 'You have successfully signed up.');
         navigation.replace(NAVIGATION_AUTH_NAMES.AVATAR_PICKER, {
           id: userId,
         });
@@ -82,6 +85,7 @@ export default function Form(): ReactElement {
           error.response.data
             ? error.response.data.message
             : 'Something went wrong:(',
+          undefined,
           () => {
             setIsLoading(false);
           },

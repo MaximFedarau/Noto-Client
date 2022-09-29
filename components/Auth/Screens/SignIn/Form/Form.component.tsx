@@ -15,7 +15,8 @@ import { AuthNavigationText } from '@components/Default/Text/Text.component';
 import { NAVIGATION_NAMES, NAVIGATION_AUTH_NAMES } from '@app-types/enum';
 import { NavigationProps, SignInFormData } from '@app-types/types';
 import { signInFormValidationSchema } from '@constants/validationSchemas';
-import { showingSubmitError } from '@utils/showingSubmitError';
+import { showingSubmitError } from '@utils/toastInteraction/showingSubmitError';
+import { showingSuccess } from '@utils/toastInteraction/showingSuccess';
 import { createAPIInstance } from '@utils/requests/instance';
 
 export default function Form(): ReactElement {
@@ -29,7 +30,7 @@ export default function Form(): ReactElement {
 
   // go to the sign up screen
   const onNavigationTextHandler = () => {
-    navigation.replace(NAVIGATION_AUTH_NAMES.SIGN_UP);
+    if (!isLoading) navigation.replace(NAVIGATION_AUTH_NAMES.SIGN_UP);
   };
 
   // submitting (log in)
@@ -45,6 +46,7 @@ export default function Form(): ReactElement {
         if (!res || !res.data) return; //checking is the response is undefined - type checking
         await SecureStore.setItemAsync('accessToken', res.data.accessToken); // saving access token to secure store
         await SecureStore.setItemAsync('refreshToken', res.data.refreshToken); // saving refresh token to secure store
+        showingSuccess('Congratulations!', 'You have successfully signed in.');
         handleReturnToHome(); // going to the home screen
       })
       .catch((error) => {
@@ -54,6 +56,7 @@ export default function Form(): ReactElement {
           error.response.data
             ? error.response.data.message
             : 'Something went wrong:(',
+          undefined,
           () => {
             setIsLoading(false);
           },

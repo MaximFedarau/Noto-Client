@@ -1,13 +1,15 @@
 import * as SQLite from 'expo-sqlite';
 
+import { DraftSchema } from '@app-types/types';
+
 const db = SQLite.openDatabase('drafts.db');
 
-export const updateDraft = (id: string, title: string, content?: string) => {
+export const updateDraftById = ({ id, title, content, date }: DraftSchema) => {
   const promise = new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        'UPDATE drafts SET title = ?, content = ? WHERE id = ?',
-        [title, content!, id],
+        'UPDATE drafts SET title = ?, content = ?, date = ? WHERE id = ?',
+        [title || '', content || '', date, id],
         (_, result) => {
           resolve(result);
         },

@@ -1,14 +1,13 @@
 import React, { ReactElement, useEffect } from 'react';
-import { NavigationProps, PublicUserData } from '@app-types/types';
+import { NavigationProps } from '@app-types/types';
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
-import { Pressable } from 'react-native';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Loading from '@screens/Loading/Loading.screen';
 import Notes from '@screens/Notes/Notes.screen';
-import NotesManaging from '@screens/NotesManaging/NotesManaging.screen';
 import Drafts from '@screens/Drafts/Drafts.screen';
 import IconButton from '@components/Default/IconButton/IconButton.component';
 import Avatar from '@components/Navigation/Avatar/Avatar.component';
@@ -19,20 +18,31 @@ import {
   CYBER_YELLOW,
   SOFT_BLUE,
 } from '@constants/colors';
+import { sizes } from '@constants/sizes';
 import { NAVIGATION_NAMES, NAVIGATION_NOTES_NAMES } from '@app-types/enum';
-import { getPublicData } from '@utils/auth/get/publicData';
+import { getPublicData } from '@utils/requests/get/publicData';
+import {
+  publicDataInitialState,
+  setPublicData,
+  setIsAuth,
+} from '@store/publicData/publicData.slice';
+import {
+  publicDataAuthSelector,
+  publicDataAvatarSelector,
+  publicDataNicknameSelector,
+} from '@store/publicData/publicData.selector';
 
 const BottomTab = createBottomTabNavigator();
 
 export default function MainBottomTabs(): ReactElement {
+  const dispatch = useDispatch();
+  const nickname = useSelector(publicDataNicknameSelector);
+  const isAuth = useSelector(publicDataAuthSelector);
+
   const navigation = useNavigation<NavigationProps>();
   const focus = useIsFocused();
 
-  const [isAuth, setIsAuth] = React.useState(false);
-  const [publicData, setPublicData] = React.useState<
-    PublicUserData | undefined
-  >(undefined);
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true);
 
   function navigateToAuth() {
     navigation.navigate(NAVIGATION_NAMES.AUTH);
@@ -41,8 +51,8 @@ export default function MainBottomTabs(): ReactElement {
   async function logOut() {
     await SecureStore.deleteItemAsync('accessToken');
     await SecureStore.deleteItemAsync('refreshToken');
-    setIsAuth(false);
-    setPublicData(undefined);
+    dispatch(setIsAuth(false));
+    dispatch(setPublicData(publicDataInitialState));
   }
 
   useEffect(() => {
@@ -50,33 +60,36 @@ export default function MainBottomTabs(): ReactElement {
       const accessToken = await SecureStore.getItemAsync('accessToken');
       const refreshToken = await SecureStore.getItemAsync('refreshToken');
       if (accessToken && refreshToken) {
-        setIsAuth(true);
         const data = await getPublicData();
         if (data) {
           // if there is a data we set it
-          setPublicData(data);
+          dispatch(setIsAuth(true));
+          dispatch(setPublicData(data));
         } else {
-          // if there is no data we delete the tokens (in function) and remove all states
-          setIsAuth(false);
-          setPublicData(undefined);
+          // if there is no data we delete the tokens (in function) and change all data
+          dispatch(setIsAuth(false));
+          dispatch(setPublicData(publicDataInitialState));
         }
       } else {
-        //if there is no tokens we remove all states
-        setIsAuth(false);
-        setPublicData(undefined);
+        //if there is no tokens we change all data
+        dispatch(setIsAuth(false));
+        dispatch(setPublicData(publicDataInitialState));
       }
     };
     if (focus) {
       checkIsAuth().finally(() => {
         setIsLoading(false);
       });
+      return;
     }
+    setIsLoading(false);
   }, [focus]);
 
   if (isLoading) return <Loading />;
 
   return (
     <BottomTab.Navigator
+      id="bottomTab"
       screenOptions={{
         headerTitleAlign: 'center',
         headerTintColor: OSLO_GRAY,
@@ -85,7 +98,10 @@ export default function MainBottomTabs(): ReactElement {
         },
         headerStyle: { backgroundColor: SPRING_WOOD },
         headerShadowVisible: false,
-        tabBarStyle: { backgroundColor: SPRING_WOOD, justifyContent: 'center' },
+        tabBarStyle: {
+          backgroundColor: SPRING_WOOD,
+          justifyContent: 'center',
+        },
         tabBarActiveTintColor: CYBER_YELLOW,
       }}
       sceneContainerStyle={{
@@ -101,15 +117,19 @@ export default function MainBottomTabs(): ReactElement {
           },
           tabBarLabel: () => null,
           headerRight: ({ tintColor }) => {
-            const { avatar } = publicData || {};
+            const avatar = useSelector(publicDataAvatarSelector);
             return (
               <RightHeaderView>
                 {avatar ? (
-                  <Avatar size={32} image={avatar} onPress={logOut} />
+                  <Avatar
+                    size={sizes.SIDE_ICON_SIZE}
+                    image={avatar}
+                    onPress={logOut}
+                  />
                 ) : (
                   <IconButton
                     iconName="person"
-                    size={32}
+                    size={sizes.SIDE_ICON_SIZE}
                     color={isAuth ? SOFT_BLUE : tintColor}
                     onPress={isAuth ? logOut : navigateToAuth}
                   />
@@ -117,36 +137,8 @@ export default function MainBottomTabs(): ReactElement {
               </RightHeaderView>
             );
           },
-          title: publicData?.nickname
-            ? `${publicData.nickname}'s Notes`
-            : 'Notes',
-        }}
-      />
-      <BottomTab.Screen
-        name={NAVIGATION_NOTES_NAMES.NOTES_MANAGING}
-        component={NotesManaging}
-        options={{
-          title: 'Manage Note',
-          headerTitleAlign: 'center',
-          headerTintColor: OSLO_GRAY,
-          headerTitleStyle: {
-            fontFamily: 'Roboto-Regular',
-          },
-          headerStyle: { backgroundColor: SPRING_WOOD },
-          headerShadowVisible: false,
-          unmountOnBlur: true,
-          tabBarLabel: () => null,
-          tabBarIcon: ({ color, size }) => {
-            return (
-              <Ionicons name="add-circle-sharp" size={size} color={color} />
-            );
-          },
-          tabBarButton: (props) => {
-            function onButtonClickHandler() {
-              navigation.navigate(NAVIGATION_NOTES_NAMES.NOTES_MANAGING);
-            }
-            return <Pressable {...props} onPress={onButtonClickHandler} />;
-          },
+          tabBarActiveTintColor: isAuth ? SOFT_BLUE : CYBER_YELLOW,
+          title: nickname ? `${nickname}'s Notes` : 'Notes',
         }}
       />
       <BottomTab.Screen
@@ -158,15 +150,19 @@ export default function MainBottomTabs(): ReactElement {
           },
           tabBarLabel: () => null,
           headerRight: ({ tintColor }) => {
-            const { avatar } = publicData || {};
+            const avatar = useSelector(publicDataAvatarSelector);
             return (
               <RightHeaderView>
                 {avatar ? (
-                  <Avatar size={32} image={avatar} onPress={logOut} />
+                  <Avatar
+                    size={sizes.SIDE_ICON_SIZE}
+                    image={avatar}
+                    onPress={logOut}
+                  />
                 ) : (
                   <IconButton
                     iconName="person"
-                    size={32}
+                    size={sizes.SIDE_ICON_SIZE}
                     color={isAuth ? SOFT_BLUE : tintColor}
                     onPress={isAuth ? logOut : navigateToAuth}
                   />
@@ -174,7 +170,7 @@ export default function MainBottomTabs(): ReactElement {
               </RightHeaderView>
             );
           },
-          title: 'Loading...',
+          title: 'Drafts',
         }}
       />
     </BottomTab.Navigator>

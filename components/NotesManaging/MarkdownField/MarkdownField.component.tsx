@@ -1,14 +1,15 @@
 import React, { ReactElement } from 'react';
 import { TextInputProps, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import RenderHtml from 'react-native-render-html';
 import * as showdown from 'showdown';
 
 import FormField from '@components/NotesManaging/FormField/FormField.component';
+import CustomRenderHTML from '@components/Default/CustomRenderHTML/CustomRenderHTML.component';
 import {
   MarkdownFieldContainer,
   TabContainer,
   TabText,
+  FieldContainer,
   MarkdownContainer,
 } from './MarkdownField.styles';
 
@@ -24,11 +25,16 @@ const MarkdownField = React.memo(function MarkdownField({
   value,
   ...props
 }: MarkdownFieldProps): ReactElement {
-  const window = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const converter = new showdown.Converter();
 
-  const [renderedHTML, setRenderdHTML] = React.useState<string>('');
+  const [renderedHTML, setRenderedHTML] = React.useState<string>('');
   const [tabIndex, setTabIndex] = React.useState<number>(0);
+
+  // when user clears the field and is in the Preivew tab, the renderedHTML is set to an empty string
+  React.useEffect(() => {
+    if (!value && tabIndex === 1) setRenderedHTML('');
+  }, [value]);
 
   return (
     <>
@@ -44,7 +50,7 @@ const MarkdownField = React.memo(function MarkdownField({
         <TabContainer
           isActive={tabIndex === 1}
           onPress={() => {
-            setRenderdHTML(converter.makeHtml(value || '')); // when we switch to markdown (html) tab, then we convert our value to html
+            setRenderedHTML(converter.makeHtml(value || '')); // when we switch to markdown (html) tab, then we convert our value to html
             setTabIndex(1);
           }}
         >
@@ -52,32 +58,23 @@ const MarkdownField = React.memo(function MarkdownField({
         </TabContainer>
       </MarkdownFieldContainer>
       {tabIndex === 0 && (
-        <FormField
-          {...props}
-          value={value}
-          errorMessage={errorMessage}
-          multiline
-          autoComplete="off"
-          leftIcon={<Ionicons name="logo-markdown" size={20} />}
-        />
+        <FieldContainer>
+          <FormField
+            {...props}
+            value={value}
+            errorMessage={errorMessage}
+            multiline
+            autoComplete="off"
+            scrollEnabled={false}
+            leftIcon={<Ionicons name="logo-markdown" size={20} />}
+          />
+        </FieldContainer>
       )}
       {tabIndex === 1 && (
         <MarkdownContainer>
-          <RenderHtml
-            contentWidth={window.width}
-            source={{
-              html: renderedHTML,
-            }}
-            ignoredDomTags={['script', 'img', 'svg', 'button']}
-            renderersProps={{
-              ul: {
-                enableExperimentalRtl: true, // enabling feature
-              },
-              ol: {
-                enableExperimentalRtl: true, // enabling feature
-              },
-            }}
-          />
+          <CustomRenderHTML contentWidth={width}>
+            {renderedHTML}
+          </CustomRenderHTML>
         </MarkdownContainer>
       )}
     </>

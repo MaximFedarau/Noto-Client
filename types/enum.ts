@@ -8,7 +8,6 @@ export enum NAVIGATION_AUTH_NAMES {
 //Notes/Drafts Screens Names
 export enum NAVIGATION_NOTES_NAMES {
   NOTES = 'Notes', // * Bottom Navigation
-  NOTES_MANAGING = 'NotesManaging', // * Bottom Navigation
   DRAFTS = 'Drafts', // * Bottom Navigation
 }
 
@@ -16,10 +15,18 @@ export enum NAVIGATION_NOTES_NAMES {
 export enum NAVIGATION_NAMES {
   AUTH = 'Auth', // * Native Stack Navigation
   NOTES_OVERVIEW = 'NotesOverview', // * Native Stack Navigation
+  NOTES_MANAGING = 'NotesManaging', // * Native Stack Navigation
 }
 
 //Button modes - for styling
 export enum BUTTON_TYPES {
   CONTAINED = 'contained',
   OUTLINED = 'outlined',
+}
+
+// Fetch pack of notes/drafts phases
+
+export enum FETCH_PACK_TYPES {
+  INITIAL = 'INITIAL',
+  LOAD_MORE = 'LOAD_MORE',
 }

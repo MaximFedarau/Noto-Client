@@ -7,6 +7,8 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { sizes } from '@constants/sizes';
+
 import { SearchBarInput } from './SearchBar.styles';
 
 export default function SearchBar(props: TextInputProps): ReactElement {
@@ -16,11 +18,14 @@ export default function SearchBar(props: TextInputProps): ReactElement {
   return (
     <View
       style={{
-        width: width - 112,
+        width:
+          width -
+          sizes.SIDE_ICON_SIZE * 2 -
+          24 * 2 - // 24px * 2 for padding on both sides
+          insets.left -
+          insets.right,
         alignSelf: 'center',
         height: 36,
-        paddingRight: insets.right,
-        paddingLeft: insets.left,
       }}
     >
       <SearchBarInput

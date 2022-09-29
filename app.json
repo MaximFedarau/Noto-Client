@@ -26,7 +26,10 @@
         "foregroundImage": "./assets/images/icon.png",
         "backgroundColor": "#F1EFE4"
       },
-      "package": "com.maximfedarau.noto"
+      "package": "com.maximfedarau.noto",
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "androidStatusBar": {
       "barStyle": "dark-content",
@@ -47,6 +50,11 @@
           "photosPermission": "The app accesses your photos to let you use them with account."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "c1a4fa29-608e-43ae-9f3d-928be1b9f482"
+      }
+    }
   }
 }

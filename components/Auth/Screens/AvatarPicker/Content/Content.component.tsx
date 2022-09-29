@@ -8,14 +8,15 @@ import LogoPicker from '@components/Auth/Screens/AvatarPicker/LogoPicker/LogoPic
 import Spinner from '@components/Auth/Defaults/Spinner/Spinner.component';
 import FormButtons from '@components/Auth/Defaults/FormButtons/FormButtons.component';
 import { AuthAvatarPickerContainer } from '@components/Default/View/View.component';
-import { NavigationProps, NavigationRouteProp } from '@app-types/types';
+import { NavigationProps, AvatarPickerRouteProp } from '@app-types/types';
 import { NAVIGATION_NAMES } from '@app-types/enum';
-import { showingSubmitError } from '@utils/showingSubmitError';
+import { showingSubmitError } from '@utils/toastInteraction/showingSubmitError';
+import { showingSuccess } from '@utils/toastInteraction/showingSuccess';
 import { createAPIRefreshInstance } from '@utils/requests/instance';
 
 export default function Content(): ReactElement {
   const navigation = useNavigation<NavigationProps>();
-  const route = useRoute<NavigationRouteProp>();
+  const route = useRoute<AvatarPickerRouteProp>();
 
   const [image, setImage] = React.useState<string>();
   const [isLoading, setIsLoading] = React.useState(false);
@@ -45,13 +46,17 @@ export default function Content(): ReactElement {
         showingSubmitError(
           'Avatar Uploading Error',
           'Something went wrong:( Try again later',
+          undefined,
           () => {
             setIsLoading(false);
           },
         );
       }
       // in other case, we need to refresh the access token
-      const instance = createAPIRefreshInstance(handleReturnToHome);
+      const instance = createAPIRefreshInstance(() => {
+        showingSubmitError('Logout', 'Your session has expired', undefined);
+        handleReturnToHome();
+      });
       instance
         .post(`/auth/token/refresh`, {})
         .then(async (res) => {
@@ -60,10 +65,15 @@ export default function Content(): ReactElement {
           await onSubmitHandler(); // uploading image again
         })
         .catch((error) => {
+          if (error.response.status === 401) return;
           console.error(error, 'image uploading error');
         });
     } else {
       // if everyting is successful, then we need to go home
+      showingSuccess(
+        'Congratulatons!',
+        'Your avatar was uploaded successfully.',
+      );
       handleReturnToHome();
     }
   };

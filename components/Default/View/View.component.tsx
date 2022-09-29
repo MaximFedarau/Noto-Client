@@ -48,8 +48,12 @@ export const LeftHeaderView = styled(DefaultView)`
 
 // ! Notes Screen
 
-export const NotesView = styled(DefaultView)`
-  align-items: center;
+export const NotesView = styled.SafeAreaView`
+  flex: 1;
+  justify-content: center;
+`;
+
+export const NotesContentView = styled(DefaultView)`
   justify-content: center;
 `;
 
@@ -59,10 +63,22 @@ export const FormView = styled(DefaultScrollView)`
   margin-vertical: 16px;
 `;
 
+export const NotesManagingRightHeaderView = styled.View`
+  margin-right: -4px;
+`;
+
+export const NotesManagingLeftHeaderView = styled.View`
+  margin-left: -8px;
+`;
+
 // ! Drafts Screen
 
 export const DraftsView = styled.SafeAreaView`
   flex: 1;
+  justify-content: center;
+`;
+
+export const DraftsContentView = styled(DefaultView)`
   justify-content: center;
 `;
 
