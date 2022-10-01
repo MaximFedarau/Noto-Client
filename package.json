@@ -39,6 +39,7 @@
     "react-native-web": "~0.18.7",
     "react-redux": "^8.0.2",
     "showdown": "^2.1.0",
+    "socket.io-client": "^4.5.2",
     "styled-components": "^5.3.5",
     "yup": "^0.32.11"
   },
