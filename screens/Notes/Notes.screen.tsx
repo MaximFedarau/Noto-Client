@@ -36,10 +36,14 @@ import {
   assignNotes,
   setIsEnd,
 } from '@store/notes/notes.slice';
+import { socketSelector } from '@store/socket/socket.selector';
+import { initSocket, removeSocket } from '@store/socket/socket.slice';
 
 import { styles } from './Notes.styles';
 
 export default function Notes(): ReactElement {
+  const socket = useSelector(socketSelector);
+
   const navigation = useNavigation<NavigationProps>();
 
   const dispatch = useDispatch();
@@ -179,6 +183,37 @@ export default function Notes(): ReactElement {
     }
     fetchNotesPack();
   }, [isAuth, isEnd, searchText]);
+
+  React.useEffect(() => {
+    if (!isAuth) {
+      if (socket)
+        socket.then((socket) => {
+          socket.disconnect();
+          dispatch(removeSocket());
+        });
+      return;
+    }
+    if (!socket) dispatch(initSocket());
+    if (socket)
+      socket.then((socket) => {
+        socket.emit('joinRoom');
+      });
+  }, [isAuth, socket]);
+
+  React.useEffect(() => {
+    if (!socket) return;
+    if (isAuth) {
+      socket.then((socket) => {
+        socket.on('update', () => {
+          dispatch(setIsEnd(false));
+        });
+        socket.on('error', (error) => {
+          console.log(error);
+        });
+      });
+    }
+    // I do not return anything, because I want to keep socket connection in the background
+  }, [isAuth, socket]);
 
   if (isError) return <Error />;
   if (isLoading) return <Loading />;

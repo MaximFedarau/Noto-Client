@@ -9,7 +9,9 @@ export const listener = createListenerMiddleware();
 export const store = configureStore({
   reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().prepend(listener.middleware),
+    getDefaultMiddleware({
+      serializableCheck: false, // set to false, becase we have global socket variable
+    }).prepend(listener.middleware),
 });
 
 //Types

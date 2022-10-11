@@ -8,7 +8,6 @@ export const createSocket = async () => {
       Authorization: `Bearer ${accessToken}`,
     },
   });
-
   return socket;
 };
 
