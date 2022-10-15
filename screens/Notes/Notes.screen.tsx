@@ -44,17 +44,16 @@ import { initSocket, removeSocket } from '@store/socket/socket.slice';
 import { styles } from './Notes.styles';
 
 export default function Notes(): ReactElement {
-  const socket = useSelector(socketSelector);
-
   const navigation = useNavigation<NavigationProps>();
 
   const dispatch = useDispatch();
+  const socket = useSelector(socketSelector);
   const isAuth = useSelector(publicDataAuthSelector);
   const notes = useSelector(notesSelector);
   const isEnd = useSelector(isEndSelector);
 
-  const [isLoading, setIsLoading] = React.useState<boolean>(true);
-  const [isPackLoading, setIsPackLoading] = React.useState<boolean>(false);
+  const [isLoading, setIsLoading] = React.useState<boolean>(true); // general loading
+  const [isPackLoading, setIsPackLoading] = React.useState<boolean>(false); // only for pack loading
   const [isError, setIsError] = React.useState<boolean>(false);
 
   const [openSearchBar, setOpenSearchBar] = React.useState<boolean>(false);
@@ -62,19 +61,21 @@ export default function Notes(): ReactElement {
 
   const [packNumber, setPackNumber] = React.useState<number>(1);
 
-  function logoutHandler() {
+  const instance = createAPIInstance(() => {
     showingSubmitError('Logout', 'Your session has expired', undefined);
     dispatch(clearNotes());
     dispatch(setPublicData(publicDataInitialState));
     dispatch(setIsAuth(false));
     setIsLoading(false);
-  }
-
-  const instance = createAPIInstance(() => {
-    logoutHandler();
   });
 
-  function clearAuthHeader() {
+  const refreshInstance = createAPIRefreshInstance(() => {
+    showingSubmitError('Logout', 'Your session has expired', undefined);
+    dispatch(setPublicData(publicDataInitialState));
+    dispatch(setIsAuth(false));
+  });
+
+  const clearAuthHeader = () => {
     setOpenSearchBar(false);
     setSearchText('');
     navigation.setOptions({
@@ -85,7 +86,7 @@ export default function Notes(): ReactElement {
       },
       headerLeft: () => null,
     });
-  }
+  };
 
   const onSearchBarChange = React.useCallback(
     debounce((text) => {
@@ -103,7 +104,6 @@ export default function Notes(): ReactElement {
 
     if (notes.length || searchText.length) {
       navigation.setOptions({
-        //Implement search bar
         headerTitle: ({ children, tintColor }) => {
           if (openSearchBar)
             return (
@@ -116,17 +116,17 @@ export default function Notes(): ReactElement {
             <Text style={[{ color: tintColor }, styles.title]}>{children}</Text>
           );
         },
-        headerTitleAlign: 'center',
         // open search bar button
         headerLeft: ({ tintColor }) => {
           function onButtonClickHandler() {
             setOpenSearchBar(!openSearchBar);
-            // do not fetch again, when searchText is already empty
+            // do not fetch again, if searchText is already empty
             if (searchText !== '') dispatch(setIsEnd(false));
             // removing debounce
             onSearchBarChange.cancel();
             setSearchText('');
           }
+
           return (
             <LeftHeaderView>
               <IconButton
@@ -158,17 +158,14 @@ export default function Notes(): ReactElement {
           isInitial ? 1 : packNumber
         }?pattern=${searchText.trim()}`,
       )
-      .then((res) => {
-        if (res.data.notePack.length) {
-          dispatch(
-            isInitial
-              ? assignNotes(res.data.notePack)
-              : addNotes(res.data.notePack),
-          );
+      .then(({ data }) => {
+        const { notePack, isEnd } = data;
+        if (notePack.length) {
+          dispatch(isInitial ? assignNotes(notePack) : addNotes(notePack));
           setPackNumber(isInitial ? 2 : packNumber + 1);
-          dispatch(setIsEnd(JSON.parse(res.data.isEnd)));
+          dispatch(setIsEnd(JSON.parse(isEnd)));
         } else {
-          isInitial && dispatch(clearNotes());
+          isInitial && dispatch(clearNotes()); // clearing notes, when it is initial fetch and there are no notes (for example, when we are making first search request)
           dispatch(setIsEnd(true));
         }
       })
@@ -182,6 +179,8 @@ export default function Notes(): ReactElement {
   }
 
   React.useEffect(() => {
+    // 1) check if user is authorized
+    // 2) it allows handles case, when token is expired in socket => the rest of logging out process
     if (!isAuth) {
       dispatch(clearNotes());
       setIsLoading(false);
@@ -200,32 +199,18 @@ export default function Notes(): ReactElement {
       return;
     }
     if (!socket) dispatch(initSocket());
-    if (socket)
-      socket.then((socket) => {
-        socket.emit('joinRoom');
-      });
+    if (socket) socket.then((socket) => socket.emit('joinRoom'));
   }, [isAuth, socket]);
 
   React.useEffect(() => {
     if (!socket) return;
     if (isAuth) {
       socket.then((socket) => {
-        socket.on('update', () => {
-          dispatch(setIsEnd(false));
-        });
+        socket.on('update', () => dispatch(setIsEnd(false)));
         socket.on(
           'error',
           (error: { status: number; message: string | string[] }) => {
             if (error.status === 401) {
-              const refreshInstance = createAPIRefreshInstance(() => {
-                showingSubmitError(
-                  'Logout',
-                  'Your session has expired',
-                  undefined,
-                );
-                dispatch(setPublicData(publicDataInitialState));
-                dispatch(setIsAuth(false));
-              });
               refreshInstance
                 .post(`/auth/token/refresh`)
                 .then(async ({ data }) => {
@@ -254,9 +239,7 @@ export default function Notes(): ReactElement {
       <NotesContentView>
         {notes.length ? (
           <NotesList
-            onEndReached={() => {
-              fetchNotesPack(FETCH_PACK_TYPES.LOAD_MORE);
-            }}
+            onEndReached={() => fetchNotesPack(FETCH_PACK_TYPES.LOAD_MORE)}
             onEndReachedThreshold={0.3}
             ListFooterComponent={isPackLoading ? <Spinner /> : null}
           >
@@ -273,9 +256,7 @@ export default function Notes(): ReactElement {
               name: 'add',
               color: 'white',
             }}
-            onPress={() => {
-              navigation.navigate(NAVIGATION_NAMES.NOTES_MANAGING);
-            }}
+            onPress={() => navigation.navigate(NAVIGATION_NAMES.NOTES_MANAGING)}
           />
         )}
       </NotesContentView>
