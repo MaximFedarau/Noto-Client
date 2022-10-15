@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Text } from 'react-native';
 import { FAB } from '@rneui/themed';
 import { debounce } from 'lodash';
+import * as SecureStore from 'expo-secure-store';
 
 import Error from '@screens/Error/Error.screen';
 import Loading from '@screens/Loading/Loading.screen';
@@ -23,6 +24,7 @@ import { NavigationProps } from '@app-types/types';
 import { NAVIGATION_NAMES, FETCH_PACK_TYPES } from '@app-types/enum';
 import { createAPIInstance } from '@utils/requests/instance';
 import { showingSubmitError } from '@utils/toastInteraction/showingSubmitError';
+import { createAPIRefreshInstance } from '@utils/requests/instance';
 import {
   setIsAuth,
   setPublicData,
@@ -60,12 +62,16 @@ export default function Notes(): ReactElement {
 
   const [packNumber, setPackNumber] = React.useState<number>(1);
 
-  const instance = createAPIInstance(() => {
+  function logoutHandler() {
     showingSubmitError('Logout', 'Your session has expired', undefined);
     dispatch(clearNotes());
     dispatch(setPublicData(publicDataInitialState));
     dispatch(setIsAuth(false));
     setIsLoading(false);
+  }
+
+  const instance = createAPIInstance(() => {
+    logoutHandler();
   });
 
   function clearAuthHeader() {
@@ -207,9 +213,34 @@ export default function Notes(): ReactElement {
         socket.on('update', () => {
           dispatch(setIsEnd(false));
         });
-        socket.on('error', (error) => {
-          console.log(error);
-        });
+        socket.on(
+          'error',
+          (error: { status: number; message: string | string[] }) => {
+            if (error.status === 401) {
+              const refreshInstance = createAPIRefreshInstance(() => {
+                showingSubmitError(
+                  'Logout',
+                  'Your session has expired',
+                  undefined,
+                );
+                dispatch(setPublicData(publicDataInitialState));
+                dispatch(setIsAuth(false));
+              });
+              refreshInstance
+                .post(`/auth/token/refresh`)
+                .then(async ({ data }) => {
+                  const { accessToken, refreshToken } = data;
+                  await SecureStore.setItemAsync('accessToken', accessToken);
+                  await SecureStore.setItemAsync('refreshToken', refreshToken);
+                  socket.disconnect(); // disconnecting socket to reconnect with new token
+                  dispatch(initSocket()); // reconnecting socket with new token
+                })
+                .catch((error) => {
+                  if (error.response.status === 401) return;
+                });
+            }
+          },
+        );
       });
     }
     // I do not return anything, because I want to keep socket connection in the background
