@@ -73,6 +73,7 @@ export default function Notes(): ReactElement {
     showingSubmitError('Logout', 'Your session has expired', undefined);
     dispatch(setPublicData(publicDataInitialState));
     dispatch(setIsAuth(false));
+    // after setting isAuth to false, other logout actions will be called by fetchNotesPack useEffect
   });
 
   const clearAuthHeader = () => {
