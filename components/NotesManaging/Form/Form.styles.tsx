@@ -5,6 +5,8 @@ export const styles = StyleSheet.create({
     flexGrow: 1,
   },
   submitButton: {
-    height: 36,
+    height: 44,
+    width: '80%',
+    maxWidth: 300,
   },
 });

@@ -5,6 +5,7 @@ import {
   NAVIGATION_NAMES,
   NAVIGATION_NOTES_NAMES,
   NAVIGATION_AUTH_NAMES,
+  SOCKET_NOTE_STATUSES,
 } from './enum';
 
 // ! Navigation Props
@@ -94,4 +95,11 @@ export interface PublicUserData {
   nickname: string;
   isAuth: boolean;
   avatar?: string;
+}
+
+// ! Socket Data Interface
+
+export interface SocketNoteData {
+  status: SOCKET_NOTE_STATUSES;
+  note: NoteSchema;
 }

@@ -30,3 +30,16 @@ export enum FETCH_PACK_TYPES {
   INITIAL = 'INITIAL',
   LOAD_MORE = 'LOAD_MORE',
 }
+
+// Socket
+
+export enum SOCKET_ERROR_CODES {
+  BAD_REQUEST = 400,
+  UNAUTHORIZED,
+}
+
+export enum SOCKET_NOTE_STATUSES {
+  CREATED = 'CREATED',
+  UPDATED = 'UPDATED',
+  DELETED = 'DELETED',
+}

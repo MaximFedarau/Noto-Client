@@ -20,8 +20,12 @@ import Spinner from '@components/Auth/Defaults/Spinner/Spinner.component';
 import { NoItemsText } from '@components/Default/Text/Text.component';
 import { SOFT_BLUE } from '@constants/colors';
 import { sizes } from '@constants/sizes';
-import { NavigationProps } from '@app-types/types';
-import { NAVIGATION_NAMES, FETCH_PACK_TYPES } from '@app-types/enum';
+import { NavigationProps, SocketNoteData } from '@app-types/types';
+import {
+  NAVIGATION_NAMES,
+  FETCH_PACK_TYPES,
+  SOCKET_NOTE_STATUSES,
+} from '@app-types/enum';
 import { createAPIInstance } from '@utils/requests/instance';
 import { showingSubmitError } from '@utils/toastInteraction/showingSubmitError';
 import { createAPIRefreshInstance } from '@utils/requests/instance';
@@ -200,26 +204,33 @@ export default function Notes(): ReactElement {
       return;
     }
     if (!socket) dispatch(initSocket());
-    if (socket) socket.then((socket) => socket.emit('joinRoom'));
+    if (socket) {
+      socket.then((socket) => socket.emit('joinRoom'));
+    }
   }, [isAuth, socket]);
 
   React.useEffect(() => {
     if (!socket) return;
     if (isAuth) {
       socket.then((socket) => {
-        socket.on('update', () => dispatch(setIsEnd(false)));
+        socket.on('global', ({ status, note }: SocketNoteData) => {
+          if (status === SOCKET_NOTE_STATUSES.CREATED) {
+            dispatch(addNotes([note]));
+          }
+        });
+
         socket.on(
-          'error',
+          'globalError',
           (error: { status: number; message: string | string[] }) => {
             if (error.status === 401) {
               refreshInstance
                 .post(`/auth/token/refresh`)
-                .then(async ({ data }) => {
-                  const { accessToken, refreshToken } = data;
+                .then(async ({ data: refreshData }) => {
+                  const { accessToken, refreshToken } = refreshData;
                   await SecureStore.setItemAsync('accessToken', accessToken);
                   await SecureStore.setItemAsync('refreshToken', refreshToken);
                   socket.disconnect(); // disconnecting socket to reconnect with new token
-                  dispatch(initSocket()); // reconnecting socket with new token
+                  dispatch(initSocket()); // reconnecting socket with new token => joinRoom event will be emitted
                 })
                 .catch((error) => {
                   if (error.response.status === 401) return;

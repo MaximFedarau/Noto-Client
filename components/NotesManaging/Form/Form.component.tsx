@@ -10,7 +10,7 @@ import {
 import * as SecureStore from 'expo-secure-store';
 import { Formik, FormikProps } from 'formik';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Error from '@screens/Error/Error.screen';
 import Loading from '@screens/Loading/Loading.screen';
@@ -34,9 +34,17 @@ import {
   NavigationProps,
   NotesManagingRouteProp,
   NoteSchema,
+  SocketNoteData,
 } from '@app-types/types';
-import { BUTTON_TYPES } from '@app-types/enum';
-import { createAPIInstance } from '@utils/requests/instance';
+import {
+  BUTTON_TYPES,
+  SOCKET_NOTE_STATUSES,
+  SOCKET_ERROR_CODES,
+} from '@app-types/enum';
+import {
+  createAPIInstance,
+  createAPIRefreshInstance,
+} from '@utils/requests/instance';
 import { showingSubmitError } from '@utils/toastInteraction/showingSubmitError';
 import { showingSuccess } from '@utils/toastInteraction/showingSuccess';
 import {
@@ -50,11 +58,15 @@ import {
   addDraft as appendDraft,
   removeDraft,
 } from '@store/drafts/drafts.slice';
+import { initSocket } from '@store/socket/socket.slice';
+import { socketSelector } from '@store/socket/socket.selector';
 
 import { styles } from './Form.styles';
 
 export default function Form(): ReactElement {
   const dispatch = useDispatch();
+
+  const socket = useSelector(socketSelector);
 
   const navigation = useNavigation<NavigationProps>();
   const route = useRoute<NotesManagingRouteProp>();
@@ -68,15 +80,29 @@ export default function Form(): ReactElement {
     });
 
   const appState = React.useRef(AppState.currentState);
-  const formRef = React.useRef<FormikProps<NotesManagingFormData> | undefined>(
-    undefined,
-  ) as React.MutableRefObject<FormikProps<NotesManagingFormData>>;
+  const formRef = React.useRef<
+    FormikProps<NotesManagingFormData> | undefined
+  >() as React.MutableRefObject<FormikProps<NotesManagingFormData>>;
+  const cancelledSocketEvents = React.useRef<
+    {
+      event: string;
+      data: object;
+    }[]
+  >([]);
 
   const defaultInstance = createAPIInstance(() => {
     dispatch(setPublicData(publicDataInitialState));
     dispatch(setIsAuth(false));
     navigation.goBack();
     //after setting isAuth to false, other logout actions will be called by fetchNotesPack useEffect in Notes.screen
+  });
+
+  const refreshInstance = createAPIRefreshInstance(() => {
+    showingSubmitError('Logout', 'Your session has expired', undefined);
+    dispatch(setPublicData(publicDataInitialState));
+    dispatch(setIsAuth(false));
+    navigation.goBack();
+    // after setting isAuth to false, other logout actions will be called by fetchNotesPack useEffect
   });
 
   React.useEffect(
@@ -324,52 +350,125 @@ export default function Form(): ReactElement {
       });
   };
 
+  // ⬇️ algorithm how to handle cancelled socket events
+  // 1. we are saving all cancelled events to the array
+  // 2. when socket is connected, we are sending all events from the array
+  // 3. when socket is connected, we are clearing the array
+  React.useEffect(() => {
+    if (socket) {
+      socket.then((socket) => {
+        // as soon as we connect to the room, we complete all cancelled tasks (if there are any)
+        // tasks are cancelled because of unauthorized error
+        socket.on('joinRoom', () => {
+          if (cancelledSocketEvents.current.length) {
+            cancelledSocketEvents.current.forEach(({ event, data }) => {
+              socket.emit(event, data);
+            });
+            cancelledSocketEvents.current = [];
+          }
+        });
+
+        socket.on('local', ({ status, note }: SocketNoteData) => {
+          let message = 'Action was completed successfully';
+
+          if (status === SOCKET_NOTE_STATUSES.CREATED) {
+            message = 'Note was successfully uploaded.';
+            dispatch(addNote(note));
+
+            if (route.params?.draftId) {
+              onDraftDeleteHandler();
+              showingSuccess(
+                'Congratulations!',
+                'Note was successfully uploaded and draft was deleted.',
+                40,
+              );
+              return;
+            }
+          }
+
+          showingSuccess('Congratulations!', message, 40);
+          navigation.goBack();
+        });
+        socket.on(
+          'localError',
+          ({
+            status,
+            message,
+            data,
+          }: {
+            status: SOCKET_ERROR_CODES;
+            message: string | string[];
+            data?: {
+              status?: SOCKET_NOTE_STATUSES;
+              note: Omit<NoteSchema, 'date' | 'id'>;
+            };
+          }) => {
+            if (status === SOCKET_ERROR_CODES.UNAUTHORIZED) {
+              refreshInstance
+                .post(`/auth/token/refresh`)
+                .then(async ({ data: refreshData }) => {
+                  const { accessToken, refreshToken } = refreshData;
+                  await SecureStore.setItemAsync('accessToken', accessToken);
+                  await SecureStore.setItemAsync('refreshToken', refreshToken);
+                  socket.disconnect(); // disconnecting socket to reconnect with new token
+                  dispatch(initSocket()); // reconnecting socket with new token => joinRoom event will be emitted
+
+                  // pushing cancelled event to the array
+                  cancelledSocketEvents.current.push({
+                    event:
+                      data?.status === SOCKET_NOTE_STATUSES.CREATED
+                        ? 'newNote'
+                        : 'localError',
+                    data: data?.note || {},
+                  });
+                })
+                .catch((error) => {
+                  if (error.response.status === 401) return;
+                });
+
+              return;
+            }
+
+            if (status === SOCKET_ERROR_CODES.BAD_REQUEST) {
+              setIsLoading(false);
+              showingSubmitError(
+                'Note Updating Error',
+                Array.isArray(message) ? message[0] : message,
+                40,
+                () => submittingFailureHandler(data?.note || {}),
+              );
+            }
+          },
+        );
+      });
+    }
+
+    // removing socket listener, because we don't need it anymore & if we don't do that, we will send duplicate requests
+    return () => {
+      if (socket) {
+        socket.then((socket) => {
+          socket.off('local');
+          socket.off('localError');
+          socket.off('joinRoom');
+        });
+      }
+    };
+  }, [socket]);
+
   const onFormSubmitHandler = async (values: NotesManagingFormData) => {
-    setIsLoading(true);
     const accessToken = await SecureStore.getItemAsync('accessToken');
     const refreshToken = await SecureStore.getItemAsync('refreshToken');
-    if (!accessToken || !refreshToken) {
+    if (!accessToken || !refreshToken || !socket) {
       unauthHandler(values);
       return;
     }
 
-    const instance = createAPIInstance(() => {
-      dispatch(setPublicData(publicDataInitialState));
-      dispatch(setIsAuth(false));
-      unauthHandler(values);
+    setIsLoading(true);
+    const { title = '', content = '' } = values;
+    (await socket).emit('newNote', {
+      title: title.trim(),
+      content: content.trim(),
     });
-    const data = await instance
-      .post<NoteSchema>('/notes', {
-        title: values.title?.trim() || undefined, // because if title is empty, then it is undefined, instead of empty string
-        content: values.content?.trim() || undefined, // because if content is empty, then it is undefined, instead of empty string
-      })
-      .catch(({ response }) => {
-        if (response.status === 401) return;
-
-        showingSubmitError(
-          'Note Uploading Error',
-          response.data ? response.data.message : 'Something went wrong:(',
-          40,
-          () => submittingFailureHandler(values),
-        );
-      });
-
-    if (!data) return;
-
-    showingSuccess(
-      'Congratulations!',
-      'Note was successfully uploaded and draft was deleted.',
-      40,
-      () => {
-        dispatch(addNote(data.data));
-        if (route.params?.draftId) {
-          onDraftDeleteHandler();
-          return;
-        }
-        setIsLoading(false);
-        if (formRef.current) formRef.current.resetForm();
-      },
-    );
   };
 
   // returning previous form values if submitting was failed
@@ -480,6 +579,13 @@ export default function Form(): ReactElement {
                   }
                 : () => null,
           });
+
+          return () => {
+            // removing headerRight, while <Loading/> or <Error/> screens are active
+            navigation.setOptions({
+              headerRight: () => null,
+            });
+          };
         }, [values]);
 
         return (
