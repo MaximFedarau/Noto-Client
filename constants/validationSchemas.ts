@@ -2,8 +2,8 @@ import * as yup from 'yup';
 
 // * Notes Managing (Adding Note/Draft) Form
 export const notesManagingFormValidationSchema = yup.object().shape({
-  title: yup.string(),
-  content: yup.string(),
+  title: yup.string().nullable(),
+  content: yup.string().nullable(),
 });
 
 // * Sign In Form

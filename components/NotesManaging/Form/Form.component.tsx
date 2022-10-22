@@ -23,6 +23,7 @@ import {
   NotesManagingLeftHeaderView,
   NotesManagingRightHeaderView,
 } from '@components/Default/View/View.component';
+import Spinner from '@components/Auth/Defaults/Spinner/Spinner.component';
 import { notesManagingFormValidationSchema } from '@constants/validationSchemas';
 import { sizes } from '@constants/sizes';
 import { addDraft } from '@utils/db/drafts/add';
@@ -63,6 +64,8 @@ import { socketSelector } from '@store/socket/socket.selector';
 
 import { styles } from './Form.styles';
 
+const FORCE_NAVIGATION_STATUS = 'force'; // status for force navigation = without checking
+
 export default function Form(): ReactElement {
   const dispatch = useDispatch();
 
@@ -72,6 +75,7 @@ export default function Form(): ReactElement {
   const route = useRoute<NotesManagingRouteProp>();
 
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isFormLoading, setIsFormLoading] = React.useState(false);
   const [isError, setIsError] = React.useState<boolean>(false);
   const [formInitialValues, setFormInitialValues] =
     React.useState<NotesManagingFormData>({
@@ -93,14 +97,16 @@ export default function Form(): ReactElement {
   const defaultInstance = createAPIInstance(() => {
     dispatch(setPublicData(publicDataInitialState));
     dispatch(setIsAuth(false));
+    if (formRef.current) formRef.current.setStatus(FORCE_NAVIGATION_STATUS); // we check formRef.current because it can be undefined, e.g when token is expired and users tries to do something
     navigation.goBack();
     //after setting isAuth to false, other logout actions will be called by fetchNotesPack useEffect in Notes.screen
   });
 
   const refreshInstance = createAPIRefreshInstance(() => {
-    showingSubmitError('Logout', 'Your session has expired', undefined);
+    showingSubmitError('Logout', 'Your session has expired');
     dispatch(setPublicData(publicDataInitialState));
     dispatch(setIsAuth(false));
+    if (formRef.current) formRef.current.setStatus(FORCE_NAVIGATION_STATUS);
     navigation.goBack();
     // after setting isAuth to false, other logout actions will be called by fetchNotesPack useEffect
   });
@@ -109,7 +115,12 @@ export default function Form(): ReactElement {
     () =>
       navigation.addListener('beforeRemove', (e) => {
         // if all fields are the same or there is no noteId, then we do not show alert
-        if (!formRef.current?.dirty || !route.params?.noteId) return;
+        if (
+          !formRef.current?.dirty ||
+          !route.params?.noteId ||
+          formRef.current.status === FORCE_NAVIGATION_STATUS
+        )
+          return;
 
         // Prevent default behavior of leaving the screen
         e.preventDefault();
@@ -158,7 +169,11 @@ export default function Form(): ReactElement {
     }
 
     return () => {
-      if (route.params?.noteId) return;
+      if (
+        route.params?.noteId ||
+        formRef.current?.status === FORCE_NAVIGATION_STATUS
+      )
+        return;
 
       const { title = '', content = '' } = formRef.current?.values || {};
       const trimmedTitle = title.trim();
@@ -309,14 +324,15 @@ export default function Form(): ReactElement {
   const onNoteUpdateHandler = async (values: NotesManagingFormData) => {
     if (!route.params || !route.params.noteId) return;
 
-    setIsLoading(true);
     const accessToken = await SecureStore.getItemAsync('accessToken');
     const refreshToken = await SecureStore.getItemAsync('refreshToken');
     if (!accessToken || !refreshToken) {
+      formRef.current?.setStatus(FORCE_NAVIGATION_STATUS);
       navigation.goBack();
       return;
     }
 
+    setIsFormLoading(true);
     const { title = '', content = '' } = values;
     const trimmedTitle = title.trim();
     const trimmedContent = content.trim();
@@ -335,17 +351,17 @@ export default function Form(): ReactElement {
             date,
           }),
         );
+        formRef.current.setStatus(FORCE_NAVIGATION_STATUS);
         navigation.goBack();
       })
       .catch(({ response }) => {
         if (response.status === 401) return;
 
-        setIsLoading(false);
+        setIsFormLoading(false);
         showingSubmitError(
           'Note Updating Error',
           response.data ? response.data.message : 'Something went wrong:(',
           40,
-          () => submittingFailureHandler(values),
         );
       });
   };
@@ -387,6 +403,7 @@ export default function Form(): ReactElement {
           }
 
           showingSuccess('Congratulations!', message, 40);
+          formRef.current.setStatus(FORCE_NAVIGATION_STATUS);
           navigation.goBack();
         });
         socket.on(
@@ -423,19 +440,18 @@ export default function Form(): ReactElement {
                   });
                 })
                 .catch((error) => {
-                  if (error.response.status === 401) return;
+                  if (error.response && error.response.status === 401) return;
                 });
 
               return;
             }
 
             if (status === SOCKET_ERROR_CODES.BAD_REQUEST) {
-              setIsLoading(false);
+              setIsFormLoading(false);
               showingSubmitError(
-                'Note Updating Error',
+                'Note Uploading Error',
                 Array.isArray(message) ? message[0] : message,
                 40,
-                () => submittingFailureHandler(data?.note || {}),
               );
             }
           },
@@ -459,27 +475,16 @@ export default function Form(): ReactElement {
     const accessToken = await SecureStore.getItemAsync('accessToken');
     const refreshToken = await SecureStore.getItemAsync('refreshToken');
     if (!accessToken || !refreshToken || !socket) {
-      unauthHandler(values);
+      Alert.alert('Oops...', 'You are not logged in:(');
       return;
     }
 
-    setIsLoading(true);
+    setIsFormLoading(true);
     const { title = '', content = '' } = values;
     (await socket).emit('newNote', {
       title: title.trim(),
       content: content.trim(),
     });
-  };
-
-  // returning previous form values if submitting was failed
-  const submittingFailureHandler = (values: NotesManagingFormData) => {
-    setIsLoading(false);
-    if (formRef.current) formRef.current.setValues(values);
-  };
-
-  const unauthHandler = (values: NotesManagingFormData) => {
-    submittingFailureHandler(values);
-    Alert.alert('Oops...', 'You are not logged in:(');
   };
 
   const errorHandling = (error: string, message: string) => {
@@ -517,18 +522,19 @@ export default function Form(): ReactElement {
 
   function onNoteDeleteHandler() {
     if (!route.params || !route.params.noteId) return;
-    setIsLoading(true);
 
+    setIsFormLoading(true);
     const { noteId } = route.params;
     defaultInstance
       .delete(`/notes/${noteId}`)
       .then(() => {
         dispatch(removeNote(noteId));
+        formRef.current.setStatus(FORCE_NAVIGATION_STATUS);
         navigation.goBack();
       })
       .catch((error) => {
-        setIsLoading(false);
-        errorHandling(error, 'Fetching Note');
+        setIsFormLoading(false);
+        errorHandling(error, 'Deleting Note');
       });
   }
 
@@ -560,7 +566,7 @@ export default function Form(): ReactElement {
         React.useLayoutEffect(() => {
           navigation.setOptions({
             headerRight:
-              values.title || values.content
+              (values.title || values.content) && !isFormLoading
                 ? () => {
                     return (
                       <NotesManagingRightHeaderView>
@@ -586,7 +592,7 @@ export default function Form(): ReactElement {
               headerRight: () => null,
             });
           };
-        }, [values]);
+        }, [values, isFormLoading]);
 
         return (
           <KeyboardAvoidingView
@@ -601,6 +607,7 @@ export default function Form(): ReactElement {
                 onChangeText={handleChange('title')}
                 value={values.title}
                 errorMessage={errors.title}
+                editable={!isFormLoading}
               >
                 Title
               </FormField>
@@ -608,21 +615,26 @@ export default function Form(): ReactElement {
                 onChangeText={handleChange('content')}
                 value={values.content}
                 errorMessage={errors.content}
+                editable={!isFormLoading}
               >
                 Content
               </MarkdownField>
-              <Button
-                type={BUTTON_TYPES.CONTAINED}
-                style={styles.submitButton}
-                onPress={
-                  // ! formik docs
-                  handleSubmit as unknown as (
-                    event: GestureResponderEvent,
-                  ) => void
-                }
-              >
-                {route.params?.noteId ? 'Update' : 'Upload'}
-              </Button>
+              {isFormLoading ? (
+                <Spinner />
+              ) : (
+                <Button
+                  type={BUTTON_TYPES.CONTAINED}
+                  style={styles.submitButton}
+                  onPress={
+                    // ! formik docs
+                    handleSubmit as unknown as (
+                      event: GestureResponderEvent,
+                    ) => void
+                  }
+                >
+                  {route.params?.noteId ? 'Update' : 'Upload'}
+                </Button>
+              )}
             </FormView>
           </KeyboardAvoidingView>
         );
