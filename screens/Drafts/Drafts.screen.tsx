@@ -154,25 +154,35 @@ export default function Drafts(): ReactElement {
   React.useEffect(() => {
     listener.startListening({
       matcher: isAnyOf(updateDraft, addDraft),
-      effect: (action) => {
+
+      effect: ({ payload }) => {
         const trimmedSearchText = searchText.trim();
+
+        // if there is no drafts
+        if (trimmedSearchText.length && drafts.length === 0) {
+          if (
+            !stringSearch(payload.title || '', trimmedSearchText) &&
+            !stringSearch(payload.content || '', trimmedSearchText)
+          )
+            dispatch(removeDraft(payload.id)); // if some draft does not have search text, remove it from list
+        }
+
+        // if there are some drafts
         if (
           trimmedSearchText.length &&
-          drafts.findIndex((draft) => draft.id === action.payload.id) !== -1
+          drafts.findIndex((draft) => draft.id === payload.id) !== -1
         ) {
           if (
-            !stringSearch(action.payload.title || '', trimmedSearchText) &&
-            !stringSearch(action.payload.content || '', trimmedSearchText)
+            !stringSearch(payload.title || '', trimmedSearchText) &&
+            !stringSearch(payload.content || '', trimmedSearchText)
           ) {
-            // if some draft does not have search text, remove it from list
-            dispatch(removeDraft(action.payload.id));
+            dispatch(removeDraft(payload.id));
           }
         }
       },
     });
-    return () => {
-      listener.clearListeners();
-    };
+
+    return () => listener.clearListeners();
   }, [searchText, drafts]);
 
   if (isError) return <Error />;
@@ -204,9 +214,7 @@ export default function Drafts(): ReactElement {
               name: 'add',
               color: 'white',
             }}
-            onPress={() => {
-              navigation.navigate(NAVIGATION_NAMES.NOTES_MANAGING);
-            }}
+            onPress={() => navigation.navigate(NAVIGATION_NAMES.NOTES_MANAGING)}
           />
         )}
       </DraftsContentView>

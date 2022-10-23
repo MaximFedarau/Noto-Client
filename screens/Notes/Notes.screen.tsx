@@ -1,6 +1,7 @@
 import React, { ReactElement } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { useSelector, useDispatch } from 'react-redux';
+import { isAnyOf } from '@reduxjs/toolkit';
 import { Text } from 'react-native';
 import { FAB } from '@rneui/themed';
 import { debounce } from 'lodash';
@@ -29,6 +30,8 @@ import {
 import { createAPIInstance } from '@utils/requests/instance';
 import { showingSubmitError } from '@utils/toastInteraction/showingSubmitError';
 import { createAPIRefreshInstance } from '@utils/requests/instance';
+import { stringSearch } from '@utils/stringInteraction/stringSearch';
+import { listener } from '@store/store';
 import {
   setIsAuth,
   setPublicData,
@@ -41,6 +44,9 @@ import {
   addNotes,
   assignNotes,
   setIsEnd,
+  updateNote,
+  addNote,
+  removeNote,
 } from '@store/notes/notes.slice';
 import { socketSelector } from '@store/socket/socket.selector';
 import { initSocket, removeSocket } from '@store/socket/socket.slice';
@@ -215,7 +221,7 @@ export default function Notes(): ReactElement {
       socket.then((socket) => {
         socket.on('global', ({ status, note }: SocketNoteData) => {
           if (status === SOCKET_NOTE_STATUSES.CREATED) {
-            dispatch(addNotes([note]));
+            dispatch(addNote(note));
           }
         });
 
@@ -242,6 +248,39 @@ export default function Notes(): ReactElement {
     }
     // I do not return anything, because I want to keep socket connection in the background
   }, [isAuth, socket]);
+
+  React.useEffect(() => {
+    listener.startListening({
+      matcher: isAnyOf(updateNote, addNote),
+
+      effect: ({ payload }) => {
+        const trimmedSearchText = searchText.trim();
+
+        // if there is no notes
+        if (trimmedSearchText.length && notes.length === 0) {
+          if (
+            !stringSearch(payload.title || '', trimmedSearchText) &&
+            !stringSearch(payload.content || '', trimmedSearchText)
+          )
+            dispatch(removeNote(payload.id)); // if some note does not have search text, remove it from list
+        }
+
+        // if there are some notes
+        if (
+          trimmedSearchText.length &&
+          notes.findIndex((note) => note.id === payload.id) !== -1
+        ) {
+          if (
+            !stringSearch(payload.title || '', trimmedSearchText) &&
+            !stringSearch(payload.content || '', trimmedSearchText)
+          )
+            dispatch(removeNote(payload.id));
+        }
+      },
+    });
+
+    return () => listener.clearListeners();
+  }, [searchText, notes]);
 
   if (isError) return <Error />;
   if (isLoading) return <Loading />;
