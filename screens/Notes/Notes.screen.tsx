@@ -31,7 +31,7 @@ import { createAPIInstance } from '@utils/requests/instance';
 import { showingSubmitError } from '@utils/toastInteraction/showingSubmitError';
 import { createAPIRefreshInstance } from '@utils/requests/instance';
 import { stringSearch } from '@utils/stringInteraction/stringSearch';
-import { listener } from '@store/store';
+import { listener, RootState } from '@store/store';
 import {
   setIsAuth,
   setPublicData,
@@ -67,7 +67,7 @@ export default function Notes(): ReactElement {
   const [isError, setIsError] = React.useState<boolean>(false);
 
   const [openSearchBar, setOpenSearchBar] = React.useState<boolean>(false);
-  const [searchText, setSearchText] = React.useState<string>('');
+  const searchText = React.useRef('');
 
   const [packNumber, setPackNumber] = React.useState<number>(1);
 
@@ -88,7 +88,7 @@ export default function Notes(): ReactElement {
 
   const clearAuthHeader = () => {
     setOpenSearchBar(false);
-    setSearchText('');
+    searchText.current = '';
     navigation.setOptions({
       headerTitle: ({ children, tintColor }) => {
         return (
@@ -101,7 +101,7 @@ export default function Notes(): ReactElement {
 
   const onSearchBarChange = React.useCallback(
     debounce((text) => {
-      setSearchText(text);
+      searchText.current = text;
       dispatch(setIsEnd(false));
     }, 300),
     [],
@@ -113,7 +113,7 @@ export default function Notes(): ReactElement {
       return;
     }
 
-    if (notes.length || searchText.length) {
+    if (notes.length || searchText.current.length) {
       navigation.setOptions({
         headerTitle: ({ children, tintColor }) => {
           if (openSearchBar)
@@ -132,10 +132,10 @@ export default function Notes(): ReactElement {
           function onButtonClickHandler() {
             setOpenSearchBar(!openSearchBar);
             // do not fetch again, if searchText is already empty
-            if (searchText !== '') dispatch(setIsEnd(false));
+            if (searchText.current !== '') dispatch(setIsEnd(false));
             // removing debounce
             onSearchBarChange.cancel();
-            setSearchText('');
+            searchText.current = '';
           }
 
           return (
@@ -167,7 +167,7 @@ export default function Notes(): ReactElement {
       .get(
         `/notes/pack/${
           isInitial ? 1 : packNumber
-        }?pattern=${searchText.trim()}`,
+        }?pattern=${searchText.current.trim()}`,
       )
       .then(({ data }) => {
         const { notePack, isEnd } = data;
@@ -198,7 +198,7 @@ export default function Notes(): ReactElement {
       return;
     }
     fetchNotesPack();
-  }, [isAuth, isEnd, searchText]);
+  }, [isAuth, isEnd, searchText.current]);
 
   React.useEffect(() => {
     if (!isAuth) {
@@ -253,19 +253,11 @@ export default function Notes(): ReactElement {
     listener.startListening({
       matcher: isAnyOf(updateNote, addNote),
 
-      effect: ({ payload }) => {
-        const trimmedSearchText = searchText.trim();
+      effect: ({ payload }, listenerAPI) => {
+        const trimmedSearchText = searchText.current.trim();
 
-        // if there is no notes
-        if (trimmedSearchText.length && notes.length === 0) {
-          if (
-            !stringSearch(payload.title || '', trimmedSearchText) &&
-            !stringSearch(payload.content || '', trimmedSearchText)
-          )
-            dispatch(removeNote(payload.id)); // if some note does not have search text, remove it from list
-        }
+        const notes = (listenerAPI.getState() as RootState).notes.notes;
 
-        // if there are some notes
         if (
           trimmedSearchText.length &&
           notes.findIndex((note) => note.id === payload.id) !== -1
@@ -278,9 +270,7 @@ export default function Notes(): ReactElement {
         }
       },
     });
-
-    return () => listener.clearListeners();
-  }, [searchText, notes]);
+  }, []);
 
   if (isError) return <Error />;
   if (isLoading) return <Loading />;
@@ -297,7 +287,9 @@ export default function Notes(): ReactElement {
             {notes}
           </NotesList>
         ) : (
-          <NoItemsText>{searchText ? 'Nothing found' : 'No notes'}</NoItemsText>
+          <NoItemsText>
+            {searchText.current ? 'Nothing found' : 'No notes'}
+          </NoItemsText>
         )}
         {!openSearchBar && isAuth && (
           <FAB
