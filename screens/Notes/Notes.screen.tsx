@@ -210,9 +210,7 @@ export default function Notes(): ReactElement {
       return;
     }
     if (!socket) dispatch(initSocket());
-    if (socket) {
-      socket.then((socket) => socket.emit('joinRoom'));
-    }
+    if (socket) socket.then((socket) => socket.emit('joinRoom'));
   }, [isAuth, socket]);
 
   React.useEffect(() => {
@@ -220,9 +218,10 @@ export default function Notes(): ReactElement {
     if (isAuth) {
       socket.then((socket) => {
         socket.on('global', ({ status, note }: SocketNoteData) => {
-          if (status === SOCKET_NOTE_STATUSES.CREATED) {
-            dispatch(addNote(note));
-          }
+          if (status === SOCKET_NOTE_STATUSES.CREATED) dispatch(addNote(note));
+
+          if (status === SOCKET_NOTE_STATUSES.DELETED)
+            dispatch(removeNote(note.id));
         });
 
         socket.on(
@@ -235,8 +234,9 @@ export default function Notes(): ReactElement {
                   const { accessToken, refreshToken } = refreshData;
                   await SecureStore.setItemAsync('accessToken', accessToken);
                   await SecureStore.setItemAsync('refreshToken', refreshToken);
-                  socket.disconnect(); // disconnecting socket to reconnect with new token
-                  dispatch(initSocket()); // reconnecting socket with new token => joinRoom event will be emitted
+
+                  socket.disconnect();
+                  dispatch(removeSocket());
                 })
                 .catch((error) => {
                   if (error.response.status === 401) return;

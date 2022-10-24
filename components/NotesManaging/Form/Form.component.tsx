@@ -59,7 +59,7 @@ import {
   addDraft as appendDraft,
   removeDraft,
 } from '@store/drafts/drafts.slice';
-import { initSocket } from '@store/socket/socket.slice';
+import { removeSocket } from '@store/socket/socket.slice';
 import { socketSelector } from '@store/socket/socket.selector';
 
 import { styles } from './Form.styles';
@@ -375,6 +375,7 @@ export default function Form(): ReactElement {
       socket.then((socket) => {
         // as soon as we connect to the room, we complete all cancelled tasks (if there are any)
         // tasks are cancelled because of unauthorized error
+
         socket.on('joinRoom', () => {
           if (cancelledSocketEvents.current.length) {
             cancelledSocketEvents.current.forEach(({ event, data }) => {
@@ -402,6 +403,11 @@ export default function Form(): ReactElement {
             }
           }
 
+          if (status === SOCKET_NOTE_STATUSES.DELETED) {
+            message = 'Note was successfully deleted.';
+            dispatch(removeNote(note.id));
+          }
+
           showingSuccess('Congratulations!', message, 40);
           formRef.current.setStatus(FORCE_NAVIGATION_STATUS);
           navigation.goBack();
@@ -417,7 +423,7 @@ export default function Form(): ReactElement {
             message: string | string[];
             data?: {
               status?: SOCKET_NOTE_STATUSES;
-              note: Omit<NoteSchema, 'date' | 'id'>;
+              note: Omit<NoteSchema, 'date' | 'id'> | { noteId: string };
             };
           }) => {
             if (status === SOCKET_ERROR_CODES.UNAUTHORIZED) {
@@ -427,17 +433,24 @@ export default function Form(): ReactElement {
                   const { accessToken, refreshToken } = refreshData;
                   await SecureStore.setItemAsync('accessToken', accessToken);
                   await SecureStore.setItemAsync('refreshToken', refreshToken);
-                  socket.disconnect(); // disconnecting socket to reconnect with new token
-                  dispatch(initSocket()); // reconnecting socket with new token => joinRoom event will be emitted
+                  let emittedMessage = '';
+
+                  switch (data?.status) {
+                    case SOCKET_NOTE_STATUSES.CREATED:
+                      emittedMessage = 'newNote';
+                      break;
+                    case SOCKET_NOTE_STATUSES.DELETED:
+                      emittedMessage = 'deleteNote';
+                      break;
+                  }
 
                   // pushing cancelled event to the array
                   cancelledSocketEvents.current.push({
-                    event:
-                      data?.status === SOCKET_NOTE_STATUSES.CREATED
-                        ? 'newNote'
-                        : 'localError',
+                    event: emittedMessage,
                     data: data?.note || {},
                   });
+                  socket.disconnect(); // disconnecting socket to reconnect with new token
+                  dispatch(removeSocket());
                 })
                 .catch((error) => {
                   if (error.response && error.response.status === 401) return;
@@ -446,14 +459,12 @@ export default function Form(): ReactElement {
               return;
             }
 
-            if (status === SOCKET_ERROR_CODES.BAD_REQUEST) {
-              setIsFormLoading(false);
-              showingSubmitError(
-                'Note Uploading Error',
-                Array.isArray(message) ? message[0] : message,
-                40,
-              );
-            }
+            setIsFormLoading(false);
+            showingSubmitError(
+              'Note Uploading Error',
+              Array.isArray(message) ? message[0] : message,
+              40,
+            );
           },
         );
       });
@@ -520,22 +531,13 @@ export default function Form(): ReactElement {
       .catch((error) => errorHandling(error, 'Deleting Draft'));
   }
 
-  function onNoteDeleteHandler() {
+  async function onNoteDeleteHandler() {
     if (!route.params || !route.params.noteId) return;
 
     setIsFormLoading(true);
     const { noteId } = route.params;
-    defaultInstance
-      .delete(`/notes/${noteId}`)
-      .then(() => {
-        dispatch(removeNote(noteId));
-        formRef.current.setStatus(FORCE_NAVIGATION_STATUS);
-        navigation.goBack();
-      })
-      .catch((error) => {
-        setIsFormLoading(false);
-        errorHandling(error, 'Deleting Note');
-      });
+
+    (await socket)?.emit('deleteNote', { noteId });
   }
 
   if (isError) return <Error />;
