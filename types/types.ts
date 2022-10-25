@@ -102,4 +102,5 @@ export interface PublicUserData {
 export interface SocketNoteData {
   status: SOCKET_NOTE_STATUSES;
   note: NoteSchema;
+  isDeleteOrigin?: boolean; // flag for delete handler, which means that answers the question: Does note was deleted from current device?
 }

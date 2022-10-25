@@ -11,6 +11,7 @@ import * as SecureStore from 'expo-secure-store';
 import { Formik, FormikProps } from 'formik';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
+import { AxiosError } from 'axios';
 
 import Error from '@screens/Error/Error.screen';
 import Loading from '@screens/Loading/Loading.screen';
@@ -385,33 +386,38 @@ export default function Form(): ReactElement {
           }
         });
 
-        socket.on('local', ({ status, note }: SocketNoteData) => {
-          let message = 'Action was completed successfully';
+        socket.on(
+          'local',
+          ({ status, note, isDeleteOrigin }: SocketNoteData) => {
+            let message = 'Action was completed successfully';
 
-          if (status === SOCKET_NOTE_STATUSES.CREATED) {
-            message = 'Note was successfully uploaded.';
-            dispatch(addNote(note));
+            if (status === SOCKET_NOTE_STATUSES.CREATED) {
+              message = 'Note was successfully uploaded.';
+              dispatch(addNote(note));
 
-            if (route.params?.draftId) {
-              onDraftDeleteHandler();
-              showingSuccess(
-                'Congratulations!',
-                'Note was successfully uploaded and draft was deleted.',
-                40,
-              );
-              return;
+              if (route.params?.draftId) {
+                onDraftDeleteHandler();
+                showingSuccess(
+                  'Congratulations!',
+                  'Note was successfully uploaded and draft was deleted.',
+                  40,
+                );
+                return;
+              }
             }
-          }
 
-          if (status === SOCKET_NOTE_STATUSES.DELETED) {
-            message = 'Note was successfully deleted.';
-            dispatch(removeNote(note.id));
-          }
+            if (status === SOCKET_NOTE_STATUSES.DELETED) {
+              message = isDeleteOrigin
+                ? 'Note was successfully deleted.'
+                : 'Note was successfully deleted from other device.';
+              isDeleteOrigin && dispatch(removeNote(note.id)); // if note was deleted from this device, then we remove it from the store
+            }
 
-          showingSuccess('Congratulations!', message, 40);
-          formRef.current.setStatus(FORCE_NAVIGATION_STATUS);
-          navigation.goBack();
-        });
+            showingSuccess('Congratulations!', message, 40);
+            formRef.current.setStatus(FORCE_NAVIGATION_STATUS);
+            navigation.goBack();
+          },
+        );
         socket.on(
           'localError',
           ({
@@ -498,8 +504,14 @@ export default function Form(): ReactElement {
     });
   };
 
-  const errorHandling = (error: string, message: string) => {
+  const errorHandling = (error: AxiosError, message: string) => {
     setIsError(true);
+    showingSubmitError(
+      message,
+      (error.response?.data as { message?: string })?.message ||
+        'Something went wrong:(',
+      40,
+    );
     console.error(error, message);
   };
 
