@@ -372,7 +372,9 @@ export default function Form(): ReactElement {
   // 2. when socket is connected, we are sending all events from the array
   // 3. when socket is connected, we are clearing the array
   React.useEffect(() => {
-    if (socket) {
+    // ! we check isLoading and isError, because we don't want to send events when we are fetching data
+    // ! if we remove this checks, then when we have error screen, it will create another client
+    if (socket && !isLoading && !isError) {
       socket.then((socket) => {
         // as soon as we connect to the room, we complete all cancelled tasks (if there are any)
         // tasks are cancelled because of unauthorized error
@@ -486,7 +488,7 @@ export default function Form(): ReactElement {
         });
       }
     };
-  }, [socket]);
+  }, [socket, isLoading, isError]);
 
   const onFormSubmitHandler = async (values: NotesManagingFormData) => {
     const accessToken = await SecureStore.getItemAsync('accessToken');
