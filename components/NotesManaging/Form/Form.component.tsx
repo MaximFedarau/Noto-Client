@@ -445,7 +445,7 @@ export default function Form(): ReactElement {
 
                   switch (data?.status) {
                     case SOCKET_NOTE_STATUSES.CREATED:
-                      emittedMessage = 'newNote';
+                      emittedMessage = 'createNote';
                       break;
                     case SOCKET_NOTE_STATUSES.DELETED:
                       emittedMessage = 'deleteNote';
@@ -500,7 +500,7 @@ export default function Form(): ReactElement {
 
     setIsFormLoading(true);
     const { title = '', content = '' } = values;
-    (await socket).emit('newNote', {
+    (await socket).emit('createNote', {
       title: title.trim(),
       content: content.trim(),
     });
