@@ -220,6 +220,9 @@ export default function Notes(): ReactElement {
         socket.on('global', ({ status, note }: SocketNoteData) => {
           if (status === SOCKET_NOTE_STATUSES.CREATED) dispatch(addNote(note));
 
+          if (status === SOCKET_NOTE_STATUSES.UPDATED)
+            dispatch(updateNote(note));
+
           if (status === SOCKET_NOTE_STATUSES.DELETED)
             dispatch(removeNote(note.id));
         });

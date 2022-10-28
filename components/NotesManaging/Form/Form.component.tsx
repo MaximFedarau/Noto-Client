@@ -322,51 +322,6 @@ export default function Form(): ReactElement {
       .finally(() => setIsLoading(false));
   };
 
-  const onNoteUpdateHandler = async (values: NotesManagingFormData) => {
-    if (!route.params || !route.params.noteId) return;
-
-    const accessToken = await SecureStore.getItemAsync('accessToken');
-    const refreshToken = await SecureStore.getItemAsync('refreshToken');
-    if (!accessToken || !refreshToken) {
-      formRef.current?.setStatus(FORCE_NAVIGATION_STATUS);
-      navigation.goBack();
-      return;
-    }
-
-    setIsFormLoading(true);
-    const { title = '', content = '' } = values;
-    const trimmedTitle = title.trim();
-    const trimmedContent = content.trim();
-    defaultInstance
-      .put<NoteSchema>(`/notes/${route.params.noteId}`, {
-        title: trimmedTitle,
-        content: trimmedContent,
-      })
-      .then(({ data }) => {
-        const { id, title, content, date } = data;
-        dispatch(
-          updateNote({
-            id,
-            title,
-            content,
-            date,
-          }),
-        );
-        formRef.current.setStatus(FORCE_NAVIGATION_STATUS);
-        navigation.goBack();
-      })
-      .catch(({ response }) => {
-        if (response.status === 401) return;
-
-        setIsFormLoading(false);
-        showingSubmitError(
-          'Note Updating Error',
-          response.data ? response.data.message : 'Something went wrong:(',
-          40,
-        );
-      });
-  };
-
   // ⬇️ algorithm how to handle cancelled socket events
   // 1. we are saving all cancelled events to the array
   // 2. when socket is connected, we are sending all events from the array
@@ -408,6 +363,11 @@ export default function Form(): ReactElement {
               }
             }
 
+            if (status === SOCKET_NOTE_STATUSES.UPDATED) {
+              message = 'Note was successfully updated.';
+              dispatch(updateNote(note));
+            }
+
             if (status === SOCKET_NOTE_STATUSES.DELETED) {
               message = isDeleteOrigin
                 ? 'Note was successfully deleted.'
@@ -446,6 +406,9 @@ export default function Form(): ReactElement {
                   switch (data?.status) {
                     case SOCKET_NOTE_STATUSES.CREATED:
                       emittedMessage = 'createNote';
+                      break;
+                    case SOCKET_NOTE_STATUSES.UPDATED:
+                      emittedMessage = 'updateNote';
                       break;
                     case SOCKET_NOTE_STATUSES.DELETED:
                       emittedMessage = 'deleteNote';
@@ -501,6 +464,29 @@ export default function Form(): ReactElement {
     setIsFormLoading(true);
     const { title = '', content = '' } = values;
     (await socket).emit('createNote', {
+      title: title.trim(),
+      content: content.trim(),
+    });
+  };
+
+  const onNoteUpdateHandler = async (values: NotesManagingFormData) => {
+    if (!route.params || !route.params.noteId) return;
+
+    const accessToken = await SecureStore.getItemAsync('accessToken');
+    const refreshToken = await SecureStore.getItemAsync('refreshToken');
+    // ? also we can check for form dirty, but I don't think it's necessary here, because we have cancel button. For example, such apps as Telegram, Slack and Discord check for form dirty.
+    // ? (!accessToken || !refreshToken || !socket || !formRef.current.dirty)
+    if (!accessToken || !refreshToken || !socket) {
+      formRef.current?.setStatus(FORCE_NAVIGATION_STATUS);
+      navigation.goBack();
+      return;
+    }
+
+    setIsFormLoading(true);
+    const { title = '', content = '' } = values;
+    const { noteId } = route.params;
+    (await socket).emit('updateNote', {
+      id: noteId,
       title: title.trim(),
       content: content.trim(),
     });
