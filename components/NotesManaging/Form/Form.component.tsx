@@ -346,6 +346,13 @@ export default function Form(): ReactElement {
         socket.on(
           'local',
           ({ status, note, isDeleteOrigin }: SocketNoteData) => {
+            if (
+              typeof isDeleteOrigin === 'boolean' &&
+              !isDeleteOrigin &&
+              note.id !== route.params?.noteId
+            )
+              return; // ! if note is not deleted from current device and note id is not equal to current note id, then we don't do anything
+
             let message = 'Action was completed successfully';
 
             if (status === SOCKET_NOTE_STATUSES.CREATED) {
