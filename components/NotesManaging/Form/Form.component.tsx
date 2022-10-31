@@ -50,6 +50,7 @@ import {
   publicDataInitialState,
   setIsAuth,
 } from '@store/publicData/publicData.slice';
+import { publicDataAuthSelector } from '@store/publicData/publicData.selector';
 import { setPublicData } from '@store/publicData/publicData.slice';
 import {
   updateDraft,
@@ -65,6 +66,7 @@ const FORCE_NAVIGATION_STATUS = 'force'; // status for force navigation = withou
 export default function Form(): ReactElement {
   const dispatch = useDispatch();
 
+  const isAuth = useSelector(publicDataAuthSelector);
   const socket = useSelector(socketSelector);
 
   const navigation = useNavigation<NavigationProps>();
@@ -200,6 +202,15 @@ export default function Form(): ReactElement {
       }
     };
   }, [route]);
+
+  React.useEffect(() => {
+    if (isLoading || isError) return;
+    // if user is not authorized and tries to open or edit note, then we go back
+    if (!isAuth && (route.params?.noteId || isFormLoading)) {
+      formRef.current?.setStatus(FORCE_NAVIGATION_STATUS);
+      navigation.goBack();
+    }
+  }, [isAuth, isLoading, isError, isFormLoading]); // route is not included because route.params?.noteId is not changing
 
   React.useEffect(() => {
     if (route.params?.noteId) return;
