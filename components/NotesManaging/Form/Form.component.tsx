@@ -43,10 +43,7 @@ import {
   SOCKET_NOTE_STATUSES,
   SOCKET_ERROR_CODES,
 } from '@app-types/enum';
-import {
-  createAPIInstance,
-  createAPIRefreshInstance,
-} from '@utils/requests/instance';
+import { createAPIInstance } from '@utils/requests/instance';
 import { showingSubmitError } from '@utils/toastInteraction/showingSubmitError';
 import { showingSuccess } from '@utils/toastInteraction/showingSuccess';
 import {
@@ -54,13 +51,11 @@ import {
   setIsAuth,
 } from '@store/publicData/publicData.slice';
 import { setPublicData } from '@store/publicData/publicData.slice';
-import { addNote, removeNote, updateNote } from '@store/notes/notes.slice';
 import {
   updateDraft,
   addDraft as appendDraft,
   removeDraft,
 } from '@store/drafts/drafts.slice';
-import { removeSocket } from '@store/socket/socket.slice';
 import { socketSelector } from '@store/socket/socket.selector';
 
 import { styles } from './Form.styles';
@@ -88,12 +83,6 @@ export default function Form(): ReactElement {
   const formRef = React.useRef<
     FormikProps<NotesManagingFormData> | undefined
   >() as React.MutableRefObject<FormikProps<NotesManagingFormData>>;
-  const cancelledSocketEvents = React.useRef<
-    {
-      event: string;
-      data: object;
-    }[]
-  >([]);
 
   const defaultInstance = createAPIInstance(() => {
     dispatch(setPublicData(publicDataInitialState));
@@ -103,15 +92,6 @@ export default function Form(): ReactElement {
     //after setting isAuth to false, other logout actions will be called by fetchNotesPack useEffect in Notes.screen
   });
 
-  const refreshInstance = createAPIRefreshInstance(() => {
-    showingSubmitError('Logout', 'Your session has expired');
-    dispatch(setPublicData(publicDataInitialState));
-    dispatch(setIsAuth(false));
-    if (formRef.current) formRef.current.setStatus(FORCE_NAVIGATION_STATUS);
-    navigation.goBack();
-    // after setting isAuth to false, other logout actions will be called by fetchNotesPack useEffect
-  });
-
   React.useEffect(
     () =>
       navigation.addListener('beforeRemove', (e) => {
@@ -119,7 +99,8 @@ export default function Form(): ReactElement {
         if (
           !formRef.current?.dirty ||
           !route.params?.noteId ||
-          formRef.current.status === FORCE_NAVIGATION_STATUS
+          formRef.current.status === FORCE_NAVIGATION_STATUS ||
+          isFormLoading // if form is loading, then we do not show alert
         )
           return;
 
@@ -142,7 +123,7 @@ export default function Form(): ReactElement {
           ],
         );
       }),
-    [navigation],
+    [navigation, isFormLoading],
   );
 
   React.useLayoutEffect(() => {
@@ -322,27 +303,11 @@ export default function Form(): ReactElement {
       .finally(() => setIsLoading(false));
   };
 
-  // ⬇️ algorithm how to handle cancelled socket events
-  // 1. we are saving all cancelled events to the array
-  // 2. when socket is connected, we are sending all events from the array
-  // 3. when socket is connected, we are clearing the array
   React.useEffect(() => {
     // ! we check isLoading and isError, because we don't want to send events when we are fetching data
     // ! if we remove this checks, then when we have error screen, it will create another client
     if (socket && !isLoading && !isError) {
       socket.then((socket) => {
-        // as soon as we connect to the room, we complete all cancelled tasks (if there are any)
-        // tasks are cancelled because of unauthorized error
-
-        socket.on('joinRoom', () => {
-          if (cancelledSocketEvents.current.length) {
-            cancelledSocketEvents.current.forEach(({ event, data }) => {
-              socket.emit(event, data);
-            });
-            cancelledSocketEvents.current = [];
-          }
-        });
-
         socket.on(
           'local',
           ({ status, note, isDeleteOrigin }: SocketNoteData) => {
@@ -357,7 +322,6 @@ export default function Form(): ReactElement {
 
             if (status === SOCKET_NOTE_STATUSES.CREATED) {
               message = 'Note was successfully uploaded.';
-              dispatch(addNote(note));
 
               if (route.params?.draftId) {
                 onDraftDeleteHandler();
@@ -370,17 +334,13 @@ export default function Form(): ReactElement {
               }
             }
 
-            if (status === SOCKET_NOTE_STATUSES.UPDATED) {
+            if (status === SOCKET_NOTE_STATUSES.UPDATED)
               message = 'Note was successfully updated.';
-              dispatch(updateNote(note));
-            }
 
-            if (status === SOCKET_NOTE_STATUSES.DELETED) {
+            if (status === SOCKET_NOTE_STATUSES.DELETED)
               message = isDeleteOrigin
                 ? 'Note was successfully deleted.'
                 : 'Note was successfully deleted from other device.';
-              isDeleteOrigin && dispatch(removeNote(note.id)); // if note was deleted from this device, then we remove it from the store
-            }
 
             showingSuccess('Congratulations!', message, 40);
             formRef.current.setStatus(FORCE_NAVIGATION_STATUS);
@@ -392,50 +352,11 @@ export default function Form(): ReactElement {
           ({
             status,
             message,
-            data,
           }: {
             status: SOCKET_ERROR_CODES;
             message: string | string[];
-            data?: {
-              status?: SOCKET_NOTE_STATUSES;
-              note: Omit<NoteSchema, 'date' | 'id'> | { noteId: string };
-            };
           }) => {
-            if (status === SOCKET_ERROR_CODES.UNAUTHORIZED) {
-              refreshInstance
-                .post(`/auth/token/refresh`)
-                .then(async ({ data: refreshData }) => {
-                  const { accessToken, refreshToken } = refreshData;
-                  await SecureStore.setItemAsync('accessToken', accessToken);
-                  await SecureStore.setItemAsync('refreshToken', refreshToken);
-                  let emittedMessage = '';
-
-                  switch (data?.status) {
-                    case SOCKET_NOTE_STATUSES.CREATED:
-                      emittedMessage = 'createNote';
-                      break;
-                    case SOCKET_NOTE_STATUSES.UPDATED:
-                      emittedMessage = 'updateNote';
-                      break;
-                    case SOCKET_NOTE_STATUSES.DELETED:
-                      emittedMessage = 'deleteNote';
-                      break;
-                  }
-
-                  // pushing cancelled event to the array
-                  cancelledSocketEvents.current.push({
-                    event: emittedMessage,
-                    data: data?.note || {},
-                  });
-                  socket.disconnect(); // disconnecting socket to reconnect with new token
-                  dispatch(removeSocket());
-                })
-                .catch((error) => {
-                  if (error.response && error.response.status === 401) return;
-                });
-
-              return;
-            }
+            if (status === SOCKET_ERROR_CODES.UNAUTHORIZED) return;
 
             setIsFormLoading(false);
             showingSubmitError(
@@ -454,7 +375,6 @@ export default function Form(): ReactElement {
         socket.then((socket) => {
           socket.off('local');
           socket.off('localError');
-          socket.off('joinRoom');
         });
       }
     };
@@ -544,7 +464,7 @@ export default function Form(): ReactElement {
     setIsFormLoading(true);
     const { noteId } = route.params;
 
-    (await socket)?.emit('deleteNote', { noteId });
+    (await socket)?.emit('deleteNote', { noteId: noteId });
   }
 
   if (isError) return <Error />;

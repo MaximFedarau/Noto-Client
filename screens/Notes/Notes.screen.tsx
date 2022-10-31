@@ -21,11 +21,12 @@ import Spinner from '@components/Auth/Defaults/Spinner/Spinner.component';
 import { NoItemsText } from '@components/Default/Text/Text.component';
 import { SOFT_BLUE } from '@constants/colors';
 import { sizes } from '@constants/sizes';
-import { NavigationProps, SocketNoteData } from '@app-types/types';
+import { NavigationProps, NoteSchema, SocketNoteData } from '@app-types/types';
 import {
   NAVIGATION_NAMES,
   FETCH_PACK_TYPES,
   SOCKET_NOTE_STATUSES,
+  SOCKET_ERROR_CODES,
 } from '@app-types/enum';
 import { createAPIInstance } from '@utils/requests/instance';
 import { showingSubmitError } from '@utils/toastInteraction/showingSubmitError';
@@ -55,6 +56,13 @@ import { styles } from './Notes.styles';
 
 export default function Notes(): ReactElement {
   const navigation = useNavigation<NavigationProps>();
+
+  const cancelledSocketEvents = React.useRef<
+    {
+      event: string;
+      data: object;
+    }[]
+  >([]);
 
   const dispatch = useDispatch();
   const socket = useSelector(socketSelector);
@@ -217,6 +225,70 @@ export default function Notes(): ReactElement {
     if (!socket) return;
     if (isAuth) {
       socket.then((socket) => {
+        // handling unauthorized note events
+        socket.onAny(
+          (
+            event,
+            args: {
+              status: SOCKET_ERROR_CODES;
+              message: string | string[];
+              data?: {
+                status?: SOCKET_NOTE_STATUSES;
+                note: Omit<NoteSchema, 'date' | 'id'> | { noteId: string };
+              };
+            },
+          ) => {
+            // as soon as we connect to the room, we complete all cancelled tasks (if there are any)
+            // tasks are cancelled because of unauthorized error
+            if (event === 'joinRoom') {
+              if (cancelledSocketEvents.current.length) {
+                cancelledSocketEvents.current.forEach(({ event, data }) => {
+                  socket.emit(event, data);
+                });
+                cancelledSocketEvents.current = [];
+              }
+            }
+
+            if (event === 'localError') {
+              const { status, data } = args;
+              if (status === SOCKET_ERROR_CODES.UNAUTHORIZED) {
+                refreshInstance
+                  .post(`/auth/token/refresh`)
+                  .then(async ({ data: refreshData }) => {
+                    const { accessToken, refreshToken } = refreshData;
+                    await SecureStore.setItemAsync('accessToken', accessToken);
+                    await SecureStore.setItemAsync(
+                      'refreshToken',
+                      refreshToken,
+                    );
+                    let emittedMessage = '';
+                    switch (data?.status) {
+                      case SOCKET_NOTE_STATUSES.CREATED:
+                        emittedMessage = 'createNote';
+                        break;
+                      case SOCKET_NOTE_STATUSES.UPDATED:
+                        emittedMessage = 'updateNote';
+                        break;
+                      case SOCKET_NOTE_STATUSES.DELETED:
+                        emittedMessage = 'deleteNote';
+                        break;
+                    }
+                    // pushing cancelled event to the array
+                    cancelledSocketEvents.current.push({
+                      event: emittedMessage,
+                      data: data?.note || {},
+                    });
+                    socket.disconnect(); // disconnecting socket to reconnect with new token
+                    dispatch(removeSocket());
+                  })
+                  .catch((error) => {
+                    if (error.response && error.response.status === 401) return;
+                  });
+              }
+            }
+          },
+        );
+
         socket.on('global', ({ status, note }: SocketNoteData) => {
           if (status === SOCKET_NOTE_STATUSES.CREATED) dispatch(addNote(note));
 
@@ -230,7 +302,7 @@ export default function Notes(): ReactElement {
         socket.on(
           'globalError',
           (error: { status: number; message: string | string[] }) => {
-            if (error.status === 401) {
+            if (error.status === SOCKET_ERROR_CODES.UNAUTHORIZED) {
               refreshInstance
                 .post(`/auth/token/refresh`)
                 .then(async ({ data: refreshData }) => {
