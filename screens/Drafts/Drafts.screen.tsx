@@ -48,13 +48,13 @@ export default function Drafts(): ReactElement {
   const [isError, setIsError] = React.useState<boolean>(false);
 
   const [openSearchBar, setOpenSearchBar] = React.useState<boolean>(false);
-  const searchText = React.useRef('');
+  const [searchText, setSearchText] = React.useState('');
 
   const navigation = useNavigation<NavigationProps>();
 
   const onSearchBarChange = React.useCallback(
     debounce((text) => {
-      searchText.current = text;
+      setSearchText(text);
       dispatch(setIsEnd(false));
     }, 300),
     [],
@@ -62,7 +62,7 @@ export default function Drafts(): ReactElement {
 
   function clearAuthHeader() {
     setOpenSearchBar(false);
-    searchText.current = '';
+    setSearchText('');
     navigation.setOptions({
       headerTitle: ({ children, tintColor }) => {
         return (
@@ -74,7 +74,7 @@ export default function Drafts(): ReactElement {
   }
 
   React.useEffect(() => {
-    if (drafts.length || searchText.current.length) {
+    if (drafts.length || searchText.length) {
       navigation.setOptions({
         //Implement search bar
         headerTitle: ({ children, tintColor }) => {
@@ -95,10 +95,10 @@ export default function Drafts(): ReactElement {
           function onButtonClickHandler() {
             setOpenSearchBar(!openSearchBar);
             // do not fetch again, when searchText is already empty
-            if (searchText.current !== '') dispatch(setIsEnd(false));
+            if (searchText !== '') dispatch(setIsEnd(false));
             // removing debounce
             onSearchBarChange.cancel();
-            searchText.current = '';
+            setSearchText('');
           }
           return (
             <LeftHeaderView>
@@ -125,7 +125,7 @@ export default function Drafts(): ReactElement {
     const isInitial = type === FETCH_PACK_TYPES.INITIAL;
 
     isInitial ? setIsLoading(true) : setIsPackLoading(true);
-    fetchDraftPack(isInitial ? 0 : drafts.length, searchText.current.trim())
+    fetchDraftPack(isInitial ? 0 : drafts.length, searchText.trim())
       .then((res) => {
         const { draftsPack } = res;
         if (draftsPack.length) {
@@ -149,14 +149,14 @@ export default function Drafts(): ReactElement {
 
   React.useEffect(() => {
     fetchDraftsPack();
-  }, [isEnd, searchText.current]);
+  }, [isEnd, searchText]);
 
   React.useEffect(() => {
-    listener.startListening({
+    const unsubscribe = listener.startListening({
       matcher: isAnyOf(updateDraft, addDraft),
 
       effect: ({ payload }, listenerAPI) => {
-        const trimmedSearchText = searchText.current.trim();
+        const trimmedSearchText = searchText.trim();
 
         const drafts = (listenerAPI.getState() as RootState).drafts.drafts;
 
@@ -172,7 +172,9 @@ export default function Drafts(): ReactElement {
         }
       },
     });
-  }, []);
+
+    return () => unsubscribe();
+  }, [searchText]);
 
   if (isError) return <Error />;
   if (isLoading) return <Loading />;
@@ -192,7 +194,7 @@ export default function Drafts(): ReactElement {
           </DraftsList>
         ) : (
           <NoItemsText>
-            {searchText.current ? 'Nothing found' : 'No drafts'}
+            {searchText ? 'Nothing found' : 'No drafts'}
           </NoItemsText>
         )}
         {!openSearchBar && (

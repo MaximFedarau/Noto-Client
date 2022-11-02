@@ -75,7 +75,7 @@ export default function Notes(): ReactElement {
   const [isError, setIsError] = React.useState<boolean>(false);
 
   const [openSearchBar, setOpenSearchBar] = React.useState<boolean>(false);
-  const searchText = React.useRef('');
+  const [searchText, setSearchText] = React.useState('');
 
   const [packNumber, setPackNumber] = React.useState<number>(1);
 
@@ -96,7 +96,7 @@ export default function Notes(): ReactElement {
 
   const clearAuthHeader = () => {
     setOpenSearchBar(false);
-    searchText.current = '';
+    setSearchText('');
     navigation.setOptions({
       headerTitle: ({ children, tintColor }) => {
         return (
@@ -109,7 +109,7 @@ export default function Notes(): ReactElement {
 
   const onSearchBarChange = React.useCallback(
     debounce((text) => {
-      searchText.current = text;
+      setSearchText(text);
       dispatch(setIsEnd(false));
     }, 300),
     [],
@@ -121,7 +121,7 @@ export default function Notes(): ReactElement {
       return;
     }
 
-    if (notes.length || searchText.current.length) {
+    if (notes.length || searchText.length) {
       navigation.setOptions({
         headerTitle: ({ children, tintColor }) => {
           if (openSearchBar)
@@ -140,10 +140,10 @@ export default function Notes(): ReactElement {
           function onButtonClickHandler() {
             setOpenSearchBar(!openSearchBar);
             // do not fetch again, if searchText is already empty
-            if (searchText.current !== '') dispatch(setIsEnd(false));
+            if (searchText !== '') dispatch(setIsEnd(false));
             // removing debounce
             onSearchBarChange.cancel();
-            searchText.current = '';
+            setSearchText('');
           }
 
           return (
@@ -175,7 +175,7 @@ export default function Notes(): ReactElement {
       .get(
         `/notes/pack/${
           isInitial ? 1 : packNumber
-        }?pattern=${searchText.current.trim()}`,
+        }?pattern=${searchText.trim()}`,
       )
       .then(({ data }) => {
         const { notePack, isEnd } = data;
@@ -206,7 +206,7 @@ export default function Notes(): ReactElement {
       return;
     }
     fetchNotesPack();
-  }, [isAuth, isEnd, searchText.current]);
+  }, [isAuth, isEnd, searchText]);
 
   React.useEffect(() => {
     if (!isAuth) {
@@ -325,11 +325,11 @@ export default function Notes(): ReactElement {
   }, [isAuth, socket]);
 
   React.useEffect(() => {
-    listener.startListening({
+    const unsubscribe = listener.startListening({
       matcher: isAnyOf(updateNote, addNote),
 
       effect: ({ payload }, listenerAPI) => {
-        const trimmedSearchText = searchText.current.trim();
+        const trimmedSearchText = searchText.trim();
 
         const notes = (listenerAPI.getState() as RootState).notes.notes;
 
@@ -345,7 +345,9 @@ export default function Notes(): ReactElement {
         }
       },
     });
-  }, []);
+
+    return () => unsubscribe();
+  }, [searchText]);
 
   if (isError) return <Error />;
   if (isLoading) return <Loading />;
@@ -362,9 +364,7 @@ export default function Notes(): ReactElement {
             {notes}
           </NotesList>
         ) : (
-          <NoItemsText>
-            {searchText.current ? 'Nothing found' : 'No notes'}
-          </NoItemsText>
+          <NoItemsText>{searchText ? 'Nothing found' : 'No notes'}</NoItemsText>
         )}
         {!openSearchBar && isAuth && (
           <FAB
