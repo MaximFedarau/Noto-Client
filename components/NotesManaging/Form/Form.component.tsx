@@ -335,27 +335,30 @@ export default function Form(): ReactElement {
 
             let message = 'Action was completed successfully';
 
-            if (status === SOCKET_NOTE_STATUSES.CREATED) {
-              message = 'Note was successfully uploaded.';
+            switch (status) {
+              case SOCKET_NOTE_STATUSES.CREATED:
+                message = 'Note was created successfully';
+                if (route.params?.draftId) {
+                  await onDraftDeleteHandler();
+                  showingSuccess(
+                    'Congratulations!',
+                    'Note was successfully uploaded and draft was deleted.',
+                    40,
+                  );
+                  return;
+                }
+                break;
 
-              if (route.params?.draftId) {
-                await onDraftDeleteHandler();
-                showingSuccess(
-                  'Congratulations!',
-                  'Note was successfully uploaded and draft was deleted.',
-                  40,
-                );
-                return;
-              }
+              case SOCKET_NOTE_STATUSES.UPDATED:
+                message = 'Note was successfully updated.';
+                break;
+
+              case SOCKET_NOTE_STATUSES.DELETED:
+                message = isDeleteOrigin
+                  ? 'Note was successfully deleted.'
+                  : 'Note was successfully deleted from other device.';
+                break;
             }
-
-            if (status === SOCKET_NOTE_STATUSES.UPDATED)
-              message = 'Note was successfully updated.';
-
-            if (status === SOCKET_NOTE_STATUSES.DELETED)
-              message = isDeleteOrigin
-                ? 'Note was successfully deleted.'
-                : 'Note was successfully deleted from other device.';
 
             showingSuccess('Congratulations!', message, 40);
             formRef.current.setStatus(FORCE_NAVIGATION_STATUS);
