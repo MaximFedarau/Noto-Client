@@ -1,11 +1,12 @@
 import React, { ReactElement } from 'react';
-import { useNavigation } from '@react-navigation/native';
-import { useSelector, useDispatch } from 'react-redux';
-import { isAnyOf } from '@reduxjs/toolkit';
 import { Text } from 'react-native';
 import { FAB } from '@rneui/themed';
-import { debounce } from 'lodash';
+import { useNavigation } from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
+import { useSelector, useDispatch } from 'react-redux';
+import { isAnyOf } from '@reduxjs/toolkit';
+import { debounce } from 'lodash';
+import { AxiosError } from 'axios';
 
 import Error from '@screens/Error/Error.screen';
 import Loading from '@screens/Loading/Loading.screen';
@@ -166,35 +167,36 @@ export default function Notes(): ReactElement {
     };
   }, [notes.length, openSearchBar, isAuth]);
 
-  function fetchNotesPack(type: FETCH_PACK_TYPES = FETCH_PACK_TYPES.INITIAL) {
+  async function fetchNotesPack(
+    type: FETCH_PACK_TYPES = FETCH_PACK_TYPES.INITIAL,
+  ) {
     if (isEnd || isPackLoading) return;
     const isInitial = type === FETCH_PACK_TYPES.INITIAL;
 
     isInitial ? setIsLoading(true) : setIsPackLoading(true);
-    instance
-      .get(
+
+    try {
+      const { data } = await instance.get(
         `/notes/pack/${
           isInitial ? 1 : packNumber
         }?pattern=${searchText.trim()}`,
-      )
-      .then(({ data }) => {
-        const { notePack, isEnd } = data;
-        if (notePack.length) {
-          dispatch(isInitial ? assignNotes(notePack) : addNotes(notePack));
-          setPackNumber(isInitial ? 2 : packNumber + 1);
-          dispatch(setIsEnd(JSON.parse(isEnd)));
-        } else {
-          isInitial && dispatch(clearNotes()); // clearing notes, when it is initial fetch and there are no notes (for example, when we are making first search request)
-          dispatch(setIsEnd(true));
-        }
-      })
-      .catch((error) => {
-        if (error.response.status === 401) return;
-        setIsError(true);
-      })
-      .finally(() => {
-        isInitial ? setIsLoading(false) : setIsPackLoading(false);
-      });
+      );
+      const { notePack, isEnd } = data;
+      if (notePack.length) {
+        dispatch(isInitial ? assignNotes(notePack) : addNotes(notePack));
+        setPackNumber(isInitial ? 2 : packNumber + 1);
+        dispatch(setIsEnd(JSON.parse(isEnd)));
+      } else {
+        isInitial && dispatch(clearNotes()); // clearing notes, when it is initial fetch and there are no notes (for example, when we are making first search request)
+        dispatch(setIsEnd(true));
+      }
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response && axiosError.response.status === 401) return;
+      setIsError(true);
+    } finally {
+      isInitial ? setIsLoading(false) : setIsPackLoading(false);
+    }
   }
 
   React.useEffect(() => {
@@ -227,7 +229,7 @@ export default function Notes(): ReactElement {
       socket.then((socket) => {
         // handling unauthorized note events
         socket.onAny(
-          (
+          async (
             event,
             args: {
               status: SOCKET_ERROR_CODES;
@@ -251,71 +253,80 @@ export default function Notes(): ReactElement {
 
             if (event === 'localError') {
               const { status, data } = args;
-              if (status === SOCKET_ERROR_CODES.UNAUTHORIZED) {
-                refreshInstance
-                  .post(`/auth/token/refresh`)
-                  .then(async ({ data: refreshData }) => {
-                    const { accessToken, refreshToken } = refreshData;
-                    await SecureStore.setItemAsync('accessToken', accessToken);
-                    await SecureStore.setItemAsync(
-                      'refreshToken',
-                      refreshToken,
-                    );
-                    let emittedMessage = '';
-                    switch (data?.status) {
-                      case SOCKET_NOTE_STATUSES.CREATED:
-                        emittedMessage = 'createNote';
-                        break;
-                      case SOCKET_NOTE_STATUSES.UPDATED:
-                        emittedMessage = 'updateNote';
-                        break;
-                      case SOCKET_NOTE_STATUSES.DELETED:
-                        emittedMessage = 'deleteNote';
-                        break;
-                    }
-                    // pushing cancelled event to the array
-                    cancelledSocketEvents.current.push({
-                      event: emittedMessage,
-                      data: data?.note || {},
-                    });
-                    socket.disconnect(); // disconnecting socket to reconnect with new token
-                    dispatch(removeSocket());
-                  })
-                  .catch((error) => {
-                    if (error.response && error.response.status === 401) return;
-                  });
+              if (status !== SOCKET_ERROR_CODES.UNAUTHORIZED) return;
+
+              try {
+                const { data: refreshData } = await refreshInstance.post(
+                  `/auth/token/refresh`,
+                );
+                const { accessToken, refreshToken } = refreshData;
+                await SecureStore.setItemAsync('accessToken', accessToken);
+                await SecureStore.setItemAsync('refreshToken', refreshToken);
+
+                let emittedMessage = '';
+                switch (data?.status) {
+                  case SOCKET_NOTE_STATUSES.CREATED:
+                    emittedMessage = 'createNote';
+                    break;
+
+                  case SOCKET_NOTE_STATUSES.UPDATED:
+                    emittedMessage = 'updateNote';
+                    break;
+
+                  case SOCKET_NOTE_STATUSES.DELETED:
+                    emittedMessage = 'deleteNote';
+                    break;
+                }
+                // pushing cancelled event to the array
+                cancelledSocketEvents.current.push({
+                  event: emittedMessage,
+                  data: data?.note || {},
+                });
+
+                socket.disconnect(); // disconnecting socket to reconnect with new token
+                dispatch(removeSocket());
+              } catch (error) {
+                const axiosError = error as AxiosError;
+                if (axiosError.response && axiosError.response.status === 401)
+                  return;
               }
             }
           },
         );
 
         socket.on('global', ({ status, note }: SocketNoteData) => {
-          if (status === SOCKET_NOTE_STATUSES.CREATED) dispatch(addNote(note));
-
-          if (status === SOCKET_NOTE_STATUSES.UPDATED)
-            dispatch(updateNote(note));
-
-          if (status === SOCKET_NOTE_STATUSES.DELETED)
-            dispatch(removeNote(note.id));
+          switch (status) {
+            case SOCKET_NOTE_STATUSES.CREATED:
+              dispatch(addNote(note));
+              break;
+            case SOCKET_NOTE_STATUSES.UPDATED:
+              dispatch(updateNote(note));
+              break;
+            case SOCKET_NOTE_STATUSES.DELETED:
+              dispatch(removeNote(note.id));
+              break;
+          }
         });
 
         socket.on(
           'globalError',
-          (error: { status: number; message: string | string[] }) => {
-            if (error.status === SOCKET_ERROR_CODES.UNAUTHORIZED) {
-              refreshInstance
-                .post(`/auth/token/refresh`)
-                .then(async ({ data: refreshData }) => {
-                  const { accessToken, refreshToken } = refreshData;
-                  await SecureStore.setItemAsync('accessToken', accessToken);
-                  await SecureStore.setItemAsync('refreshToken', refreshToken);
+          async (error: { status: number; message: string | string[] }) => {
+            if (error.status !== SOCKET_ERROR_CODES.UNAUTHORIZED) return;
 
-                  socket.disconnect();
-                  dispatch(removeSocket());
-                })
-                .catch((error) => {
-                  if (error.response.status === 401) return;
-                });
+            try {
+              const { data: refreshData } = await refreshInstance.post(
+                `/auth/token/refresh`,
+              );
+              const { accessToken, refreshToken } = refreshData;
+              await SecureStore.setItemAsync('accessToken', accessToken);
+              await SecureStore.setItemAsync('refreshToken', refreshToken);
+
+              socket.disconnect();
+              dispatch(removeSocket());
+            } catch (error) {
+              const axiosError = error as AxiosError;
+              if (axiosError.response && axiosError.response.status === 401)
+                return;
             }
           },
         );

@@ -1,10 +1,10 @@
 import React, { ReactElement } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigation } from '@react-navigation/native';
 import { Text } from 'react-native';
 import { FAB } from '@rneui/themed';
-import { debounce } from 'lodash';
+import { useDispatch, useSelector } from 'react-redux';
 import { isAnyOf } from '@reduxjs/toolkit';
+import { useNavigation } from '@react-navigation/native';
+import { debounce } from 'lodash';
 
 import Error from '@screens/Error/Error.screen';
 import Loading from '@screens/Loading/Loading.screen';
@@ -120,31 +120,30 @@ export default function Drafts(): ReactElement {
     };
   }, [drafts.length, openSearchBar]);
 
-  function fetchDraftsPack(type: FETCH_PACK_TYPES = FETCH_PACK_TYPES.INITIAL) {
+  async function fetchDraftsPack(
+    type: FETCH_PACK_TYPES = FETCH_PACK_TYPES.INITIAL,
+  ) {
     if (isEnd || isPackLoading) return;
     const isInitial = type === FETCH_PACK_TYPES.INITIAL;
 
     isInitial ? setIsLoading(true) : setIsPackLoading(true);
-    fetchDraftPack(isInitial ? 0 : drafts.length, searchText.trim())
-      .then((res) => {
-        const { draftsPack } = res;
-        if (draftsPack.length) {
-          dispatch(
-            isInitial ? assignDrafts(draftsPack) : addDrafts(draftsPack),
-          );
-          dispatch(setIsEnd(res.isEnd));
-        } else {
-          isInitial && dispatch(clearDrafts());
-          dispatch(setIsEnd(true));
-        }
-      })
-      .catch((error) => {
-        if (error.response.status === 401) return;
-        setIsError(true);
-      })
-      .finally(() => {
-        isInitial ? setIsLoading(false) : setIsPackLoading(false);
-      });
+    try {
+      const { draftsPack, isEnd } = await fetchDraftPack(
+        isInitial ? 0 : drafts.length,
+        searchText.trim(),
+      );
+      if (draftsPack.length) {
+        dispatch(isInitial ? assignDrafts(draftsPack) : addDrafts(draftsPack));
+        dispatch(setIsEnd(isEnd));
+      } else {
+        isInitial && dispatch(clearDrafts());
+        dispatch(setIsEnd(true));
+      }
+    } catch (error) {
+      setIsError(true);
+    } finally {
+      isInitial ? setIsLoading(false) : setIsPackLoading(false);
+    }
   }
 
   React.useEffect(() => {
