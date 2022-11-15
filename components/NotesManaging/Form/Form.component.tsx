@@ -283,7 +283,6 @@ export default function Form(): ReactElement {
       });
       setIsError(false);
     } catch (error) {
-      console.log(error);
       errorHandling(error as AxiosError, 'Fetching Draft');
     } finally {
       setIsLoading(false);

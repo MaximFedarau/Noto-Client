@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import React, { ReactElement, useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import { Provider } from 'react-redux';
@@ -20,16 +20,17 @@ const Stack = createNativeStackNavigator();
 export default function App(): ReactElement | null {
   const [isSetupError, setIsSetupError] = React.useState<boolean>(false);
 
-  React.useEffect(() => {
-    initDbDrafts()
-      .then((message) => {
-        setIsSetupError(false);
-        console.info(message);
-      })
-      .catch((error) => {
-        console.error(error, 'App setup');
-        setIsSetupError(true);
-      });
+  const initDrafts = async () => {
+    try {
+      await initDbDrafts();
+    } catch (error) {
+      setIsSetupError(true);
+      console.error(error, 'App setup');
+    }
+  };
+
+  useEffect(() => {
+    initDrafts();
   }, []);
 
   const [fontsLoaded] = useFonts({

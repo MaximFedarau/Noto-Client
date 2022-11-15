@@ -1,7 +1,8 @@
 import React, { ReactElement } from 'react';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import * as FileSystem from 'expo-file-system';
 import * as SecureStore from 'expo-secure-store';
-import { useRoute, useNavigation } from '@react-navigation/native';
+import { AxiosError } from 'axios';
 
 import ContentScrollView from '@components/Auth/Defaults/ContentScrollView/ContentScrollView.component';
 import LogoPicker from '@components/Auth/Screens/AvatarPicker/LogoPicker/LogoPicker.component';
@@ -27,7 +28,7 @@ export default function Content(): ReactElement {
     setIsLoading(true);
     // image uploading
     const accessToken = await SecureStore.getItemAsync('accessToken'); // getting access token with goal to access API
-    const data = await FileSystem.uploadAsync(
+    const { status } = await FileSystem.uploadAsync(
       `${process.env.API_URL}/auth/image/upload/${route.params.id}`,
       image,
       {
@@ -39,9 +40,9 @@ export default function Content(): ReactElement {
         },
       },
     );
-    if (data.status >= 400) {
+    if (status >= 400) {
       // if the status is >= 400 (client or server error), then the image was not uploaded
-      if (data.status !== 401) {
+      if (status !== 401) {
         // if the status is not 401 (unauthorized), then we just show the error
         showingSubmitError(
           'Avatar Uploading Error',
@@ -51,23 +52,25 @@ export default function Content(): ReactElement {
             setIsLoading(false);
           },
         );
+        return;
       }
+
       // in other case, we need to refresh the access token
       const instance = createAPIRefreshInstance(() => {
         showingSubmitError('Logout', 'Your session has expired', undefined);
         handleReturnToHome();
       });
-      instance
-        .post(`/auth/token/refresh`, {})
-        .then(async (res) => {
-          await SecureStore.setItemAsync('accessToken', res.data.accessToken); // setting new access token
-          await SecureStore.setItemAsync('refreshToken', res.data.refreshToken); // setting new refresh token
-          await onSubmitHandler(); // uploading image again
-        })
-        .catch((error) => {
-          if (error.response.status === 401) return;
-          console.error(error, 'image uploading error');
-        });
+      try {
+        const { data } = await instance.post(`/auth/token/refresh`);
+        const { accessToken, refreshToken } = data;
+        await SecureStore.setItemAsync('accessToken', accessToken); // setting new access token
+        await SecureStore.setItemAsync('refreshToken', refreshToken); // setting new refresh token
+        await onSubmitHandler(); // uploading image again
+      } catch (error) {
+        const axiosError = error as AxiosError;
+        if (axiosError.response && axiosError.response.status === 401) return;
+        console.error(error, 'image uploading error');
+      }
     } else {
       // if everyting is successful, then we need to go home
       showingSuccess(

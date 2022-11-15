@@ -1,7 +1,8 @@
 import React, { ReactElement } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
 import { Formik } from 'formik';
-import { useNavigation } from '@react-navigation/native';
+import { AxiosError } from 'axios';
 
 import FormField from '@components/Auth/Defaults/FormField/FormField.component';
 import FormButtons from '@components/Auth/Defaults/FormButtons/FormButtons.component';
@@ -34,34 +35,39 @@ export default function Form(): ReactElement {
   };
 
   // submitting (log in)
-  const onFormSubmitHandler = ({ nickname, password }: SignInFormData) => {
+  const onFormSubmitHandler = async ({
+    nickname,
+    password,
+  }: SignInFormData) => {
     setIsLoading(true);
     const instance = createAPIInstance();
-    instance
-      .post<{ accessToken: string; refreshToken: string }>('/auth/login', {
+
+    try {
+      const res = await instance.post<{
+        accessToken: string;
+        refreshToken: string;
+      }>('/auth/login', {
         nickname: nickname.trim(),
         password,
-      })
-      .then(async (res) => {
-        if (!res || !res.data) return; //checking is the response is undefined - type checking
-        await SecureStore.setItemAsync('accessToken', res.data.accessToken); // saving access token to secure store
-        await SecureStore.setItemAsync('refreshToken', res.data.refreshToken); // saving refresh token to secure store
-        showingSuccess('Congratulations!', 'You have successfully signed in.');
-        handleReturnToHome(); // going to the home screen
-      })
-      .catch((error) => {
-        //handling possible errors
-        showingSubmitError(
-          'Login Error',
-          error.response.data
-            ? error.response.data.message
-            : 'Something went wrong:(',
-          undefined,
-          () => {
-            setIsLoading(false);
-          },
-        );
       });
+      if (!res || !res.data) return; //checking is the response is undefined - type checking
+      await SecureStore.setItemAsync('accessToken', res.data.accessToken); // saving access token to secure store
+      await SecureStore.setItemAsync('refreshToken', res.data.refreshToken); // saving refresh token to secure store
+      showingSuccess('Congratulations!', 'You have successfully signed in.');
+      handleReturnToHome(); // going to the home screen
+    } catch (error) {
+      const { response } = error as AxiosError<{ message: string }>;
+      showingSubmitError(
+        'Login Error',
+        response && response.data
+          ? response.data.message
+          : 'Something went wrong:(',
+        undefined,
+        () => {
+          setIsLoading(false);
+        },
+      );
+    }
   };
 
   // returning home

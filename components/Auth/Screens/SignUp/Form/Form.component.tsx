@@ -1,7 +1,8 @@
 import React, { ReactElement } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
 import { Formik } from 'formik';
-import { useNavigation } from '@react-navigation/native';
+import { AxiosError } from 'axios';
 
 import FormField from '@components/Auth/Defaults/FormField/FormField.component';
 import Spinner from '@components/Auth/Defaults/Spinner/Spinner.component';
@@ -41,56 +42,41 @@ export default function Form(): ReactElement {
     const instance = createAPIInstance();
     const trimmedNickname = nickname.trim(); // trimming the nickname
 
-    // * section: sign up
-    const signUpResponse = await instance
-      .post<{ id: string }>(`/auth/signup`, {
-        nickname: trimmedNickname,
-        password,
-      }) // signing up the user
-      .catch((error) => {
-        // catching possible errors
-        showingSubmitError(
-          'Sign Up Error',
-          error.response.data
-            ? error.response.data.message
-            : 'Something went wrong:(',
-          undefined,
-          () => {
-            setIsLoading(false);
-          },
-        );
-      });
-    if (!signUpResponse) return; // if the response is undefined, stoping method - error was handled before
-    const userId = signUpResponse.data.id;
+    try {
+      const { data: signUpData } = await instance.post<{ id: string }>(
+        `/auth/signup`,
+        {
+          nickname: trimmedNickname,
+          password,
+        },
+      );
+      const { id } = signUpData;
 
-    // * section: login
-    instance // in any case we login user
-      .post<{ accessToken: string; refreshToken: string }>(`/auth/login`, {
-        nickname: trimmedNickname,
-        password,
-      })
-      .then(async (res) => {
-        if (!res || !res.data) return; //checking is the response is undefined - type checking
-        await SecureStore.setItemAsync('accessToken', res.data.accessToken); // saving access token to secure store
-        await SecureStore.setItemAsync('refreshToken', res.data.refreshToken); // saving refresh token to secure store
-        showingSuccess('Congratulations!', 'You have successfully signed up.');
-        navigation.replace(NAVIGATION_AUTH_NAMES.AVATAR_PICKER, {
-          id: userId,
+      const res = await instance // in any case we login user
+        .post<{ accessToken: string; refreshToken: string }>(`/auth/login`, {
+          nickname: trimmedNickname,
+          password,
         });
-      })
-      .catch((error) => {
-        //handling possible errors
-        showingSubmitError(
-          'Login Error',
-          error.response.data
-            ? error.response.data.message
-            : 'Something went wrong:(',
-          undefined,
-          () => {
-            setIsLoading(false);
-          },
-        );
+      if (!res || !res.data) return; //checking is the response is undefined - type checking
+      await SecureStore.setItemAsync('accessToken', res.data.accessToken); // saving access token to secure store
+      await SecureStore.setItemAsync('refreshToken', res.data.refreshToken); // saving refresh token to secure store
+      showingSuccess('Congratulations!', 'You have successfully signed up.');
+      navigation.replace(NAVIGATION_AUTH_NAMES.AVATAR_PICKER, {
+        id,
       });
+    } catch (error) {
+      const { response } = error as AxiosError<{ message: string }>;
+      showingSubmitError(
+        'Sign Up Error',
+        response && response?.data
+          ? response.data.message
+          : 'Something went wrong:(',
+        undefined,
+        () => {
+          setIsLoading(false);
+        },
+      );
+    }
   }
 
   // returning to the main screen
