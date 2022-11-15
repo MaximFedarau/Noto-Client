@@ -1,6 +1,8 @@
 import * as SecureStore from 'expo-secure-store';
 import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
 
+import { AuthTokens } from '@app-types/types';
+
 export const createAPIRefreshInstance = (onExit?: () => void) => {
   const refreshInstance = axios.create({
     baseURL: `${process.env.API_URL}`,
@@ -46,9 +48,11 @@ export const createAPIInstance = (onExit?: () => void) => {
     (config: AxiosResponse) => config,
     async (error) => {
       if (error.response.status === 401) {
-        const res = await refreshInstance.post(`/auth/token/refresh`);
-        await SecureStore.setItemAsync('accessToken', res.data.accessToken);
-        await SecureStore.setItemAsync('refreshToken', res.data.refreshToken);
+        const { data } = await refreshInstance.post<AuthTokens>(
+          `/auth/token/refresh`,
+        );
+        await SecureStore.setItemAsync('accessToken', data.accessToken);
+        await SecureStore.setItemAsync('refreshToken', data.refreshToken);
         return instance.request(error.config);
       }
       throw error;

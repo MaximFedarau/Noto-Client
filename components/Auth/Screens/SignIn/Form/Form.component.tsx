@@ -14,7 +14,7 @@ import {
 } from '@components/Default/View/View.component';
 import { AuthNavigationText } from '@components/Default/Text/Text.component';
 import { NAVIGATION_NAMES, NAVIGATION_AUTH_NAMES } from '@app-types/enum';
-import { NavigationProps, SignInFormData } from '@app-types/types';
+import { NavigationProps, SignInFormData, AuthTokens } from '@app-types/types';
 import { signInFormValidationSchema } from '@constants/validationSchemas';
 import { showingSubmitError } from '@utils/toastInteraction/showingSubmitError';
 import { showingSuccess } from '@utils/toastInteraction/showingSuccess';
@@ -43,16 +43,12 @@ export default function Form(): ReactElement {
     const instance = createAPIInstance();
 
     try {
-      const res = await instance.post<{
-        accessToken: string;
-        refreshToken: string;
-      }>('/auth/login', {
+      const { data } = await instance.post<AuthTokens>('/auth/login', {
         nickname: nickname.trim(),
         password,
       });
-      if (!res || !res.data) return; //checking is the response is undefined - type checking
-      await SecureStore.setItemAsync('accessToken', res.data.accessToken); // saving access token to secure store
-      await SecureStore.setItemAsync('refreshToken', res.data.refreshToken); // saving refresh token to secure store
+      await SecureStore.setItemAsync('accessToken', data.accessToken); // saving access token to secure store
+      await SecureStore.setItemAsync('refreshToken', data.refreshToken); // saving refresh token to secure store
       showingSuccess('Congratulations!', 'You have successfully signed in.');
       handleReturnToHome(); // going to the home screen
     } catch (error) {

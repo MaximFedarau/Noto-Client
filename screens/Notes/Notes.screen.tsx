@@ -22,7 +22,12 @@ import Spinner from '@components/Auth/Defaults/Spinner/Spinner.component';
 import { NoItemsText } from '@components/Default/Text/Text.component';
 import { SOFT_BLUE } from '@constants/colors';
 import { sizes } from '@constants/sizes';
-import { NavigationProps, NoteSchema, SocketNoteData } from '@app-types/types';
+import {
+  NavigationProps,
+  NoteSchema,
+  SocketNoteData,
+  AuthTokens,
+} from '@app-types/types';
 import {
   NAVIGATION_NAMES,
   FETCH_PACK_TYPES,
@@ -256,9 +261,8 @@ export default function Notes(): ReactElement {
               if (status !== SOCKET_ERROR_CODES.UNAUTHORIZED) return;
 
               try {
-                const { data: refreshData } = await refreshInstance.post(
-                  `/auth/token/refresh`,
-                );
+                const { data: refreshData } =
+                  await refreshInstance.post<AuthTokens>(`/auth/token/refresh`);
                 const { accessToken, refreshToken } = refreshData;
                 await SecureStore.setItemAsync('accessToken', accessToken);
                 await SecureStore.setItemAsync('refreshToken', refreshToken);
@@ -314,9 +318,8 @@ export default function Notes(): ReactElement {
             if (error.status !== SOCKET_ERROR_CODES.UNAUTHORIZED) return;
 
             try {
-              const { data: refreshData } = await refreshInstance.post(
-                `/auth/token/refresh`,
-              );
+              const { data: refreshData } =
+                await refreshInstance.post<AuthTokens>(`/auth/token/refresh`);
               const { accessToken, refreshToken } = refreshData;
               await SecureStore.setItemAsync('accessToken', accessToken);
               await SecureStore.setItemAsync('refreshToken', refreshToken);

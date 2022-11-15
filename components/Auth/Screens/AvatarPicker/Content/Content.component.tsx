@@ -9,7 +9,11 @@ import LogoPicker from '@components/Auth/Screens/AvatarPicker/LogoPicker/LogoPic
 import Spinner from '@components/Auth/Defaults/Spinner/Spinner.component';
 import FormButtons from '@components/Auth/Defaults/FormButtons/FormButtons.component';
 import { AuthAvatarPickerContainer } from '@components/Default/View/View.component';
-import { NavigationProps, AvatarPickerRouteProp } from '@app-types/types';
+import {
+  NavigationProps,
+  AvatarPickerRouteProp,
+  AuthTokens,
+} from '@app-types/types';
 import { NAVIGATION_NAMES } from '@app-types/enum';
 import { showingSubmitError } from '@utils/toastInteraction/showingSubmitError';
 import { showingSuccess } from '@utils/toastInteraction/showingSuccess';
@@ -61,7 +65,7 @@ export default function Content(): ReactElement {
         handleReturnToHome();
       });
       try {
-        const { data } = await instance.post(`/auth/token/refresh`);
+        const { data } = await instance.post<AuthTokens>(`/auth/token/refresh`);
         const { accessToken, refreshToken } = data;
         await SecureStore.setItemAsync('accessToken', accessToken); // setting new access token
         await SecureStore.setItemAsync('refreshToken', refreshToken); // setting new refresh token

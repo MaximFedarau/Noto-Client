@@ -104,3 +104,10 @@ export interface SocketNoteData {
   note: NoteSchema;
   isDeleteOrigin?: boolean; // flag for delete handler, which means that answers the question: Does note was deleted from current device?
 }
+
+// ! Tokens Interface
+
+export interface AuthTokens {
+  accessToken: string;
+  refreshToken: string;
+}
