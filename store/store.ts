@@ -1,10 +1,7 @@
-//RTK
-import { configureStore, createListenerMiddleware } from '@reduxjs/toolkit';
+import { configureStore } from '@reduxjs/toolkit';
 
-//Root Reducer
 import { rootReducer } from './rootReducer';
-
-export const listener = createListenerMiddleware();
+import { listener } from './middlewares/listener';
 
 export const store = configureStore({
   reducer: rootReducer,
@@ -14,5 +11,6 @@ export const store = configureStore({
     }).prepend(listener.middleware),
 });
 
-//Types
 export type RootState = ReturnType<typeof store.getState>;
+
+export type AppDispatch = typeof store.dispatch;

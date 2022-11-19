@@ -38,7 +38,6 @@ import { createAPIInstance } from '@utils/requests/instance';
 import { showingSubmitError } from '@utils/toastInteraction/showingSubmitError';
 import { createAPIRefreshInstance } from '@utils/requests/instance';
 import { stringSearch } from '@utils/stringInteraction/stringSearch';
-import { listener, RootState } from '@store/store';
 import {
   setIsAuth,
   setPublicData,
@@ -57,6 +56,7 @@ import {
 } from '@store/notes/notes.slice';
 import { socketSelector } from '@store/socket/socket.selector';
 import { initSocket, removeSocket } from '@store/socket/socket.slice';
+import { listener, AppStartListening } from '@store/middlewares/listener';
 
 import { styles } from './Notes.styles';
 
@@ -339,24 +339,21 @@ export default function Notes(): ReactElement {
   }, [isAuth, socket]);
 
   React.useEffect(() => {
-    const unsubscribe = listener.startListening({
+    const unsubscribe = (listener.startListening as AppStartListening)({
       matcher: isAnyOf(updateNote, addNote),
-
       effect: ({ payload }, listenerAPI) => {
-        const trimmedSearchText = searchText.trim();
-
-        const notes = (listenerAPI.getState() as RootState).notes.notes;
+        const { notes } = listenerAPI.getState().notes;
+        const { id, title, content } = payload as NoteSchema;
+        const pattern = searchText.trim();
+        const isExists = notes.findIndex((note) => note.id === id) !== -1;
 
         if (
-          trimmedSearchText.length &&
-          notes.findIndex((note) => note.id === payload.id) !== -1
-        ) {
-          if (
-            !stringSearch(payload.title || '', trimmedSearchText) &&
-            !stringSearch(payload.content || '', trimmedSearchText)
-          )
-            dispatch(removeNote(payload.id));
-        }
+          pattern &&
+          isExists &&
+          !stringSearch(title, pattern) &&
+          !stringSearch(content, pattern)
+        )
+          dispatch(removeNote(id));
       },
     });
 

@@ -19,7 +19,7 @@ import {
   LeftHeaderView,
 } from '@components/Default/View/View.component';
 import { NoItemsText } from '@components/Default/Text/Text.component';
-import { NavigationProps } from '@app-types/types';
+import { DraftSchema, NavigationProps } from '@app-types/types';
 import { draftsSelector, isEndSelector } from '@store/drafts/drafts.selector';
 import {
   assignDrafts,
@@ -30,10 +30,10 @@ import {
   addDraft,
   removeDraft,
 } from '@store/drafts/drafts.slice';
+import { listener, AppStartListening } from '@store/middlewares/listener';
 import { FETCH_PACK_TYPES, NAVIGATION_NAMES } from '@app-types/enum';
 import { CYBER_YELLOW } from '@constants/colors';
 import { sizes } from '@constants/sizes';
-import { listener, RootState } from '@store/store';
 import { stringSearch } from '@utils/stringInteraction/stringSearch';
 
 import { styles } from './Drafts.styles';
@@ -151,24 +151,21 @@ export default function Drafts(): ReactElement {
   }, [isEnd, searchText]);
 
   React.useEffect(() => {
-    const unsubscribe = listener.startListening({
+    const unsubscribe = (listener.startListening as AppStartListening)({
       matcher: isAnyOf(updateDraft, addDraft),
-
       effect: ({ payload }, listenerAPI) => {
-        const trimmedSearchText = searchText.trim();
-
-        const drafts = (listenerAPI.getState() as RootState).drafts.drafts;
+        const { drafts } = listenerAPI.getState().drafts;
+        const { id, title, content } = payload as DraftSchema;
+        const pattern = searchText.trim();
+        const isExists = drafts.findIndex((draft) => draft.id === id) !== -1;
 
         if (
-          trimmedSearchText.length &&
-          drafts.findIndex((draft) => draft.id === payload.id) !== -1
-        ) {
-          if (
-            !stringSearch(payload.title || '', trimmedSearchText) &&
-            !stringSearch(payload.content || '', trimmedSearchText)
-          )
-            dispatch(removeDraft(payload.id));
-        }
+          pattern &&
+          isExists &&
+          !stringSearch(title, pattern) &&
+          !stringSearch(content, pattern)
+        )
+          dispatch(removeDraft(id));
       },
     });
 
