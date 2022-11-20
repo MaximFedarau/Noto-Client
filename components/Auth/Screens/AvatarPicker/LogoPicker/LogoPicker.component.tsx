@@ -51,8 +51,8 @@ export default function LogoPicker({
       aspect: [16, 9],
       quality: 1, // best quality
     });
-    if (image.cancelled) return;
-    setImage(image.uri);
+    if (image.canceled) return;
+    setImage(image.assets[0].uri);
   };
   return (
     <View>
