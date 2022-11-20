@@ -33,9 +33,10 @@ import {
   FETCH_PACK_TYPES,
   SOCKET_NOTE_STATUSES,
   SOCKET_ERROR_CODES,
+  TOAST_TYPE,
 } from '@app-types/enum';
 import { createAPIInstance } from '@utils/requests/instance';
-import { showingSubmitError } from '@utils/toastInteraction/showingSubmitError';
+import { showToast } from '@utils/toasts/showToast';
 import { createAPIRefreshInstance } from '@utils/requests/instance';
 import { stringSearch } from '@utils/stringInteraction/stringSearch';
 import {
@@ -86,7 +87,7 @@ export default function Notes(): ReactElement {
   const [packNumber, setPackNumber] = React.useState<number>(1);
 
   const instance = createAPIInstance(() => {
-    showingSubmitError('Logout', 'Your session has expired', undefined);
+    showToast(TOAST_TYPE.ERROR, 'Logout', 'Your session has expired');
     dispatch(clearNotes());
     dispatch(setPublicData(publicDataInitialState));
     dispatch(setIsAuth(false));
@@ -94,7 +95,7 @@ export default function Notes(): ReactElement {
   });
 
   const refreshInstance = createAPIRefreshInstance(() => {
-    showingSubmitError('Logout', 'Your session has expired', undefined);
+    showToast(TOAST_TYPE.ERROR, 'Logout', 'Your session has expired');
     dispatch(setPublicData(publicDataInitialState));
     dispatch(setIsAuth(false));
     // after setting isAuth to false, other logout actions will be called by fetchNotesPack useEffect

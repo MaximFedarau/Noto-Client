@@ -14,9 +14,8 @@ import {
   AvatarPickerRouteProp,
   AuthTokens,
 } from '@app-types/types';
-import { NAVIGATION_NAMES } from '@app-types/enum';
-import { showingSubmitError } from '@utils/toastInteraction/showingSubmitError';
-import { showingSuccess } from '@utils/toastInteraction/showingSuccess';
+import { NAVIGATION_NAMES, TOAST_TYPE } from '@app-types/enum';
+import { showToast } from '@utils/toasts/showToast';
 import { createAPIRefreshInstance } from '@utils/requests/instance';
 
 export default function Content(): ReactElement {
@@ -48,20 +47,18 @@ export default function Content(): ReactElement {
       // if the status is >= 400 (client or server error), then the image was not uploaded
       if (status !== 401) {
         // if the status is not 401 (unauthorized), then we just show the error
-        showingSubmitError(
+        setIsLoading(false);
+        showToast(
+          TOAST_TYPE.ERROR,
           'Avatar Uploading Error',
           'Something went wrong:( Try again later',
-          undefined,
-          () => {
-            setIsLoading(false);
-          },
         );
         return;
       }
 
       // in other case, we need to refresh the access token
       const instance = createAPIRefreshInstance(() => {
-        showingSubmitError('Logout', 'Your session has expired', undefined);
+        showToast(TOAST_TYPE.ERROR, 'Logout', 'Your session has expired');
         handleReturnToHome();
       });
       try {
@@ -77,7 +74,8 @@ export default function Content(): ReactElement {
       }
     } else {
       // if everyting is successful, then we need to go home
-      showingSuccess(
+      showToast(
+        TOAST_TYPE.SUCCESS,
         'Congratulatons!',
         'Your avatar was uploaded successfully.',
       );

@@ -14,10 +14,13 @@ import {
 } from '@components/Default/View/View.component';
 import { AuthNavigationText } from '@components/Default/Text/Text.component';
 import { NavigationProps, SignUpFormData, AuthTokens } from '@app-types/types';
-import { NAVIGATION_NAMES, NAVIGATION_AUTH_NAMES } from '@app-types/enum';
+import {
+  NAVIGATION_NAMES,
+  NAVIGATION_AUTH_NAMES,
+  TOAST_TYPE,
+} from '@app-types/enum';
 import { signUpFormValidationSchema } from '@constants/validationSchemas';
-import { showingSubmitError } from '@utils/toastInteraction/showingSubmitError';
-import { showingSuccess } from '@utils/toastInteraction/showingSuccess';
+import { showToast } from '@utils/toasts/showToast';
 import { createAPIInstance } from '@utils/requests/instance';
 
 export default function Form(): ReactElement {
@@ -59,21 +62,23 @@ export default function Form(): ReactElement {
         });
       await SecureStore.setItemAsync('accessToken', data.accessToken); // saving access token to secure store
       await SecureStore.setItemAsync('refreshToken', data.refreshToken); // saving refresh token to secure store
-      showingSuccess('Congratulations!', 'You have successfully signed up.');
+      showToast(
+        TOAST_TYPE.SUCCESS,
+        'Congratulations!',
+        'You have successfully signed up.',
+      );
       navigation.replace(NAVIGATION_AUTH_NAMES.AVATAR_PICKER, {
         id,
       });
     } catch (error) {
       const { response } = error as AxiosError<{ message: string }>;
-      showingSubmitError(
+      setIsLoading(false);
+      showToast(
+        TOAST_TYPE.ERROR,
         'Sign Up Error',
         response && response?.data
           ? response.data.message
           : 'Something went wrong:(',
-        undefined,
-        () => {
-          setIsLoading(false);
-        },
       );
     }
   }

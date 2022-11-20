@@ -1,10 +1,11 @@
 import { PublicUserData } from '@app-types/types';
+import { TOAST_TYPE } from '@app-types/enum';
 import { createAPIInstance } from '@utils/requests/instance';
-import { showingSubmitError } from '@utils/toastInteraction/showingSubmitError';
+import { showToast } from '@utils/toasts/showToast';
 
 export const getPublicData = async () => {
   const instance = createAPIInstance(() => {
-    showingSubmitError('Logout', 'Your session has expired', undefined);
+    showToast(TOAST_TYPE.ERROR, 'Logout', 'Your session has expired');
   });
   let data: PublicUserData | undefined; // public data = result
   try {

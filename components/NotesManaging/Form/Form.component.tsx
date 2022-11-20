@@ -42,10 +42,10 @@ import {
   BUTTON_TYPES,
   SOCKET_NOTE_STATUSES,
   SOCKET_ERROR_CODES,
+  TOAST_TYPE,
 } from '@app-types/enum';
 import { createAPIInstance } from '@utils/requests/instance';
-import { showingSubmitError } from '@utils/toastInteraction/showingSubmitError';
-import { showingSuccess } from '@utils/toastInteraction/showingSuccess';
+import { showToast } from '@utils/toasts/showToast';
 import {
   publicDataInitialState,
   setIsAuth,
@@ -339,10 +339,10 @@ export default function Form(): ReactElement {
                 message = 'Note was created successfully';
                 if (route.params?.draftId) {
                   await onDraftDeleteHandler();
-                  showingSuccess(
+                  showToast(
+                    TOAST_TYPE.SUCCESS,
                     'Congratulations!',
                     'Note was successfully uploaded and draft was deleted.',
-                    40,
                   );
                   return;
                 }
@@ -359,7 +359,7 @@ export default function Form(): ReactElement {
                 break;
             }
 
-            showingSuccess('Congratulations!', message, 40);
+            showToast(TOAST_TYPE.SUCCESS, 'Congratulations!', message);
             formRef.current.setStatus(FORCE_NAVIGATION_STATUS);
             navigation.goBack();
           },
@@ -376,10 +376,10 @@ export default function Form(): ReactElement {
             if (status === SOCKET_ERROR_CODES.UNAUTHORIZED) return;
 
             setIsFormLoading(false);
-            showingSubmitError(
+            showToast(
+              TOAST_TYPE.ERROR,
               'Note Uploading Error',
               Array.isArray(message) ? message[0] : message,
-              40,
             );
           },
         );
@@ -433,13 +433,12 @@ export default function Form(): ReactElement {
 
   const errorHandling = (error: AxiosError, message: string) => {
     setIsError(true);
-    showingSubmitError(
+    showToast(
+      TOAST_TYPE.ERROR,
       message,
       (error.response?.data as { message?: string })?.message ||
         'Something went wrong:(',
-      40,
     );
-    console.error(error, message);
   };
 
   async function onDraftDeleteHandler() {

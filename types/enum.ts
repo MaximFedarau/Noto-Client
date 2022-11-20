@@ -43,3 +43,11 @@ export enum SOCKET_NOTE_STATUSES {
   UPDATED = 'UPDATED',
   DELETED = 'DELETED',
 }
+
+// Toasts
+
+export enum TOAST_TYPE {
+  SUCCESS = 'success',
+  ERROR = 'error',
+  INFO = 'info',
+}
