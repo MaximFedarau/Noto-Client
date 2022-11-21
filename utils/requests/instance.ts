@@ -60,7 +60,3 @@ export const createAPIInstance = (onExit?: () => void) => {
   );
   return instance;
 };
-
-createAPIInstance.defaultProps = {
-  API_URL: (process.env.API_URL = 'http://localhost:5000'),
-};

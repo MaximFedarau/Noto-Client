@@ -17,7 +17,12 @@ module.exports = function (api) {
             '@store': './store',
           },
         },
+      ],
+      [
         'transform-inline-environment-variables',
+        {
+          include: ['API_URL'],
+        },
       ],
     ],
   };

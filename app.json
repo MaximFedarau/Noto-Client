@@ -14,9 +14,7 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.maximfedarau.noto"
@@ -27,9 +25,7 @@
         "backgroundColor": "#F1EFE4"
       },
       "package": "com.maximfedarau.noto",
-      "permissions": [
-        "android.permission.RECORD_AUDIO"
-      ]
+      "permissions": ["android.permission.RECORD_AUDIO"]
     },
     "androidStatusBar": {
       "barStyle": "dark-content",

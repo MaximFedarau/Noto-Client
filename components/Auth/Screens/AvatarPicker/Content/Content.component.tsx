@@ -106,7 +106,3 @@ export default function Content(): ReactElement {
     </ContentScrollView>
   );
 }
-
-Content.defaultProps = {
-  API_URL: (process.env.API_URL = 'http://localhost:5000'),
-};

@@ -9,9 +9,6 @@
     },
     "preview": {
       "distribution": "internal",
-      "env": {
-        "API_URL": "http://localhost:5000"
-      },
       "android": {
         "buildType": "apk"
       },
@@ -19,11 +16,7 @@
         "simulator": true
       }
     },
-    "production": {
-      "env": {
-        "API_URL": "http://localhost:5000"
-      }
-    }
+    "production": {}
   },
   "submit": {
     "production": {}
