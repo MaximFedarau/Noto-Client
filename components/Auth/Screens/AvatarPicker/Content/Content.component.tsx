@@ -1,7 +1,7 @@
-import React, { ReactElement } from 'react';
+import React, { FC, useState } from 'react';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import * as FileSystem from 'expo-file-system';
-import * as SecureStore from 'expo-secure-store';
+import { uploadAsync, FileSystemUploadType } from 'expo-file-system';
+import { getItemAsync, setItemAsync } from 'expo-secure-store';
 import { AxiosError } from 'axios';
 
 import ContentScrollView from '@components/Auth/Defaults/ContentScrollView/ContentScrollView.component';
@@ -18,80 +18,77 @@ import { NAVIGATION_NAMES, TOAST_TYPE } from '@app-types/enum';
 import { showToast } from '@utils/toasts/showToast';
 import { createAPIRefreshInstance } from '@utils/requests/instance';
 
-export default function Content(): ReactElement {
+const Content: FC = () => {
   const navigation = useNavigation<NavigationProps>();
   const route = useRoute<AvatarPickerRouteProp>();
 
-  const [image, setImage] = React.useState<string>();
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [image, setImage] = useState<string>();
+  const [isLoading, setIsLoading] = useState(false);
 
-  // image uploading
+  const instance = createAPIRefreshInstance(() => {
+    showToast(TOAST_TYPE.ERROR, 'Logout', 'Your session has expired');
+    handleReturnToHome();
+  });
+
   const onSubmitHandler = async () => {
-    if (!route.params || !image) return; // if there is no id or image, then function hadnling is cancelled
+    if (!route.params || !image) return;
     setIsLoading(true);
-    // image uploading
-    const accessToken = await SecureStore.getItemAsync('accessToken'); // getting access token with goal to access API
-    const { status } = await FileSystem.uploadAsync(
-      `${process.env.API_URL}/auth/image/upload/${route.params.id}`,
-      image,
-      {
-        httpMethod: 'POST',
-        uploadType: FileSystem.FileSystemUploadType.MULTIPART, // multipart upload type
-        fieldName: 'file', // field name for image (like on backend)
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
+
+    const accessToken = await getItemAsync('accessToken');
+    try {
+      const { status } = await uploadAsync(
+        `${process.env.API_URL}/auth/image/upload/${route.params.id}`,
+        image,
+        {
+          httpMethod: 'POST',
+          uploadType: FileSystemUploadType.MULTIPART, // multipart upload type
+          fieldName: 'file', // field name for image (like on backend)
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
         },
-      },
-    );
-    if (status >= 400) {
-      // if the status is >= 400 (client or server error), then the image was not uploaded
-      if (status !== 401) {
-        // if the status is not 401 (unauthorized), then we just show the error
-        setIsLoading(false);
+      );
+
+      if (status < 400) {
         showToast(
-          TOAST_TYPE.ERROR,
-          'Avatar Uploading Error',
-          'Something went wrong:( Try again later',
+          TOAST_TYPE.SUCCESS,
+          'Congratulatons!',
+          'Your avatar was uploaded successfully.',
         );
+        handleReturnToHome();
         return;
       }
 
-      // in other case, we need to refresh the access token
-      const instance = createAPIRefreshInstance(() => {
-        showToast(TOAST_TYPE.ERROR, 'Logout', 'Your session has expired');
-        handleReturnToHome();
-      });
+      if (status !== 401) throw new Error();
+
       try {
-        const { data } = await instance.post<AuthTokens>(`/auth/token/refresh`);
+        const { data } = await instance.post<AuthTokens>('/auth/token/refresh');
         const { accessToken, refreshToken } = data;
-        await SecureStore.setItemAsync('accessToken', accessToken); // setting new access token
-        await SecureStore.setItemAsync('refreshToken', refreshToken); // setting new refresh token
+        await setItemAsync('accessToken', accessToken);
+        await setItemAsync('refreshToken', refreshToken);
         await onSubmitHandler(); // uploading image again
       } catch (error) {
-        const axiosError = error as AxiosError;
-        if (axiosError.response && axiosError.response.status === 401) return;
-        console.error(error, 'image uploading error');
+        const { response } = error as AxiosError;
+        if (response && response.status === 401) return;
+        throw new Error();
       }
-    } else {
-      // if everyting is successful, then we need to go home
+    } catch (error) {
+      setIsLoading(false);
       showToast(
-        TOAST_TYPE.SUCCESS,
-        'Congratulatons!',
-        'Your avatar was uploaded successfully.',
+        TOAST_TYPE.ERROR,
+        'Avatar Uploading Error',
+        'Something went wrong:( Try again later',
       );
-      handleReturnToHome();
     }
   };
 
-  //returning home handler
-  const handleReturnToHome = () => {
+  const handleReturnToHome = () =>
     navigation.navigate(NAVIGATION_NAMES.NOTES_OVERVIEW);
-  };
 
   return (
     <ContentScrollView>
       <AuthAvatarPickerContainer>
-        <LogoPicker image={image} setImage={setImage} />
+        <LogoPicker image={image} setImage={setImage} disabled={isLoading} />
         {isLoading ? (
           <Spinner />
         ) : (
@@ -105,4 +102,6 @@ export default function Content(): ReactElement {
       </AuthAvatarPickerContainer>
     </ContentScrollView>
   );
-}
+};
+
+export default Content;
