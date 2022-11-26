@@ -3,12 +3,12 @@ import { useWindowDimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import * as showdown from 'showdown';
 
-import { NoteContainer } from './Note.styles';
 import { NoteTitle } from '@components/Default/Text/Text.component';
 import CustomRenderHTML from '@components/Default/CustomRenderHTML/CustomRenderHTML.component';
 import { NavigationProps, NoteSchema } from '@app-types/types';
 import { NAVIGATION_NAMES } from '@app-types/enum';
 import { contentFormat } from '@utils/stringInteraction/contentFormat';
+import { NoteContainer } from './Note.styles';
 
 //Interface for Props
 interface NoteProps {

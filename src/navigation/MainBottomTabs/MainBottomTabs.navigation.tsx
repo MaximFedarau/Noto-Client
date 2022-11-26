@@ -1,5 +1,4 @@
 import React, { ReactElement, useEffect } from 'react';
-import { NavigationProps } from '@app-types/types';
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
@@ -19,6 +18,7 @@ import {
   SOFT_BLUE,
 } from '@constants/colors';
 import { sizes } from '@constants/sizes';
+import { NavigationProps } from '@app-types/types';
 import { NAVIGATION_NAMES, NAVIGATION_NOTES_NAMES } from '@app-types/enum';
 import { getPublicData } from '@utils/requests/get/publicData';
 import {

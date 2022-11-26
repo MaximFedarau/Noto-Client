@@ -6,12 +6,10 @@ import {
   launchImageLibraryAsync,
 } from 'expo-image-picker';
 import Svg, { Path } from 'react-native-svg';
-import { TOAST_TYPE } from '@app-types/enum';
 
-import { PickedImage } from './LogoPicker.styles';
 import { showToast } from '@utils/toasts/showToast';
-
-import { styles } from './LogoPicker.styles';
+import { TOAST_TYPE } from '@app-types/enum';
+import { styles, PickedImage } from './LogoPicker.styles';
 
 interface Props {
   image: undefined | string;

@@ -1,8 +1,8 @@
 import { ReactElement } from 'react';
 import { PressableProps, StyleProp, TextStyle } from 'react-native';
 
-import { ButtonContainer, ButtonText } from './Button.styles';
 import { BUTTON_TYPES } from '@app-types/enum';
+import { ButtonContainer, ButtonText } from './Button.styles';
 
 //Interface for Props
 interface ButtonProps extends PressableProps {
