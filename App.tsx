@@ -1,80 +1,66 @@
-import React, { ReactElement, useEffect } from 'react';
+import React, { FC, useEffect, useCallback } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { Provider } from 'react-redux';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
-import { Provider } from 'react-redux';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { preventAutoHideAsync, hideAsync } from 'expo-splash-screen';
 import Toast from 'react-native-toast-message';
 
-import MainBottomTabs from '@navigation/MainBottomTabs/MainBottomTabs.navigation';
-import AuthStack from '@navigation/AuthStack/AuthStack.navigation';
-import NotesManaging from '@screens/NotesManaging/NotesManaging.screen';
+import Navigator from './src';
 import Error from '@screens/Error/Error.screen';
 import { initDbDrafts } from '@utils/db/drafts/init';
 import { store } from '@store/store';
-import { NAVIGATION_NAMES } from '@app-types/enum';
-import { OSLO_GRAY, SPRING_WOOD } from '@constants/colors';
 
-const Stack = createNativeStackNavigator();
+/* App initialization order
+1) preventAutoHideAsync()
+2) useFonts()
+3) useEffect() with database initialization
+4) useEffect() with fonts
+5) hideAsync()
+*/
 
-export default function App(): ReactElement | null {
-  const [isSetupError, setIsSetupError] = React.useState<boolean>(false);
+preventAutoHideAsync();
 
-  const initDrafts = async () => {
+const App: FC = () => {
+  const [isSetupError, setIsSetupError] = React.useState(false);
+  const [fontsLoaded] = useFonts({
+    'Roboto-Regular': require('./assets/fonts/Roboto/Roboto-Regular.ttf'),
+  });
+
+  const initDrafts = useCallback(async () => {
     try {
       await initDbDrafts();
     } catch (error) {
       setIsSetupError(true);
       console.error(error, 'App setup');
     }
-  };
+  }, []);
+
+  const fontsLoadingHandler = useCallback(async () => {
+    if (fontsLoaded) await hideAsync();
+  }, [fontsLoaded]);
 
   useEffect(() => {
     initDrafts();
   }, []);
 
-  const [fontsLoaded] = useFonts({
-    'Roboto-Regular': require('./assets/fonts/Roboto/Roboto-Regular.ttf'),
-  });
+  useEffect(() => {
+    fontsLoadingHandler();
+  }, [fontsLoaded]);
 
-  if (!fontsLoaded) return null;
-
-  if (isSetupError) return <Error />;
+  if (!fontsLoaded || isSetupError) return <Error />;
 
   return (
     <>
       <StatusBar style="dark" animated />
       <Provider store={store}>
         <NavigationContainer>
-          <Stack.Navigator
-            screenOptions={{
-              headerShown: false,
-            }}
-          >
-            <Stack.Screen
-              name={NAVIGATION_NAMES.NOTES_OVERVIEW}
-              component={MainBottomTabs}
-            />
-            <Stack.Screen
-              name={NAVIGATION_NAMES.NOTES_MANAGING}
-              component={NotesManaging}
-              options={{
-                headerShown: true,
-                headerShadowVisible: false,
-                headerTitleAlign: 'center',
-                headerTintColor: OSLO_GRAY,
-                headerTitleStyle: {
-                  fontFamily: 'Roboto-Regular',
-                },
-                headerStyle: { backgroundColor: SPRING_WOOD },
-                contentStyle: { backgroundColor: SPRING_WOOD },
-              }}
-            />
-            <Stack.Screen name={NAVIGATION_NAMES.AUTH} component={AuthStack} />
-          </Stack.Navigator>
+          <Navigator />
         </NavigationContainer>
       </Provider>
       <Toast />
     </>
   );
-}
+};
+
+export default App;
