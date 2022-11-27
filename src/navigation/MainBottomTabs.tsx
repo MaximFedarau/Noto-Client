@@ -20,24 +20,20 @@ import {
 import { sizes } from '@constants/sizes';
 import { NavigationProps, NavigationName, NavigationNotesName } from '@types';
 import { getPublicData } from '@utils';
+import { setProfile, setIsAuth, clearUser } from '@store/user/user.slice';
 import {
-  publicDataInitialState,
-  setPublicData,
-  setIsAuth,
-} from '@store/publicData/publicData.slice';
-import {
-  publicDataAuthSelector,
-  publicDataAvatarSelector,
-  publicDataNicknameSelector,
-} from '@store/publicData/publicData.selector';
+  userIsAuthSelector,
+  userAvatarSelector,
+  userNicknameSelector,
+} from '@store/user/user.selector';
 
 const BottomTab = createBottomTabNavigator();
 
 const MainBottomTabs: FC = () => {
   const dispatch = useDispatch();
-  const nickname = useSelector(publicDataNicknameSelector);
-  const avatar = useSelector(publicDataAvatarSelector);
-  const isAuth = useSelector(publicDataAuthSelector);
+  const nickname = useSelector(userNicknameSelector);
+  const avatar = useSelector(userAvatarSelector);
+  const isAuth = useSelector(userIsAuthSelector);
 
   const navigation = useNavigation<NavigationProps>();
   const focus = useIsFocused();
@@ -52,7 +48,7 @@ const MainBottomTabs: FC = () => {
     await SecureStore.deleteItemAsync('accessToken');
     await SecureStore.deleteItemAsync('refreshToken');
     dispatch(setIsAuth(false));
-    dispatch(setPublicData(publicDataInitialState));
+    dispatch(clearUser());
   };
 
   const checkIsAuth = async () => {
@@ -61,10 +57,10 @@ const MainBottomTabs: FC = () => {
     if (accessToken && refreshToken) {
       const data = await getPublicData();
       dispatch(setIsAuth(data ? true : false));
-      dispatch(setPublicData(data || publicDataInitialState));
+      dispatch(data ? setProfile(data) : clearUser());
     } else {
       dispatch(setIsAuth(false));
-      dispatch(setPublicData(publicDataInitialState));
+      dispatch(clearUser());
     }
   };
 

@@ -40,12 +40,8 @@ import {
   stringSearch,
 } from '@utils';
 
-import {
-  setIsAuth,
-  setPublicData,
-  publicDataInitialState,
-} from '@store/publicData/publicData.slice';
-import { publicDataAuthSelector } from '@store/publicData/publicData.selector';
+import { setIsAuth, clearUser } from '@store/user/user.slice';
+import { userIsAuthSelector } from '@store/user/user.selector';
 import { notesSelector, isEndSelector } from '@store/notes/notes.selector';
 import {
   clearNotes,
@@ -74,7 +70,7 @@ export default function Notes(): ReactElement {
 
   const dispatch = useDispatch();
   const socket = useSelector(socketSelector);
-  const isAuth = useSelector(publicDataAuthSelector);
+  const isAuth = useSelector(userIsAuthSelector);
   const notes = useSelector(notesSelector);
   const isEnd = useSelector(isEndSelector);
 
@@ -90,14 +86,14 @@ export default function Notes(): ReactElement {
   const instance = createAPIInstance(() => {
     showToast(ToastType.ERROR, 'Logout', 'Your session has expired');
     dispatch(clearNotes());
-    dispatch(setPublicData(publicDataInitialState));
+    dispatch(clearUser());
     dispatch(setIsAuth(false));
     setIsLoading(false);
   });
 
   const refreshInstance = createAPIRefreshInstance(() => {
     showToast(ToastType.ERROR, 'Logout', 'Your session has expired');
-    dispatch(setPublicData(publicDataInitialState));
+    dispatch(clearUser());
     dispatch(setIsAuth(false));
     // after setting isAuth to false, other logout actions will be called by fetchNotesPack useEffect
   });

@@ -15,6 +15,8 @@ export interface User {
   avatar?: string;
 }
 
+export type Profile = Omit<User, 'isAuth'>;
+
 export interface AuthTokens {
   accessToken: string;
   refreshToken: string;

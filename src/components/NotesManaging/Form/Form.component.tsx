@@ -46,12 +46,8 @@ import {
   SocketNoteStatus,
   SocketErrorCode,
 } from '@types';
-import {
-  publicDataInitialState,
-  setIsAuth,
-} from '@store/publicData/publicData.slice';
-import { publicDataAuthSelector } from '@store/publicData/publicData.selector';
-import { setPublicData } from '@store/publicData/publicData.slice';
+import { clearUser, setIsAuth } from '@store/user/user.slice';
+import { userIsAuthSelector } from '@store/user/user.selector';
 import {
   updateDraft,
   addDraft as appendDraft,
@@ -66,7 +62,7 @@ const FORCE_NAVIGATION_STATUS = 'force'; // status for force navigation = withou
 export default function Form(): ReactElement {
   const dispatch = useDispatch();
 
-  const isAuth = useSelector(publicDataAuthSelector);
+  const isAuth = useSelector(userIsAuthSelector);
   const socket = useSelector(socketSelector);
 
   const navigation = useNavigation<NavigationProps>();
@@ -87,7 +83,7 @@ export default function Form(): ReactElement {
   >() as React.MutableRefObject<FormikProps<RecordsManagingData>>;
 
   const defaultInstance = createAPIInstance(() => {
-    dispatch(setPublicData(publicDataInitialState));
+    dispatch(clearUser());
     dispatch(setIsAuth(false));
     if (formRef.current) formRef.current.setStatus(FORCE_NAVIGATION_STATUS); // we check formRef.current because it can be undefined, e.g when token is expired and users tries to do something
     navigation.goBack();
