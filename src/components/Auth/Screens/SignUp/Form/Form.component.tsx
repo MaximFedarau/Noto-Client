@@ -22,8 +22,7 @@ import {
   AuthTokens,
 } from '@types';
 import { signUpFormValidationSchema } from '@constants/validationSchemas';
-import { showToast } from '@utils/toasts/showToast';
-import { createAPIInstance } from '@utils/requests/instance';
+import { showToast, createAPIInstance } from '@utils';
 
 export default function Form(): ReactElement {
   const navigation = useNavigation<NavigationProps>();

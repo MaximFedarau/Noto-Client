@@ -6,7 +6,7 @@ import * as showdown from 'showdown';
 import { NoteTitle } from '@components/Default/Text/Text.component';
 import CustomRenderHTML from '@components/Default/CustomRenderHTML/CustomRenderHTML.component';
 import { NavigationProps, NavigationName, Record } from '@types';
-import { contentFormat } from '@utils/stringInteraction/contentFormat';
+import { contentFormat } from '@utils';
 import { NoteContainer } from './Note.styles';
 
 //Interface for Props

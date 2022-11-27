@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { Socket } from 'socket.io-client';
 
-import { createSocket } from '@utils/requests/io';
+import { createSocket } from '@utils';
 
 export const socketSlice = createSlice({
   name: 'socketSlice',

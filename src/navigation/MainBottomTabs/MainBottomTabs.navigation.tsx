@@ -19,7 +19,7 @@ import {
 } from '@constants/colors';
 import { sizes } from '@constants/sizes';
 import { NavigationProps, NavigationName, NavigationNotesName } from '@types';
-import { getPublicData } from '@utils/requests/get/publicData';
+import { getPublicData } from '@utils';
 import {
   publicDataInitialState,
   setPublicData,

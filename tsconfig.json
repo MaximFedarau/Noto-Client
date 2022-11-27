@@ -11,8 +11,13 @@
       "@screens/*": ["src/screens/*"],
       "@assets/*": ["./assets/*"],
       "@navigation/*": ["src/navigation/*"],
+
       "@types": ["src/types"],
+      "@types/*": ["src/types/*"],
+
       "@utils/*": ["src/utils/*"],
+      "@utils": ["src/utils"],
+
       "@store/*": ["src/store/*"]
     }
   }

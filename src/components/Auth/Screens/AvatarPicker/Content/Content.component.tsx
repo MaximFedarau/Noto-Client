@@ -16,8 +16,7 @@ import {
   ToastType,
   AuthTokens,
 } from '@types';
-import { showToast } from '@utils/toasts/showToast';
-import { createAPIRefreshInstance } from '@utils/requests/instance';
+import { showToast, createAPIRefreshInstance } from '@utils';
 
 const Content: FC = () => {
   const navigation = useNavigation<NavigationProps>();

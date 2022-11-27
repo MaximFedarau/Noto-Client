@@ -27,10 +27,14 @@ import {
 import Spinner from '@components/Auth/Defaults/Spinner/Spinner.component';
 import { notesManagingFormValidationSchema } from '@constants/validationSchemas';
 import { sizes } from '@constants/sizes';
-import { addDraft } from '@utils/db/drafts/add';
-import { fetchDraftById } from '@utils/db/drafts/fetch';
-import { updateDraftById } from '@utils/db/drafts/update';
-import { deleteDraftById } from '@utils/db/drafts/delete';
+import {
+  addDraft,
+  fetchDraftById,
+  updateDraftById,
+  deleteDraftById,
+  createAPIInstance,
+  showToast,
+} from '@utils';
 import {
   NotesManagingRouteProp,
   NavigationProps,
@@ -42,8 +46,6 @@ import {
   SocketNoteStatus,
   SocketErrorCode,
 } from '@types';
-import { createAPIInstance } from '@utils/requests/instance';
-import { showToast } from '@utils/toasts/showToast';
 import {
   publicDataInitialState,
   setIsAuth,

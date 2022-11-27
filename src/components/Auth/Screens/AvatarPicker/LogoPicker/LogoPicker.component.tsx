@@ -7,7 +7,7 @@ import {
 } from 'expo-image-picker';
 import Svg, { Path } from 'react-native-svg';
 
-import { showToast } from '@utils/toasts/showToast';
+import { showToast } from '@utils';
 import { ToastType } from '@types';
 import { styles, PickedImage } from './LogoPicker.styles';
 

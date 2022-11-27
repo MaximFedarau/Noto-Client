@@ -33,10 +33,13 @@ import {
   SocketErrorCode,
   AuthTokens,
 } from '@types';
-import { createAPIInstance } from '@utils/requests/instance';
-import { showToast } from '@utils/toasts/showToast';
-import { createAPIRefreshInstance } from '@utils/requests/instance';
-import { stringSearch } from '@utils/stringInteraction/stringSearch';
+import {
+  createAPIInstance,
+  showToast,
+  createAPIRefreshInstance,
+  stringSearch,
+} from '@utils';
+
 import {
   setIsAuth,
   setPublicData,

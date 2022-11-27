@@ -8,7 +8,7 @@ import Toast from 'react-native-toast-message';
 
 import Navigator from './src';
 import Error from '@screens/Error/Error.screen';
-import { initDbDrafts } from '@utils/db/drafts/init';
+import { initDbDrafts } from '@utils';
 import { store } from '@store/store';
 
 /* App initialization order

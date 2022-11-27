@@ -7,7 +7,7 @@ import { DraftContainer } from './Draft.styles';
 import { DraftTitle } from '@components/Default/Text/Text.component';
 import CustomRenderHTML from '@components/Default/CustomRenderHTML/CustomRenderHTML.component';
 import { NavigationProps, NavigationName, Record } from '@types';
-import { contentFormat } from '@utils/stringInteraction/contentFormat';
+import { contentFormat } from '@utils';
 
 //Interface for Props
 interface DraftProps {

@@ -12,7 +12,7 @@ import IconButton from '@components/Default/IconButton/IconButton.component';
 import SearchBar from '@components/Default/SearchBar/SearchBar.component';
 import DraftsList from '@components/Drafts/DraftsList/DraftsList.component';
 import Spinner from '@components/Auth/Defaults/Spinner/Spinner.component';
-import { fetchDraftPack } from '@utils/db/drafts/fetch';
+import { fetchDraftPack } from '@utils';
 import {
   DraftsView,
   DraftsContentView,
@@ -33,7 +33,7 @@ import {
 import { listener, AppStartListening } from '@store/middlewares/listener';
 import { CYBER_YELLOW } from '@constants/colors';
 import { sizes } from '@constants/sizes';
-import { stringSearch } from '@utils/stringInteraction/stringSearch';
+import { stringSearch } from '@utils';
 
 import { styles } from './Drafts.styles';
 

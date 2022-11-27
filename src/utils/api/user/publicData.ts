@@ -1,6 +1,6 @@
 import { ToastType, User } from '@types';
-import { createAPIInstance } from '@utils/requests/instance';
-import { showToast } from '@utils/toasts/showToast';
+import { createAPIInstance } from '@utils/api/instance';
+import { showToast } from '@utils/showToast';
 
 export const getPublicData = async () => {
   const instance = createAPIInstance(() => {
