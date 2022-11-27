@@ -1,12 +1,12 @@
 import Toast from 'react-native-toast-message';
 
-import { TOAST_TYPE } from '@app-types/enum';
+import { ToastType } from '@types';
 
-export const showToast = (type: TOAST_TYPE, title: string, text: string) => {
+export const showToast = (type: ToastType, title: string, text: string) => {
   Toast.show({
     type: type,
     text1: title,
     text2: text,
   });
-  if (type === TOAST_TYPE.ERROR) console.error(`${title}\n`, text);
+  if (type === ToastType.ERROR) console.error(`${title}\n`, text);
 };

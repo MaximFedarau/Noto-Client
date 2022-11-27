@@ -3,14 +3,14 @@ import { FlatList, FlatListProps } from 'react-native';
 
 import Note from '@components/Notes/Note/Note.component';
 import GoUpButton from '@components/Auth/Defaults/GoUpButton/GoUpButton.component';
-import { NoteSchema } from '@app-types/types';
+import { Record } from '@types';
 import { SOFT_BLUE } from '@constants/colors';
 import { sizes } from '@constants/sizes';
 
 //Interface for Props (removing standard keys: children, data and renderItem)
 interface NotesListProps
-  extends Omit<FlatListProps<NoteSchema>, 'children' | 'data' | 'renderItem'> {
-  children: NoteSchema[];
+  extends Omit<FlatListProps<Record>, 'children' | 'data' | 'renderItem'> {
+  children: Record[];
 }
 
 export default function NotesList({
@@ -22,7 +22,7 @@ export default function NotesList({
   const [layoutHeight, setLayoutHeight] = React.useState<number>(0);
   const [offset, setOffset] = React.useState<number>(0);
 
-  const ref = React.useRef<FlatList<NoteSchema>>(null);
+  const ref = React.useRef<FlatList<Record>>(null);
 
   // after all content renders
   React.useLayoutEffect(() => {

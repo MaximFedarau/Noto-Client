@@ -5,7 +5,7 @@ import MainBottomTabs from '@navigation/MainBottomTabs/MainBottomTabs.navigation
 import AuthStack from '@navigation/AuthStack/AuthStack.navigation';
 import NotesManaging from '@screens/NotesManaging/NotesManaging.screen';
 import { OSLO_GRAY, SPRING_WOOD } from '@constants/colors';
-import { NAVIGATION_NAMES } from '@app-types/enum';
+import { NavigationName } from '@types';
 
 const Stack = createNativeStackNavigator();
 
@@ -16,11 +16,11 @@ const Navigator: FC = () => (
     }}
   >
     <Stack.Screen
-      name={NAVIGATION_NAMES.NOTES_OVERVIEW}
+      name={NavigationName.NOTES_OVERVIEW}
       component={MainBottomTabs}
     />
     <Stack.Screen
-      name={NAVIGATION_NAMES.NOTES_MANAGING}
+      name={NavigationName.NOTES_MANAGING}
       component={NotesManaging}
       options={{
         headerShown: true,
@@ -34,7 +34,7 @@ const Navigator: FC = () => (
         contentStyle: { backgroundColor: SPRING_WOOD },
       }}
     />
-    <Stack.Screen name={NAVIGATION_NAMES.AUTH} component={AuthStack} />
+    <Stack.Screen name={NavigationName.AUTH} component={AuthStack} />
   </Stack.Navigator>
 );
 

@@ -24,17 +24,15 @@ import { SOFT_BLUE } from '@constants/colors';
 import { sizes } from '@constants/sizes';
 import {
   NavigationProps,
-  NoteSchema,
-  SocketNoteData,
+  NavigationName,
+  ToastType,
+  Record,
+  FetchPackType,
+  SocketNote,
+  SocketNoteStatus,
+  SocketErrorCode,
   AuthTokens,
-} from '@app-types/types';
-import {
-  NAVIGATION_NAMES,
-  FETCH_PACK_TYPES,
-  SOCKET_NOTE_STATUSES,
-  SOCKET_ERROR_CODES,
-  TOAST_TYPE,
-} from '@app-types/enum';
+} from '@types';
 import { createAPIInstance } from '@utils/requests/instance';
 import { showToast } from '@utils/toasts/showToast';
 import { createAPIRefreshInstance } from '@utils/requests/instance';
@@ -87,7 +85,7 @@ export default function Notes(): ReactElement {
   const [packNumber, setPackNumber] = React.useState<number>(1);
 
   const instance = createAPIInstance(() => {
-    showToast(TOAST_TYPE.ERROR, 'Logout', 'Your session has expired');
+    showToast(ToastType.ERROR, 'Logout', 'Your session has expired');
     dispatch(clearNotes());
     dispatch(setPublicData(publicDataInitialState));
     dispatch(setIsAuth(false));
@@ -95,7 +93,7 @@ export default function Notes(): ReactElement {
   });
 
   const refreshInstance = createAPIRefreshInstance(() => {
-    showToast(TOAST_TYPE.ERROR, 'Logout', 'Your session has expired');
+    showToast(ToastType.ERROR, 'Logout', 'Your session has expired');
     dispatch(setPublicData(publicDataInitialState));
     dispatch(setIsAuth(false));
     // after setting isAuth to false, other logout actions will be called by fetchNotesPack useEffect
@@ -173,11 +171,9 @@ export default function Notes(): ReactElement {
     };
   }, [notes.length, openSearchBar, isAuth]);
 
-  async function fetchNotesPack(
-    type: FETCH_PACK_TYPES = FETCH_PACK_TYPES.INITIAL,
-  ) {
+  async function fetchNotesPack(type: FetchPackType = FetchPackType.INITIAL) {
     if (isEnd || isPackLoading) return;
-    const isInitial = type === FETCH_PACK_TYPES.INITIAL;
+    const isInitial = type === FetchPackType.INITIAL;
 
     isInitial ? setIsLoading(true) : setIsPackLoading(true);
 
@@ -238,11 +234,11 @@ export default function Notes(): ReactElement {
           async (
             event,
             args: {
-              status: SOCKET_ERROR_CODES;
+              status: SocketErrorCode;
               message: string | string[];
               data?: {
-                status?: SOCKET_NOTE_STATUSES;
-                note: Omit<NoteSchema, 'date' | 'id'> | { noteId: string };
+                status?: SocketNoteStatus;
+                note: Omit<Record, 'date' | 'id'> | { noteId: string };
               };
             },
           ) => {
@@ -259,7 +255,7 @@ export default function Notes(): ReactElement {
 
             if (event === 'localError') {
               const { status, data } = args;
-              if (status !== SOCKET_ERROR_CODES.UNAUTHORIZED) return;
+              if (status !== SocketErrorCode.UNAUTHORIZED) return;
 
               try {
                 const { data: refreshData } =
@@ -270,15 +266,15 @@ export default function Notes(): ReactElement {
 
                 let emittedMessage = '';
                 switch (data?.status) {
-                  case SOCKET_NOTE_STATUSES.CREATED:
+                  case SocketNoteStatus.CREATED:
                     emittedMessage = 'createNote';
                     break;
 
-                  case SOCKET_NOTE_STATUSES.UPDATED:
+                  case SocketNoteStatus.UPDATED:
                     emittedMessage = 'updateNote';
                     break;
 
-                  case SOCKET_NOTE_STATUSES.DELETED:
+                  case SocketNoteStatus.DELETED:
                     emittedMessage = 'deleteNote';
                     break;
                 }
@@ -299,15 +295,15 @@ export default function Notes(): ReactElement {
           },
         );
 
-        socket.on('global', ({ status, note }: SocketNoteData) => {
+        socket.on('global', ({ status, note }: SocketNote) => {
           switch (status) {
-            case SOCKET_NOTE_STATUSES.CREATED:
+            case SocketNoteStatus.CREATED:
               dispatch(addNote(note));
               break;
-            case SOCKET_NOTE_STATUSES.UPDATED:
+            case SocketNoteStatus.UPDATED:
               dispatch(updateNote(note));
               break;
-            case SOCKET_NOTE_STATUSES.DELETED:
+            case SocketNoteStatus.DELETED:
               dispatch(removeNote(note.id));
               break;
           }
@@ -316,7 +312,7 @@ export default function Notes(): ReactElement {
         socket.on(
           'globalError',
           async (error: { status: number; message: string | string[] }) => {
-            if (error.status !== SOCKET_ERROR_CODES.UNAUTHORIZED) return;
+            if (error.status !== SocketErrorCode.UNAUTHORIZED) return;
 
             try {
               const { data: refreshData } =
@@ -344,7 +340,7 @@ export default function Notes(): ReactElement {
       matcher: isAnyOf(updateNote, addNote),
       effect: ({ payload }, listenerAPI) => {
         const { notes } = listenerAPI.getState().notes;
-        const { id, title, content } = payload as NoteSchema;
+        const { id, title, content } = payload as Record;
         const pattern = searchText.trim();
         const isExists = notes.findIndex((note) => note.id === id) !== -1;
 
@@ -369,7 +365,7 @@ export default function Notes(): ReactElement {
       <NotesContentView>
         {notes.length ? (
           <NotesList
-            onEndReached={() => fetchNotesPack(FETCH_PACK_TYPES.LOAD_MORE)}
+            onEndReached={() => fetchNotesPack(FetchPackType.LOAD_MORE)}
             onEndReachedThreshold={0.3}
             ListFooterComponent={isPackLoading ? <Spinner /> : null}
           >
@@ -386,7 +382,7 @@ export default function Notes(): ReactElement {
               name: 'add',
               color: 'white',
             }}
-            onPress={() => navigation.navigate(NAVIGATION_NAMES.NOTES_MANAGING)}
+            onPress={() => navigation.navigate(NavigationName.NOTES_MANAGING)}
           />
         )}
       </NotesContentView>

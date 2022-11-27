@@ -32,18 +32,16 @@ import { fetchDraftById } from '@utils/db/drafts/fetch';
 import { updateDraftById } from '@utils/db/drafts/update';
 import { deleteDraftById } from '@utils/db/drafts/delete';
 import {
-  NotesManagingFormData,
-  NavigationProps,
   NotesManagingRouteProp,
-  NoteSchema,
-  SocketNoteData,
-} from '@app-types/types';
-import {
-  BUTTON_TYPES,
-  SOCKET_NOTE_STATUSES,
-  SOCKET_ERROR_CODES,
-  TOAST_TYPE,
-} from '@app-types/enum';
+  NavigationProps,
+  ButtonType,
+  ToastType,
+  RecordsManagingData,
+  Record,
+  SocketNote,
+  SocketNoteStatus,
+  SocketErrorCode,
+} from '@types';
 import { createAPIInstance } from '@utils/requests/instance';
 import { showToast } from '@utils/toasts/showToast';
 import {
@@ -76,15 +74,15 @@ export default function Form(): ReactElement {
   const [isFormLoading, setIsFormLoading] = React.useState(false);
   const [isError, setIsError] = React.useState<boolean>(false);
   const [formInitialValues, setFormInitialValues] =
-    React.useState<NotesManagingFormData>({
+    React.useState<RecordsManagingData>({
       title: '',
       content: '',
     });
 
   const appState = React.useRef(AppState.currentState);
   const formRef = React.useRef<
-    FormikProps<NotesManagingFormData> | undefined
-  >() as React.MutableRefObject<FormikProps<NotesManagingFormData>>;
+    FormikProps<RecordsManagingData> | undefined
+  >() as React.MutableRefObject<FormikProps<RecordsManagingData>>;
 
   const defaultInstance = createAPIInstance(() => {
     dispatch(setPublicData(publicDataInitialState));
@@ -293,7 +291,7 @@ export default function Form(): ReactElement {
     if (!route.params || !route.params.noteId) return;
 
     try {
-      const { data } = await defaultInstance.get<NoteSchema>(
+      const { data } = await defaultInstance.get<Record>(
         `/notes/${route.params.noteId}`,
       );
       setIsError(false);
@@ -324,7 +322,7 @@ export default function Form(): ReactElement {
       socket.then((socket) => {
         socket.on(
           'local',
-          async ({ status, note, isDeleteOrigin }: SocketNoteData) => {
+          async ({ status, note, isDeleteOrigin }: SocketNote) => {
             if (
               typeof isDeleteOrigin === 'boolean' &&
               !isDeleteOrigin &&
@@ -335,12 +333,12 @@ export default function Form(): ReactElement {
             let message = 'Action was completed successfully';
 
             switch (status) {
-              case SOCKET_NOTE_STATUSES.CREATED:
+              case SocketNoteStatus.CREATED:
                 message = 'Note was created successfully';
                 if (route.params?.draftId) {
                   await onDraftDeleteHandler();
                   showToast(
-                    TOAST_TYPE.SUCCESS,
+                    ToastType.SUCCESS,
                     'Congratulations!',
                     'Note was successfully uploaded and draft was deleted.',
                   );
@@ -348,18 +346,18 @@ export default function Form(): ReactElement {
                 }
                 break;
 
-              case SOCKET_NOTE_STATUSES.UPDATED:
+              case SocketNoteStatus.UPDATED:
                 message = 'Note was successfully updated.';
                 break;
 
-              case SOCKET_NOTE_STATUSES.DELETED:
+              case SocketNoteStatus.DELETED:
                 message = isDeleteOrigin
                   ? 'Note was successfully deleted.'
                   : 'Note was successfully deleted from other device.';
                 break;
             }
 
-            showToast(TOAST_TYPE.SUCCESS, 'Congratulations!', message);
+            showToast(ToastType.SUCCESS, 'Congratulations!', message);
             formRef.current.setStatus(FORCE_NAVIGATION_STATUS);
             navigation.goBack();
           },
@@ -370,14 +368,14 @@ export default function Form(): ReactElement {
             status,
             message,
           }: {
-            status: SOCKET_ERROR_CODES;
+            status: SocketErrorCode;
             message: string | string[];
           }) => {
-            if (status === SOCKET_ERROR_CODES.UNAUTHORIZED) return;
+            if (status === SocketErrorCode.UNAUTHORIZED) return;
 
             setIsFormLoading(false);
             showToast(
-              TOAST_TYPE.ERROR,
+              ToastType.ERROR,
               'Note Uploading Error',
               Array.isArray(message) ? message[0] : message,
             );
@@ -392,7 +390,7 @@ export default function Form(): ReactElement {
     };
   }, [socket, isLoading, isError]);
 
-  const onFormSubmitHandler = async (values: NotesManagingFormData) => {
+  const onFormSubmitHandler = async (values: RecordsManagingData) => {
     const accessToken = await SecureStore.getItemAsync('accessToken');
     const refreshToken = await SecureStore.getItemAsync('refreshToken');
     if (!accessToken || !refreshToken || !socket) {
@@ -408,7 +406,7 @@ export default function Form(): ReactElement {
     });
   };
 
-  const onNoteUpdateHandler = async (values: NotesManagingFormData) => {
+  const onNoteUpdateHandler = async (values: RecordsManagingData) => {
     if (!route.params || !route.params.noteId) return;
 
     const accessToken = await SecureStore.getItemAsync('accessToken');
@@ -434,7 +432,7 @@ export default function Form(): ReactElement {
   const errorHandling = (error: AxiosError, message: string) => {
     setIsError(true);
     showToast(
-      TOAST_TYPE.ERROR,
+      ToastType.ERROR,
       message,
       (error.response?.data as { message?: string })?.message ||
         'Something went wrong:(',
@@ -564,7 +562,7 @@ export default function Form(): ReactElement {
                 <Spinner />
               ) : (
                 <Button
-                  type={BUTTON_TYPES.CONTAINED}
+                  type={ButtonType.CONTAINED}
                   style={styles.submitButton}
                   onPress={
                     // ! formik docs

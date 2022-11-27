@@ -18,8 +18,7 @@ import {
   SOFT_BLUE,
 } from '@constants/colors';
 import { sizes } from '@constants/sizes';
-import { NavigationProps } from '@app-types/types';
-import { NAVIGATION_NAMES, NAVIGATION_NOTES_NAMES } from '@app-types/enum';
+import { NavigationProps, NavigationName, NavigationNotesName } from '@types';
 import { getPublicData } from '@utils/requests/get/publicData';
 import {
   publicDataInitialState,
@@ -45,7 +44,7 @@ export default function MainBottomTabs(): ReactElement {
   const [isLoading, setIsLoading] = React.useState(true);
 
   function navigateToAuth() {
-    navigation.navigate(NAVIGATION_NAMES.AUTH);
+    navigation.navigate(NavigationName.AUTH);
   }
 
   async function logOut() {
@@ -109,7 +108,7 @@ export default function MainBottomTabs(): ReactElement {
       }}
     >
       <BottomTab.Screen
-        name={NAVIGATION_NOTES_NAMES.NOTES}
+        name={NavigationNotesName.NOTES}
         component={Notes}
         options={{
           tabBarIcon: ({ color, size }) => {
@@ -142,7 +141,7 @@ export default function MainBottomTabs(): ReactElement {
         }}
       />
       <BottomTab.Screen
-        name={NAVIGATION_NOTES_NAMES.DRAFTS}
+        name={NavigationNotesName.DRAFTS}
         component={Drafts}
         options={{
           tabBarIcon: ({ color, size }) => {

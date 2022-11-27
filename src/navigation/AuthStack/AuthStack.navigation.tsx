@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import SignIn from '@screens/SignIn/SignIn.screen';
 import SignUp from '@screens/SignUp/SignUp.screen';
 import AvatarPicker from '@screens/AvatarPicker/AvatarPicker.screen';
-import { NAVIGATION_AUTH_NAMES } from '@app-types/enum';
+import { NavigationAuthName } from '@types';
 import { SPRING_WOOD } from '@constants/colors';
 
 const Stack = createNativeStackNavigator();
@@ -19,10 +19,10 @@ export default function AuthStack(): ReactElement {
         },
       }}
     >
-      <Stack.Screen name={NAVIGATION_AUTH_NAMES.SIGN_IN} component={SignIn} />
-      <Stack.Screen name={NAVIGATION_AUTH_NAMES.SIGN_UP} component={SignUp} />
+      <Stack.Screen name={NavigationAuthName.SIGN_IN} component={SignIn} />
+      <Stack.Screen name={NavigationAuthName.SIGN_UP} component={SignUp} />
       <Stack.Screen
-        name={NAVIGATION_AUTH_NAMES.AVATAR_PICKER}
+        name={NavigationAuthName.AVATAR_PICKER}
         component={AvatarPicker}
       />
     </Stack.Navigator>

@@ -5,14 +5,13 @@ import * as showdown from 'showdown';
 
 import { NoteTitle } from '@components/Default/Text/Text.component';
 import CustomRenderHTML from '@components/Default/CustomRenderHTML/CustomRenderHTML.component';
-import { NavigationProps, NoteSchema } from '@app-types/types';
-import { NAVIGATION_NAMES } from '@app-types/enum';
+import { NavigationProps, NavigationName, Record } from '@types';
 import { contentFormat } from '@utils/stringInteraction/contentFormat';
 import { NoteContainer } from './Note.styles';
 
 //Interface for Props
 interface NoteProps {
-  children: NoteSchema;
+  children: Record;
 }
 
 const Note = React.memo(function Note({ children }: NoteProps): ReactElement {
@@ -29,7 +28,7 @@ const Note = React.memo(function Note({ children }: NoteProps): ReactElement {
   // going to the notes overview screen passing route.id as a prop
   const onNotePressHandler = () => {
     if (!title && !content) return;
-    navigation.navigate(NAVIGATION_NAMES.NOTES_MANAGING, {
+    navigation.navigate(NavigationName.NOTES_MANAGING, {
       noteId: id,
     });
   };

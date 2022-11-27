@@ -8,7 +8,7 @@ import {
 import Svg, { Path } from 'react-native-svg';
 
 import { showToast } from '@utils/toasts/showToast';
-import { TOAST_TYPE } from '@app-types/enum';
+import { ToastType } from '@types';
 import { styles, PickedImage } from './LogoPicker.styles';
 
 interface Props {
@@ -52,7 +52,7 @@ const LogoPicker: FC<Props> = ({ image, setImage, disabled = false }) => {
     if (fileSize > 10485760) {
       // 10485760 - backend (Cloudinary) limit
       showToast(
-        TOAST_TYPE.ERROR,
+        ToastType.ERROR,
         'Image size is too big',
         'Please, choose another one.',
       );

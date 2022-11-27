@@ -1,10 +1,10 @@
 import * as SQLite from 'expo-sqlite';
 
-import { DraftSchema } from '@app-types/types';
+import { Record } from '@types';
 
 const db = SQLite.openDatabase('drafts.db');
 
-export const updateDraftById = ({ id, title, content, date }: DraftSchema) => {
+export const updateDraftById = ({ id, title, content, date }: Record) => {
   const promise = new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(

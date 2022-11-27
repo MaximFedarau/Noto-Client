@@ -19,7 +19,7 @@ import {
   LeftHeaderView,
 } from '@components/Default/View/View.component';
 import { NoItemsText } from '@components/Default/Text/Text.component';
-import { DraftSchema, NavigationProps } from '@app-types/types';
+import { NavigationProps, NavigationName, Record, FetchPackType } from '@types';
 import { draftsSelector, isEndSelector } from '@store/drafts/drafts.selector';
 import {
   assignDrafts,
@@ -31,7 +31,6 @@ import {
   removeDraft,
 } from '@store/drafts/drafts.slice';
 import { listener, AppStartListening } from '@store/middlewares/listener';
-import { FETCH_PACK_TYPES, NAVIGATION_NAMES } from '@app-types/enum';
 import { CYBER_YELLOW } from '@constants/colors';
 import { sizes } from '@constants/sizes';
 import { stringSearch } from '@utils/stringInteraction/stringSearch';
@@ -120,11 +119,9 @@ export default function Drafts(): ReactElement {
     };
   }, [drafts.length, openSearchBar]);
 
-  async function fetchDraftsPack(
-    type: FETCH_PACK_TYPES = FETCH_PACK_TYPES.INITIAL,
-  ) {
+  async function fetchDraftsPack(type: FetchPackType = FetchPackType.INITIAL) {
     if (isEnd || isPackLoading) return;
-    const isInitial = type === FETCH_PACK_TYPES.INITIAL;
+    const isInitial = type === FetchPackType.INITIAL;
 
     isInitial ? setIsLoading(true) : setIsPackLoading(true);
     try {
@@ -155,7 +152,7 @@ export default function Drafts(): ReactElement {
       matcher: isAnyOf(updateDraft, addDraft),
       effect: ({ payload }, listenerAPI) => {
         const { drafts } = listenerAPI.getState().drafts;
-        const { id, title, content } = payload as DraftSchema;
+        const { id, title, content } = payload as Record;
         const pattern = searchText.trim();
         const isExists = drafts.findIndex((draft) => draft.id === id) !== -1;
 
@@ -181,7 +178,7 @@ export default function Drafts(): ReactElement {
         {drafts.length ? (
           <DraftsList
             onEndReached={() => {
-              fetchDraftsPack(FETCH_PACK_TYPES.LOAD_MORE);
+              fetchDraftsPack(FetchPackType.LOAD_MORE);
             }}
             onEndReachedThreshold={0.3}
             ListFooterComponent={isPackLoading ? <Spinner /> : null}
@@ -201,7 +198,7 @@ export default function Drafts(): ReactElement {
               name: 'add',
               color: 'white',
             }}
-            onPress={() => navigation.navigate(NAVIGATION_NAMES.NOTES_MANAGING)}
+            onPress={() => navigation.navigate(NavigationName.NOTES_MANAGING)}
           />
         )}
       </DraftsContentView>

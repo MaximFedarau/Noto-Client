@@ -3,14 +3,14 @@ import { FlatList, FlatListProps } from 'react-native';
 
 import Draft from '@components/Drafts/Draft/Draft.component';
 import GoUpButton from '@components/Auth/Defaults/GoUpButton/GoUpButton.component';
-import { DraftSchema } from '@app-types/types';
+import { Record } from '@types';
 import { CYBER_YELLOW } from '@constants/colors';
 import { sizes } from '@constants/sizes';
 
 //Interface for Props
 interface DraftsListProps
-  extends Omit<FlatListProps<DraftSchema>, 'children' | 'data' | 'renderItem'> {
-  children: DraftSchema[];
+  extends Omit<FlatListProps<Record>, 'children' | 'data' | 'renderItem'> {
+  children: Record[];
 }
 
 export default function DraftsList({
@@ -22,7 +22,7 @@ export default function DraftsList({
   const [layoutHeight, setLayoutHeight] = React.useState<number>(0);
   const [offset, setOffset] = React.useState<number>(0);
 
-  const ref = React.useRef<FlatList<DraftSchema>>(null);
+  const ref = React.useRef<FlatList<Record>>(null);
 
   // after all content renders
   React.useLayoutEffect(() => {

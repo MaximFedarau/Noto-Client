@@ -10,11 +10,12 @@ import Spinner from '@components/Auth/Defaults/Spinner/Spinner.component';
 import FormButtons from '@components/Auth/Defaults/FormButtons/FormButtons.component';
 import { AuthAvatarPickerContainer } from '@components/Default/View/View.component';
 import {
-  NavigationProps,
   AvatarPickerRouteProp,
+  NavigationProps,
+  NavigationName,
+  ToastType,
   AuthTokens,
-} from '@app-types/types';
-import { NAVIGATION_NAMES, TOAST_TYPE } from '@app-types/enum';
+} from '@types';
 import { showToast } from '@utils/toasts/showToast';
 import { createAPIRefreshInstance } from '@utils/requests/instance';
 
@@ -26,7 +27,7 @@ const Content: FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const instance = createAPIRefreshInstance(() => {
-    showToast(TOAST_TYPE.ERROR, 'Logout', 'Your session has expired');
+    showToast(ToastType.ERROR, 'Logout', 'Your session has expired');
     handleReturnToHome();
   });
 
@@ -51,7 +52,7 @@ const Content: FC = () => {
 
       if (status < 400) {
         showToast(
-          TOAST_TYPE.SUCCESS,
+          ToastType.SUCCESS,
           'Congratulatons!',
           'Your avatar was uploaded successfully.',
         );
@@ -75,7 +76,7 @@ const Content: FC = () => {
     } catch (error) {
       setIsLoading(false);
       showToast(
-        TOAST_TYPE.ERROR,
+        ToastType.ERROR,
         'Avatar Uploading Error',
         'Something went wrong:( Try again later',
       );
@@ -83,7 +84,7 @@ const Content: FC = () => {
   };
 
   const handleReturnToHome = () =>
-    navigation.navigate(NAVIGATION_NAMES.NOTES_OVERVIEW);
+    navigation.navigate(NavigationName.NOTES_OVERVIEW);
 
   return (
     <ContentScrollView>

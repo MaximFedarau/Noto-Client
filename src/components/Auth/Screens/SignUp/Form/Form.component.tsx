@@ -13,12 +13,14 @@ import {
   AuthFormContentContainer,
 } from '@components/Default/View/View.component';
 import { AuthNavigationText } from '@components/Default/Text/Text.component';
-import { NavigationProps, SignUpFormData, AuthTokens } from '@app-types/types';
 import {
-  NAVIGATION_NAMES,
-  NAVIGATION_AUTH_NAMES,
-  TOAST_TYPE,
-} from '@app-types/enum';
+  NavigationProps,
+  NavigationAuthName,
+  NavigationName,
+  ToastType,
+  SignUpData,
+  AuthTokens,
+} from '@types';
 import { signUpFormValidationSchema } from '@constants/validationSchemas';
 import { showToast } from '@utils/toasts/showToast';
 import { createAPIInstance } from '@utils/requests/instance';
@@ -26,7 +28,7 @@ import { createAPIInstance } from '@utils/requests/instance';
 export default function Form(): ReactElement {
   const navigation = useNavigation<NavigationProps>();
 
-  const formInitialValues: SignUpFormData = {
+  const formInitialValues: SignUpData = {
     nickname: '',
     password: '',
     confirmPassword: '',
@@ -36,11 +38,11 @@ export default function Form(): ReactElement {
 
   //going to the sign in screen
   const onNavigationTextHandler = () => {
-    if (!isLoading) navigation.replace(NAVIGATION_AUTH_NAMES.SIGN_IN);
+    if (!isLoading) navigation.replace(NavigationAuthName.SIGN_IN);
   };
 
   // submit hanlder (sign up  + log in)
-  async function onFormSubmitHandler({ nickname, password }: SignUpFormData) {
+  async function onFormSubmitHandler({ nickname, password }: SignUpData) {
     setIsLoading(true); // setting that the form is loading
     const instance = createAPIInstance();
     const trimmedNickname = nickname.trim(); // trimming the nickname
@@ -63,18 +65,18 @@ export default function Form(): ReactElement {
       await SecureStore.setItemAsync('accessToken', data.accessToken); // saving access token to secure store
       await SecureStore.setItemAsync('refreshToken', data.refreshToken); // saving refresh token to secure store
       showToast(
-        TOAST_TYPE.SUCCESS,
+        ToastType.SUCCESS,
         'Congratulations!',
         'You have successfully signed up.',
       );
-      navigation.replace(NAVIGATION_AUTH_NAMES.AVATAR_PICKER, {
+      navigation.replace(NavigationAuthName.AVATAR_PICKER, {
         id,
       });
     } catch (error) {
       const { response } = error as AxiosError<{ message: string }>;
       setIsLoading(false);
       showToast(
-        TOAST_TYPE.ERROR,
+        ToastType.ERROR,
         'Sign Up Error',
         response && response?.data
           ? response.data.message
@@ -85,7 +87,7 @@ export default function Form(): ReactElement {
 
   // returning to the main screen
   const handleReturnToHome = () => {
-    navigation.navigate(NAVIGATION_NAMES.NOTES_OVERVIEW);
+    navigation.navigate(NavigationName.NOTES_OVERVIEW);
   };
 
   return (

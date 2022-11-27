@@ -14,18 +14,20 @@ import {
 } from '@components/Default/View/View.component';
 import { AuthNavigationText } from '@components/Default/Text/Text.component';
 import {
-  NAVIGATION_NAMES,
-  NAVIGATION_AUTH_NAMES,
-  TOAST_TYPE,
-} from '@app-types/enum';
-import { NavigationProps, SignInFormData, AuthTokens } from '@app-types/types';
+  NavigationAuthName,
+  NavigationProps,
+  NavigationName,
+  ToastType,
+  SignInData,
+  AuthTokens,
+} from '@types';
 import { signInFormValidationSchema } from '@constants/validationSchemas';
 import { showToast } from '@utils/toasts/showToast';
 import { createAPIInstance } from '@utils/requests/instance';
 
 export default function Form(): ReactElement {
   const navigation = useNavigation<NavigationProps>();
-  const fontInitialValues: SignInFormData = {
+  const fontInitialValues: SignInData = {
     nickname: '',
     password: '',
   };
@@ -34,14 +36,11 @@ export default function Form(): ReactElement {
 
   // go to the sign up screen
   const onNavigationTextHandler = () => {
-    if (!isLoading) navigation.replace(NAVIGATION_AUTH_NAMES.SIGN_UP);
+    if (!isLoading) navigation.replace(NavigationAuthName.SIGN_UP);
   };
 
   // submitting (log in)
-  const onFormSubmitHandler = async ({
-    nickname,
-    password,
-  }: SignInFormData) => {
+  const onFormSubmitHandler = async ({ nickname, password }: SignInData) => {
     setIsLoading(true);
     const instance = createAPIInstance();
 
@@ -53,7 +52,7 @@ export default function Form(): ReactElement {
       await SecureStore.setItemAsync('accessToken', data.accessToken); // saving access token to secure store
       await SecureStore.setItemAsync('refreshToken', data.refreshToken); // saving refresh token to secure store
       showToast(
-        TOAST_TYPE.SUCCESS,
+        ToastType.SUCCESS,
         'Congratulations!',
         'You have successfully signed in.',
       );
@@ -62,7 +61,7 @@ export default function Form(): ReactElement {
       const { response } = error as AxiosError<{ message: string }>;
       setIsLoading(false);
       showToast(
-        TOAST_TYPE.ERROR,
+        ToastType.ERROR,
         'Login Error',
         response && response.data
           ? response.data.message
@@ -73,7 +72,7 @@ export default function Form(): ReactElement {
 
   // returning home
   const handleReturnToHome = () => {
-    navigation.navigate(NAVIGATION_NAMES.NOTES_OVERVIEW);
+    navigation.navigate(NavigationName.NOTES_OVERVIEW);
   };
 
   return (

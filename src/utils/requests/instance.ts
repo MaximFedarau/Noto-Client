@@ -1,7 +1,7 @@
 import * as SecureStore from 'expo-secure-store';
 import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
 
-import { AuthTokens } from '@app-types/types';
+import { AuthTokens } from '@types';
 
 export const createAPIRefreshInstance = (onExit?: () => void) => {
   const refreshInstance = axios.create({

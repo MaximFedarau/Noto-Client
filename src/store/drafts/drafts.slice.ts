@@ -1,10 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { DraftSchema } from '@app-types/types';
+import { Record } from '@types';
 
 //Interface for the Initial State
 interface DraftsState {
-  drafts: DraftSchema[];
+  drafts: Record[];
   isEnd: boolean;
 }
 
@@ -17,14 +17,14 @@ export const draftsSlice = createSlice({
   name: 'draftsSlice',
   initialState: draftsInitialState,
   reducers: {
-    addDraft: (state: DraftsState, action: PayloadAction<DraftSchema>) => {
+    addDraft: (state: DraftsState, action: PayloadAction<Record>) => {
       // if user does not see the draft, then we do not change state - new draft will be shown when user scrolls to the end
       if (!state.isEnd) {
         return state;
       }
       state.drafts.push(action.payload);
     },
-    addDrafts: (state: DraftsState, action: PayloadAction<DraftSchema[]>) => {
+    addDrafts: (state: DraftsState, action: PayloadAction<Record[]>) => {
       state.drafts.push(...action.payload);
     },
     removeDraft: (state: DraftsState, action: PayloadAction<string>) => {
@@ -32,7 +32,7 @@ export const draftsSlice = createSlice({
         (draft) => draft.id !== action.payload,
       );
     },
-    updateDraft: (state: DraftsState, action: PayloadAction<DraftSchema>) => {
+    updateDraft: (state: DraftsState, action: PayloadAction<Record>) => {
       const { drafts } = state;
       // if user does not see the draft, then we just remove it - saved draft will be shown when user scrolls to the end
       if (!state.isEnd) {
@@ -52,10 +52,7 @@ export const draftsSlice = createSlice({
         drafts.push(action.payload);
       }
     },
-    assignDrafts: (
-      state: DraftsState,
-      action: PayloadAction<DraftSchema[]>,
-    ) => {
+    assignDrafts: (state: DraftsState, action: PayloadAction<Record[]>) => {
       state.drafts = action.payload;
     },
     clearDrafts: () => draftsInitialState,

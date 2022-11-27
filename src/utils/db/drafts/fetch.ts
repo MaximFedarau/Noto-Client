@@ -1,13 +1,13 @@
 import * as SQLite from 'expo-sqlite';
 
-import { DraftSchema } from '@app-types/types';
+import { Record } from '@types';
 
 const db = SQLite.openDatabase('drafts.db');
 
 export const fetchDraftPack = (offset = 0, pattern = '') => {
   // count all items
   const promise = new Promise<{
-    draftsPack: DraftSchema[];
+    draftsPack: Record[];
     isEnd: boolean;
   }>((resolve, reject) => {
     let itemsCount = 0;
@@ -46,7 +46,7 @@ export const fetchDraftPack = (offset = 0, pattern = '') => {
 };
 
 export const fetchDraftById = (id: string) => {
-  const promise = new Promise<DraftSchema>((resolve, reject) => {
+  const promise = new Promise<Record>((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
         'SELECT * FROM drafts WHERE id = ?',

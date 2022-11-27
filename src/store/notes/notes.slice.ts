@@ -1,10 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { NoteSchema } from '@app-types/types';
+import { Record } from '@types';
 
 //Interface for the Initial State
 interface NotesState {
-  notes: NoteSchema[];
+  notes: Record[];
   isEnd: boolean;
 }
 
@@ -17,20 +17,20 @@ export const notesSlice = createSlice({
   name: 'notesSlice',
   initialState: notesInitialState,
   reducers: {
-    addNote: (state: NotesState, action: PayloadAction<NoteSchema>) => {
+    addNote: (state: NotesState, action: PayloadAction<Record>) => {
       // if user does not see the note, then we do not change state - new note will be shown when user scrolls to the end
       if (!state.isEnd) {
         return state;
       }
       state.notes.push(action.payload);
     },
-    addNotes: (state: NotesState, action: PayloadAction<NoteSchema[]>) => {
+    addNotes: (state: NotesState, action: PayloadAction<Record[]>) => {
       state.notes.push(...action.payload);
     },
     removeNote: (state: NotesState, action: PayloadAction<string>) => {
       state.notes = state.notes.filter((note) => note.id !== action.payload);
     },
-    updateNote: (state: NotesState, action: PayloadAction<NoteSchema>) => {
+    updateNote: (state: NotesState, action: PayloadAction<Record>) => {
       const { notes } = state;
       // if user does not see the note, then we just remove it - saved note will be shown when user scrolls to the end
       if (!state.isEnd) {
@@ -50,7 +50,7 @@ export const notesSlice = createSlice({
         notes.push(action.payload);
       }
     },
-    assignNotes: (state: NotesState, action: PayloadAction<NoteSchema[]>) => {
+    assignNotes: (state: NotesState, action: PayloadAction<Record[]>) => {
       state.notes = action.payload;
     },
     clearNotes: () => notesInitialState,
