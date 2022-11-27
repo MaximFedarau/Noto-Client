@@ -13,7 +13,6 @@ export const NoItemsText = styled(DefaultText)`
   color: ${OSLO_GRAY};
   font-size: 20px;
   text-transform: uppercase;
-  font-family: 'Roboto-Regular';
   align-self: center;
 `;
 

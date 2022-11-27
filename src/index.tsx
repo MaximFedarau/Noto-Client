@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import MainBottomTabs from '@navigation/MainBottomTabs/MainBottomTabs.navigation';
-import AuthStack from '@navigation/AuthStack/AuthStack.navigation';
+import MainBottomTabs from '@navigation/MainBottomTabs';
+import AuthStack from '@navigation/AuthStack';
 import NotesManaging from '@screens/NotesManaging/NotesManaging.screen';
 import { OSLO_GRAY, SPRING_WOOD } from '@constants/colors';
 import { NavigationName } from '@types';
@@ -10,11 +10,7 @@ import { NavigationName } from '@types';
 const Stack = createNativeStackNavigator();
 
 const Navigator: FC = () => (
-  <Stack.Navigator
-    screenOptions={{
-      headerShown: false,
-    }}
-  >
+  <Stack.Navigator screenOptions={{ headerShown: false }}>
     <Stack.Screen
       name={NavigationName.NOTES_OVERVIEW}
       component={MainBottomTabs}
@@ -27,9 +23,7 @@ const Navigator: FC = () => (
         headerShadowVisible: false,
         headerTitleAlign: 'center',
         headerTintColor: OSLO_GRAY,
-        headerTitleStyle: {
-          fontFamily: 'Roboto-Regular',
-        },
+        headerTitleStyle: { fontFamily: 'Roboto-Regular' },
         headerStyle: { backgroundColor: SPRING_WOOD },
         contentStyle: { backgroundColor: SPRING_WOOD },
       }}

@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect } from 'react';
+import React, { FC, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
@@ -33,9 +33,10 @@ import {
 
 const BottomTab = createBottomTabNavigator();
 
-export default function MainBottomTabs(): ReactElement {
+const MainBottomTabs: FC = () => {
   const dispatch = useDispatch();
   const nickname = useSelector(publicDataNicknameSelector);
+  const avatar = useSelector(publicDataAvatarSelector);
   const isAuth = useSelector(publicDataAuthSelector);
 
   const navigation = useNavigation<NavigationProps>();
@@ -43,80 +44,61 @@ export default function MainBottomTabs(): ReactElement {
 
   const [isLoading, setIsLoading] = React.useState(true);
 
-  function navigateToAuth() {
+  const navigateToAuth = () => {
     navigation.navigate(NavigationName.AUTH);
-  }
+  };
 
-  async function logOut() {
+  const logOut = async () => {
     await SecureStore.deleteItemAsync('accessToken');
     await SecureStore.deleteItemAsync('refreshToken');
     dispatch(setIsAuth(false));
     dispatch(setPublicData(publicDataInitialState));
-  }
+  };
+
+  const checkIsAuth = async () => {
+    const accessToken = await SecureStore.getItemAsync('accessToken');
+    const refreshToken = await SecureStore.getItemAsync('refreshToken');
+    if (accessToken && refreshToken) {
+      const data = await getPublicData();
+      dispatch(setIsAuth(data ? true : false));
+      dispatch(setPublicData(data || publicDataInitialState));
+    } else {
+      dispatch(setIsAuth(false));
+      dispatch(setPublicData(publicDataInitialState));
+    }
+  };
 
   useEffect(() => {
-    const checkIsAuth = async () => {
-      const accessToken = await SecureStore.getItemAsync('accessToken');
-      const refreshToken = await SecureStore.getItemAsync('refreshToken');
-      if (accessToken && refreshToken) {
-        const data = await getPublicData();
-        if (data) {
-          // if there is a data we set it
-          dispatch(setIsAuth(true));
-          dispatch(setPublicData(data));
-        } else {
-          // if there is no data we delete the tokens (in function) and change all data
-          dispatch(setIsAuth(false));
-          dispatch(setPublicData(publicDataInitialState));
-        }
-      } else {
-        //if there is no tokens we change all data
-        dispatch(setIsAuth(false));
-        dispatch(setPublicData(publicDataInitialState));
-      }
-    };
     if (focus) {
-      checkIsAuth().finally(() => {
+      try {
+        checkIsAuth();
+      } finally {
         setIsLoading(false);
-      });
-      return;
-    }
-    setIsLoading(false);
+      }
+    } else setIsLoading(false);
   }, [focus]);
 
   if (isLoading) return <Loading />;
 
   return (
     <BottomTab.Navigator
-      id="bottomTab"
       screenOptions={{
-        headerTitleAlign: 'center',
         headerTintColor: OSLO_GRAY,
-        headerTitleStyle: {
-          fontFamily: 'Roboto-Regular',
-        },
+        headerTitleStyle: { fontFamily: 'Roboto-Regular' },
         headerStyle: { backgroundColor: SPRING_WOOD },
         headerShadowVisible: false,
-        tabBarStyle: {
-          backgroundColor: SPRING_WOOD,
-          justifyContent: 'center',
-        },
+        tabBarStyle: { backgroundColor: SPRING_WOOD },
         tabBarActiveTintColor: CYBER_YELLOW,
+        tabBarShowLabel: false,
       }}
-      sceneContainerStyle={{
-        backgroundColor: SPRING_WOOD,
-      }}
+      sceneContainerStyle={{ backgroundColor: SPRING_WOOD }}
     >
       <BottomTab.Screen
         name={NavigationNotesName.NOTES}
         component={Notes}
         options={{
-          tabBarIcon: ({ color, size }) => {
-            return <Ionicons name="document" size={size} color={color} />;
-          },
-          tabBarLabel: () => null,
+          tabBarIcon: (props) => <Ionicons name="document" {...props} />,
           headerRight: ({ tintColor }) => {
-            const avatar = useSelector(publicDataAvatarSelector);
             return (
               <RightHeaderView>
                 {avatar ? (
@@ -144,12 +126,8 @@ export default function MainBottomTabs(): ReactElement {
         name={NavigationNotesName.DRAFTS}
         component={Drafts}
         options={{
-          tabBarIcon: ({ color, size }) => {
-            return <Ionicons name="archive" size={size} color={color} />;
-          },
-          tabBarLabel: () => null,
+          tabBarIcon: (props) => <Ionicons name="archive" {...props} />,
           headerRight: ({ tintColor }) => {
-            const avatar = useSelector(publicDataAvatarSelector);
             return (
               <RightHeaderView>
                 {avatar ? (
@@ -174,4 +152,6 @@ export default function MainBottomTabs(): ReactElement {
       />
     </BottomTab.Navigator>
   );
-}
+};
+
+export default MainBottomTabs;
