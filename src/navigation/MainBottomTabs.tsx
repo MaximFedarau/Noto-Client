@@ -20,16 +20,18 @@ import {
 import { sizes } from '@constants/sizes';
 import { NavigationProps, NavigationName, NavigationNotesName } from '@types';
 import { getPublicData } from '@utils';
-import { setProfile, setIsAuth, clearUser } from '@store/user/user.slice';
 import {
+  setProfile,
+  setIsAuth,
+  clearUser,
   userIsAuthSelector,
   userAvatarSelector,
   userNicknameSelector,
-} from '@store/user/user.selector';
+} from '@store/user';
 
 const BottomTab = createBottomTabNavigator();
 
-const MainBottomTabs: FC = () => {
+export const MainBottomTabs: FC = () => {
   const dispatch = useDispatch();
   const nickname = useSelector(userNicknameSelector);
   const avatar = useSelector(userAvatarSelector);
@@ -81,6 +83,7 @@ const MainBottomTabs: FC = () => {
       screenOptions={{
         headerTintColor: OSLO_GRAY,
         headerTitleStyle: { fontFamily: 'Roboto-Regular' },
+        headerTitleAlign: 'center',
         headerStyle: { backgroundColor: SPRING_WOOD },
         headerShadowVisible: false,
         tabBarStyle: { backgroundColor: SPRING_WOOD },
@@ -149,5 +152,3 @@ const MainBottomTabs: FC = () => {
     </BottomTab.Navigator>
   );
 };
-
-export default MainBottomTabs;

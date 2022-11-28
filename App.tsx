@@ -10,7 +10,7 @@ import Navigator from './src';
 import Loading from '@screens/Loading/Loading.screen';
 import Error from '@screens/Error/Error.screen';
 import { initDbDrafts } from '@utils';
-import { store } from '@store/store';
+import { store } from '@store';
 
 preventAutoHideAsync();
 

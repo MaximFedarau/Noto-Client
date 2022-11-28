@@ -1,8 +1,7 @@
 import React, { FC } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import MainBottomTabs from '@navigation/MainBottomTabs';
-import AuthStack from '@navigation/AuthStack';
+import { AuthStack, MainBottomTabs } from '@navigation';
 import NotesManaging from '@screens/NotesManaging/NotesManaging.screen';
 import { OSLO_GRAY, SPRING_WOOD } from '@constants/colors';
 import { NavigationName } from '@types';

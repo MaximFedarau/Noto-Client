@@ -1,7 +1,5 @@
-//RTK
 import { combineReducers } from '@reduxjs/toolkit';
 
-//Slices
 import { userSlice } from './user/user.slice';
 import { notesSlice } from './notes/notes.slice';
 import { draftsSlice } from './drafts/drafts.slice';

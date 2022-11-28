@@ -2,60 +2,57 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { Record } from '@types';
 
-//Interface for the Initial State
-interface NotesState {
+interface State {
   notes: Record[];
   isEnd: boolean;
 }
 
-export const notesInitialState: NotesState = {
+export const initialState: State = {
   notes: [],
   isEnd: false,
 };
 
 export const notesSlice = createSlice({
   name: 'notesSlice',
-  initialState: notesInitialState,
+  initialState,
   reducers: {
-    addNote: (state: NotesState, action: PayloadAction<Record>) => {
+    addNote: (state, { payload }: PayloadAction<Record>) => {
+      const { notes, isEnd } = state;
       // if user does not see the note, then we do not change state - new note will be shown when user scrolls to the end
-      if (!state.isEnd) {
-        return state;
-      }
-      state.notes.push(action.payload);
+      if (!isEnd) return state;
+      notes.push(payload);
     },
-    addNotes: (state: NotesState, action: PayloadAction<Record[]>) => {
-      state.notes.push(...action.payload);
+    addNotes: ({ notes }, { payload }: PayloadAction<Record[]>) => {
+      notes.push(...payload);
     },
-    removeNote: (state: NotesState, action: PayloadAction<string>) => {
-      state.notes = state.notes.filter((note) => note.id !== action.payload);
-    },
-    updateNote: (state: NotesState, action: PayloadAction<Record>) => {
+    removeNote: (state, { payload }: PayloadAction<string>) => {
       const { notes } = state;
+      state.notes = notes.filter(({ id }) => id !== payload);
+    },
+    updateNote: (state, { payload }: PayloadAction<Record>) => {
+      const { notes, isEnd } = state;
       // if user does not see the note, then we just remove it - saved note will be shown when user scrolls to the end
-      if (!state.isEnd) {
-        state.notes = notes.filter((note) => note.id !== action.payload.id);
+      if (!isEnd) {
+        state.notes = notes.filter(({ id }) => id !== payload.id);
         return;
       }
-      const index = notes.findIndex((note) => note.id === action.payload.id);
+      const index = notes.findIndex(({ id }) => id === payload.id);
       if (index !== -1) {
         const length = notes.length;
         if (length > 1 && index < length - 1) {
           notes.splice(index, 1);
-          notes.push(action.payload);
+          notes.push(payload);
           return;
         }
-        notes[index] = action.payload;
-      } else {
-        notes.push(action.payload);
-      }
+        notes[index] = payload;
+      } else notes.push(payload);
     },
-    assignNotes: (state: NotesState, action: PayloadAction<Record[]>) => {
-      state.notes = action.payload;
+    assignNotes: (state, { payload }: PayloadAction<Record[]>) => {
+      state.notes = payload;
     },
-    clearNotes: () => notesInitialState,
-    setIsEnd: (state: NotesState, action: PayloadAction<boolean>) => {
-      state.isEnd = action.payload;
+    clearNotes: () => initialState,
+    setIsEnd: (state, { payload }: PayloadAction<boolean>) => {
+      state.isEnd = payload;
     },
   },
 });

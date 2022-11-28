@@ -20,8 +20,9 @@ import {
 } from '@components/Default/View/View.component';
 import { NoItemsText } from '@components/Default/Text/Text.component';
 import { NavigationProps, NavigationName, Record, FetchPackType } from '@types';
-import { draftsSelector, isEndSelector } from '@store/drafts/drafts.selector';
 import {
+  draftsSelector,
+  isEndSelector,
   assignDrafts,
   clearDrafts,
   addDrafts,
@@ -29,8 +30,8 @@ import {
   updateDraft,
   addDraft,
   removeDraft,
-} from '@store/drafts/drafts.slice';
-import { listener, AppStartListening } from '@store/middlewares/listener';
+} from '@store/drafts';
+import { listener, AppStartListening } from '@store/middlewares';
 import { CYBER_YELLOW } from '@constants/colors';
 import { sizes } from '@constants/sizes';
 import { stringSearch } from '@utils';

@@ -2,62 +2,57 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { Record } from '@types';
 
-//Interface for the Initial State
-interface DraftsState {
+interface State {
   drafts: Record[];
   isEnd: boolean;
 }
 
-export const draftsInitialState: DraftsState = {
+const initialState: State = {
   drafts: [],
   isEnd: false,
 };
 
 export const draftsSlice = createSlice({
   name: 'draftsSlice',
-  initialState: draftsInitialState,
+  initialState,
   reducers: {
-    addDraft: (state: DraftsState, action: PayloadAction<Record>) => {
+    addDraft: (state, { payload }: PayloadAction<Record>) => {
+      const { drafts, isEnd } = state;
       // if user does not see the draft, then we do not change state - new draft will be shown when user scrolls to the end
-      if (!state.isEnd) {
-        return state;
-      }
-      state.drafts.push(action.payload);
+      if (!isEnd) return state;
+      drafts.push(payload);
     },
-    addDrafts: (state: DraftsState, action: PayloadAction<Record[]>) => {
-      state.drafts.push(...action.payload);
+    addDrafts: ({ drafts }, { payload }: PayloadAction<Record[]>) => {
+      drafts.push(...payload);
     },
-    removeDraft: (state: DraftsState, action: PayloadAction<string>) => {
-      state.drafts = state.drafts.filter(
-        (draft) => draft.id !== action.payload,
-      );
-    },
-    updateDraft: (state: DraftsState, action: PayloadAction<Record>) => {
+    removeDraft: (state, { payload }: PayloadAction<string>) => {
       const { drafts } = state;
+      state.drafts = drafts.filter(({ id }) => id !== payload);
+    },
+    updateDraft: (state, { payload }: PayloadAction<Record>) => {
+      const { drafts, isEnd } = state;
       // if user does not see the draft, then we just remove it - saved draft will be shown when user scrolls to the end
-      if (!state.isEnd) {
-        state.drafts = drafts.filter((draft) => draft.id !== action.payload.id);
+      if (!isEnd) {
+        state.drafts = drafts.filter(({ id }) => id !== payload.id);
         return;
       }
-      const index = drafts.findIndex((draft) => draft.id === action.payload.id);
+      const index = drafts.findIndex(({ id }) => id === payload.id);
       if (index !== -1) {
         const length = drafts.length;
         if (length > 1 && index < length - 1) {
           drafts.splice(index, 1);
-          drafts.push(action.payload);
+          drafts.push(payload);
           return;
         }
-        drafts[index] = action.payload;
-      } else {
-        drafts.push(action.payload);
-      }
+        drafts[index] = payload;
+      } else drafts.push(payload);
     },
-    assignDrafts: (state: DraftsState, action: PayloadAction<Record[]>) => {
-      state.drafts = action.payload;
+    assignDrafts: (state, { payload }: PayloadAction<Record[]>) => {
+      state.drafts = payload;
     },
-    clearDrafts: () => draftsInitialState,
-    setIsEnd: (state: DraftsState, action: PayloadAction<boolean>) => {
-      state.isEnd = action.payload;
+    clearDrafts: () => initialState,
+    setIsEnd: (state, { payload }: PayloadAction<boolean>) => {
+      state.isEnd = payload;
     },
   },
 });

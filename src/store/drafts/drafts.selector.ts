@@ -1,15 +1,15 @@
 import { createSelector } from '@reduxjs/toolkit';
 
-import { RootState } from '@store/store';
+import { RootState } from '@store';
 
-const publicDataReducerSelector = (state: RootState) => state.drafts;
+const draftsReducerSelector = ({ drafts }: RootState) => drafts;
 
 export const draftsSelector = createSelector(
-  publicDataReducerSelector,
-  (drafts) => drafts.drafts,
+  draftsReducerSelector,
+  ({ drafts }) => drafts,
 );
 
 export const isEndSelector = createSelector(
-  publicDataReducerSelector,
-  (drafts) => drafts.isEnd,
+  draftsReducerSelector,
+  ({ isEnd }) => isEnd,
 );

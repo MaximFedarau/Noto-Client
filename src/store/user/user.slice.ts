@@ -12,11 +12,11 @@ export const userSlice = createSlice({
   name: 'userSlice',
   initialState,
   reducers: {
-    setProfile: (state: User, { payload }: PayloadAction<Profile>) => {
+    setProfile: (state, { payload }: PayloadAction<Profile>) => {
       state.avatar = payload.avatar;
       state.nickname = payload.nickname;
     },
-    setIsAuth: (state: User, { payload }: PayloadAction<boolean>) => {
+    setIsAuth: (state, { payload }: PayloadAction<boolean>) => {
       state.isAuth = payload;
     },
     clearUser: () => initialState,

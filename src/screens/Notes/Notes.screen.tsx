@@ -40,10 +40,10 @@ import {
   stringSearch,
 } from '@utils';
 
-import { setIsAuth, clearUser } from '@store/user/user.slice';
-import { userIsAuthSelector } from '@store/user/user.selector';
-import { notesSelector, isEndSelector } from '@store/notes/notes.selector';
+import { setIsAuth, clearUser, userIsAuthSelector } from '@store/user';
 import {
+  notesSelector,
+  isEndSelector,
   clearNotes,
   addNotes,
   assignNotes,
@@ -51,10 +51,9 @@ import {
   updateNote,
   addNote,
   removeNote,
-} from '@store/notes/notes.slice';
-import { socketSelector } from '@store/socket/socket.selector';
-import { initSocket, removeSocket } from '@store/socket/socket.slice';
-import { listener, AppStartListening } from '@store/middlewares/listener';
+} from '@store/notes';
+import { socketSelector, initSocket, removeSocket } from '@store/socket';
+import { listener, AppStartListening } from '@store/middlewares';
 
 import { styles } from './Notes.styles';
 

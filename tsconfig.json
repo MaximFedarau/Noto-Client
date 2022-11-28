@@ -12,6 +12,7 @@
 
       "@screens/*": ["src/screens/*"],
 
+      "@navigation": ["src/navigation"],
       "@navigation/*": ["src/navigation/*"],
 
       "@types": ["src/types"],
@@ -20,6 +21,7 @@
       "@utils": ["src/utils"],
       "@utils/*": ["src/utils/*"],
 
+      "@store": ["src/store"],
       "@store/*": ["src/store/*"]
     }
   }

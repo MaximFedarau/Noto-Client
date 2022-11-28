@@ -46,14 +46,13 @@ import {
   SocketNoteStatus,
   SocketErrorCode,
 } from '@types';
-import { clearUser, setIsAuth } from '@store/user/user.slice';
-import { userIsAuthSelector } from '@store/user/user.selector';
+import { clearUser, setIsAuth, userIsAuthSelector } from '@store/user';
 import {
   updateDraft,
   addDraft as appendDraft,
   removeDraft,
-} from '@store/drafts/drafts.slice';
-import { socketSelector } from '@store/socket/socket.selector';
+} from '@store/drafts';
+import { socketSelector } from '@store/socket';
 
 import { styles } from './Form.styles';
 

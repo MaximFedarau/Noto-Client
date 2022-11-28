@@ -3,7 +3,7 @@ import {
   TypedStartListening,
 } from '@reduxjs/toolkit';
 
-import { RootState, AppDispatch } from '@store/store';
+import { RootState, AppDispatch } from '@store';
 
 export const listener = createListenerMiddleware();
 

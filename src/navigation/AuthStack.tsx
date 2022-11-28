@@ -9,7 +9,7 @@ import { SPRING_WOOD } from '@constants/colors';
 
 const Stack = createNativeStackNavigator();
 
-const AuthStack: FC = () => (
+export const AuthStack: FC = () => (
   <Stack.Navigator
     screenOptions={{
       headerShown: false,
@@ -24,5 +24,3 @@ const AuthStack: FC = () => (
     />
   </Stack.Navigator>
 );
-
-export default AuthStack;
