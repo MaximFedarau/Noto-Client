@@ -10,6 +10,7 @@
 
       "@constants/*": ["src/constants/*"],
 
+      "@screens": ["src/screens"],
       "@screens/*": ["src/screens/*"],
 
       "@navigation": ["src/navigation"],

@@ -1,9 +1,7 @@
 import React, { FC } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import SignIn from '@screens/SignIn/SignIn.screen';
-import SignUp from '@screens/SignUp/SignUp.screen';
-import AvatarPicker from '@screens/AvatarPicker/AvatarPicker.screen';
+import { SignIn, SignUp, AvatarPicker } from '@screens';
 import { NavigationAuthName } from '@types';
 import { SPRING_WOOD } from '@constants/colors';
 

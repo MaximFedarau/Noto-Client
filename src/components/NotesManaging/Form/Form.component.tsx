@@ -13,8 +13,8 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { AxiosError } from 'axios';
 
-import Error from '@screens/Error/Error.screen';
-import Loading from '@screens/Loading/Loading.screen';
+import { Error } from '@screens/Error';
+import { Loading } from '@screens/Loading';
 import IconButton from '@components/Default/IconButton/IconButton.component';
 import Button from '@components/Default/Button/Button.component';
 import FormField from '@components/NotesManaging/FormField/FormField.component';

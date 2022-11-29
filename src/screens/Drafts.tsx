@@ -1,13 +1,12 @@
-import React, { ReactElement } from 'react';
-import { Text } from 'react-native';
+import React, { FC, useEffect, useState } from 'react';
 import { FAB } from '@rneui/themed';
 import { useDispatch, useSelector } from 'react-redux';
 import { isAnyOf } from '@reduxjs/toolkit';
 import { useNavigation } from '@react-navigation/native';
 import { debounce } from 'lodash';
 
-import Error from '@screens/Error/Error.screen';
-import Loading from '@screens/Loading/Loading.screen';
+import { Error } from './Error';
+import { Loading } from './Loading';
 import IconButton from '@components/Default/IconButton/IconButton.component';
 import SearchBar from '@components/Default/SearchBar/SearchBar.component';
 import DraftsList from '@components/Drafts/DraftsList/DraftsList.component';
@@ -18,7 +17,10 @@ import {
   DraftsContentView,
   LeftHeaderView,
 } from '@components/Default/View/View.component';
-import { NoItemsText } from '@components/Default/Text/Text.component';
+import {
+  NoItemsText,
+  RecordsHeaderTitle,
+} from '@components/Default/Text/Text.component';
 import { NavigationProps, NavigationName, Record, FetchPackType } from '@types';
 import {
   draftsSelector,
@@ -36,48 +38,48 @@ import { CYBER_YELLOW } from '@constants/colors';
 import { sizes } from '@constants/sizes';
 import { stringSearch } from '@utils';
 
-import { styles } from './Drafts.styles';
-
-export default function Drafts(): ReactElement {
+export const Drafts: FC = () => {
   const dispatch = useDispatch();
   const drafts = useSelector(draftsSelector);
   const isEnd = useSelector(isEndSelector);
 
-  const [isLoading, setIsLoading] = React.useState<boolean>(true);
-  const [isPackLoading, setIsPackLoading] = React.useState<boolean>(false);
-  const [isError, setIsError] = React.useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isPackLoading, setIsPackLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
 
-  const [openSearchBar, setOpenSearchBar] = React.useState<boolean>(false);
-  const [searchText, setSearchText] = React.useState('');
+  const [openSearchBar, setOpenSearchBar] = useState(false);
+  const [searchText, setSearchText] = useState('');
 
   const navigation = useNavigation<NavigationProps>();
 
-  const onSearchBarChange = React.useCallback(
-    debounce((text) => {
-      setSearchText(text);
-      dispatch(setIsEnd(false));
-    }, 300),
-    [],
-  );
+  const onSearchBarChange = debounce((text) => {
+    setSearchText(text);
+    dispatch(setIsEnd(false));
+  }, 300);
 
-  function clearAuthHeader() {
+  const clearAuthHeader = () => {
     setOpenSearchBar(false);
     setSearchText('');
     navigation.setOptions({
-      headerTitle: ({ children, tintColor }) => {
-        return (
-          <Text style={[{ color: tintColor }, styles.title]}>{children}</Text>
-        );
-      },
+      headerTitle: (props) => <RecordsHeaderTitle {...props} />,
       headerLeft: () => null,
     });
-  }
+  };
 
-  React.useEffect(() => {
+  const onSearchButtonClickHandler = () => {
+    setOpenSearchBar(!openSearchBar);
+    // do not fetch again, when searchText is already empty
+    if (searchText !== '') dispatch(setIsEnd(false));
+    // removing debounce
+    onSearchBarChange.cancel();
+    setSearchText('');
+  };
+
+  useEffect(() => {
     if (drafts.length || searchText.length) {
       navigation.setOptions({
         //Implement search bar
-        headerTitle: ({ children, tintColor }) => {
+        headerTitle: (props) => {
           if (openSearchBar)
             return (
               <SearchBar
@@ -85,56 +87,42 @@ export default function Drafts(): ReactElement {
                 onChangeText={onSearchBarChange}
               />
             );
-          return (
-            <Text style={[{ color: tintColor }, styles.title]}>{children}</Text>
-          );
+          return <RecordsHeaderTitle {...props} />;
         },
-        headerTitleAlign: 'center',
         // open search bar button
-        headerLeft: ({ tintColor }) => {
-          function onButtonClickHandler() {
-            setOpenSearchBar(!openSearchBar);
-            // do not fetch again, when searchText is already empty
-            if (searchText !== '') dispatch(setIsEnd(false));
-            // removing debounce
-            onSearchBarChange.cancel();
-            setSearchText('');
-          }
-          return (
-            <LeftHeaderView>
-              <IconButton
-                iconName="search"
-                size={sizes.SIDE_ICON_SIZE}
-                color={tintColor}
-                onPress={onButtonClickHandler}
-              />
-            </LeftHeaderView>
-          );
-        },
+        headerLeft: ({ tintColor }) => (
+          <LeftHeaderView>
+            <IconButton
+              iconName="search"
+              size={sizes.SIDE_ICON_SIZE}
+              color={tintColor}
+              onPress={onSearchButtonClickHandler}
+            />
+          </LeftHeaderView>
+        ),
       });
     } else clearAuthHeader();
 
-    return () => {
-      //removing debounce, when component is unmounted
-      onSearchBarChange.cancel();
-    };
+    return () => onSearchBarChange.cancel(); //removing debounce, when component is unmounted
   }, [drafts.length, openSearchBar]);
 
-  async function fetchDraftsPack(type: FetchPackType = FetchPackType.INITIAL) {
+  const fetchDraftsPack = async (
+    type: FetchPackType = FetchPackType.INITIAL,
+  ) => {
     if (isEnd || isPackLoading) return;
     const isInitial = type === FetchPackType.INITIAL;
 
     isInitial ? setIsLoading(true) : setIsPackLoading(true);
     try {
       const { draftsPack, isEnd } = await fetchDraftPack(
-        isInitial ? 0 : drafts.length,
+        isInitial ? 0 : drafts.length, // when searching we need to have first pack
         searchText.trim(),
       );
       if (draftsPack.length) {
         dispatch(isInitial ? assignDrafts(draftsPack) : addDrafts(draftsPack));
         dispatch(setIsEnd(isEnd));
       } else {
-        isInitial && dispatch(clearDrafts());
+        isInitial && dispatch(clearDrafts()); // when searching we need to clear first seearch result
         dispatch(setIsEnd(true));
       }
     } catch (error) {
@@ -142,13 +130,13 @@ export default function Drafts(): ReactElement {
     } finally {
       isInitial ? setIsLoading(false) : setIsPackLoading(false);
     }
-  }
+  };
 
-  React.useEffect(() => {
+  useEffect(() => {
     fetchDraftsPack();
   }, [isEnd, searchText]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const unsubscribe = (listener.startListening as AppStartListening)({
       matcher: isAnyOf(updateDraft, addDraft),
       effect: ({ payload }, listenerAPI) => {
@@ -178,9 +166,7 @@ export default function Drafts(): ReactElement {
       <DraftsContentView>
         {drafts.length ? (
           <DraftsList
-            onEndReached={() => {
-              fetchDraftsPack(FetchPackType.LOAD_MORE);
-            }}
+            onEndReached={() => fetchDraftsPack(FetchPackType.LOAD_MORE)}
             onEndReachedThreshold={0.3}
             ListFooterComponent={isPackLoading ? <Spinner /> : null}
           >
@@ -195,14 +181,11 @@ export default function Drafts(): ReactElement {
           <FAB
             placement="right"
             color={CYBER_YELLOW}
-            icon={{
-              name: 'add',
-              color: 'white',
-            }}
+            icon={{ name: 'add', color: 'white' }}
             onPress={() => navigation.navigate(NavigationName.NOTES_MANAGING)}
           />
         )}
       </DraftsContentView>
     </DraftsView>
   );
-}
+};

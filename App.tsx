@@ -7,8 +7,7 @@ import { useFonts } from 'expo-font';
 import { preventAutoHideAsync, hideAsync } from 'expo-splash-screen';
 
 import Navigator from './src';
-import Loading from '@screens/Loading/Loading.screen';
-import Error from '@screens/Error/Error.screen';
+import { Loading, Error } from '@screens';
 import { initDbDrafts } from '@utils';
 import { store } from '@store';
 

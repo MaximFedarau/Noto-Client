@@ -5,9 +5,7 @@ import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useDispatch, useSelector } from 'react-redux';
 
-import Loading from '@screens/Loading/Loading.screen';
-import Notes from '@screens/Notes/Notes.screen';
-import Drafts from '@screens/Drafts/Drafts.screen';
+import { Loading, Notes, Drafts } from '@screens';
 import IconButton from '@components/Default/IconButton/IconButton.component';
 import Avatar from '@components/Navigation/Avatar/Avatar.component';
 import { RightHeaderView } from '@components/Default/View/View.component';

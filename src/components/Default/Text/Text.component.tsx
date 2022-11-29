@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { HeaderTitle } from '@react-navigation/elements';
 
 import { OSLO_GRAY } from '@constants/colors';
 
@@ -43,4 +44,10 @@ export const AuthNavigationText = styled(DefaultText)`
   font-size: 16px;
   font-weight: bold;
   text-align: center;
+`;
+
+// ! Notes & Drafts screens
+
+export const RecordsHeaderTitle = styled(HeaderTitle)`
+  font-family: Roboto-Regular;
 `;
