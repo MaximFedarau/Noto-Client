@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { Loading, Notes, Drafts } from '@screens';
 import IconButton from '@components/Default/IconButton/IconButton.component';
-import Avatar from '@components/Navigation/Avatar/Avatar.component';
+import Avatar from '@components/Default/Avatar/Avatar.component';
 import { RightHeaderView } from '@components/Default/View/View.component';
 import {
   OSLO_GRAY,

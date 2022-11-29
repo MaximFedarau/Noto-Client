@@ -14,3 +14,8 @@ export enum FetchPackType {
   INITIAL = 'INITIAL',
   LOAD_MORE = 'LOAD_MORE',
 }
+
+export enum RecordType {
+  NOTE = 'NOTE',
+  DRAFT = 'DRAFT',
+}

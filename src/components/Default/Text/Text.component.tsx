@@ -17,15 +17,9 @@ export const NoItemsText = styled(DefaultText)`
   align-self: center;
 `;
 
-// ! Drafts
-export const DraftTitle = styled(DefaultText)`
-  text-align: center;
-  font-size: 22px;
-  font-weight: bold;
-`;
+// ! Records
 
-// ! Notes
-export const NoteTitle = styled(DefaultText)`
+export const RecordTitle = styled(DefaultText)`
   text-align: center;
   font-size: 22px;
   font-weight: bold;

@@ -16,7 +16,7 @@ import {
   NotesView,
   NotesContentView,
 } from '@components/Default/View/View.component';
-import NotesList from '@components/Notes/NotesList/NotesList.component';
+import RecordsList from '@components/Records/RecordsList/RecordsList.component';
 import Spinner from '@components/Auth/Defaults/Spinner/Spinner.component';
 import {
   NoItemsText,
@@ -34,6 +34,7 @@ import {
   SocketNoteStatus,
   SocketErrorCode,
   AuthTokens,
+  RecordType,
 } from '@types';
 import {
   createAPIInstance,
@@ -348,13 +349,14 @@ export const Notes: FC = () => {
     <NotesView>
       <NotesContentView>
         {notes.length ? (
-          <NotesList
+          <RecordsList
+            type={RecordType.NOTE}
             onEndReached={() => fetchNotesPack(FetchPackType.LOAD_MORE)}
             onEndReachedThreshold={0.3}
             ListFooterComponent={isPackLoading ? <Spinner /> : null}
           >
             {notes}
-          </NotesList>
+          </RecordsList>
         ) : (
           <NoItemsText>{searchText ? 'Nothing found' : 'No notes'}</NoItemsText>
         )}

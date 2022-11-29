@@ -9,7 +9,7 @@ import { Error } from './Error';
 import { Loading } from './Loading';
 import IconButton from '@components/Default/IconButton/IconButton.component';
 import SearchBar from '@components/Default/SearchBar/SearchBar.component';
-import DraftsList from '@components/Drafts/DraftsList/DraftsList.component';
+import RecordsList from '@components/Records/RecordsList/RecordsList.component';
 import Spinner from '@components/Auth/Defaults/Spinner/Spinner.component';
 import { fetchDraftPack } from '@utils';
 import {
@@ -21,7 +21,13 @@ import {
   NoItemsText,
   RecordsHeaderTitle,
 } from '@components/Default/Text/Text.component';
-import { NavigationProps, NavigationName, Record, FetchPackType } from '@types';
+import {
+  NavigationProps,
+  NavigationName,
+  Record,
+  FetchPackType,
+  RecordType,
+} from '@types';
 import {
   draftsSelector,
   isEndSelector,
@@ -165,13 +171,14 @@ export const Drafts: FC = () => {
     <DraftsView>
       <DraftsContentView>
         {drafts.length ? (
-          <DraftsList
+          <RecordsList
+            type={RecordType.DRAFT}
             onEndReached={() => fetchDraftsPack(FetchPackType.LOAD_MORE)}
             onEndReachedThreshold={0.3}
             ListFooterComponent={isPackLoading ? <Spinner /> : null}
           >
             {drafts}
-          </DraftsList>
+          </RecordsList>
         ) : (
           <NoItemsText>
             {searchText ? 'Nothing found' : 'No drafts'}
