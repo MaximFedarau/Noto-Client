@@ -52,26 +52,25 @@ export const MainBottomTabs: FC = () => {
   };
 
   const checkIsAuth = async () => {
-    const accessToken = await SecureStore.getItemAsync('accessToken');
-    const refreshToken = await SecureStore.getItemAsync('refreshToken');
-    if (accessToken && refreshToken) {
-      const data = await getPublicData();
-      dispatch(setIsAuth(data ? true : false));
-      dispatch(data ? setProfile(data) : clearUser());
-    } else {
-      dispatch(setIsAuth(false));
-      dispatch(clearUser());
+    try {
+      const accessToken = await SecureStore.getItemAsync('accessToken');
+      const refreshToken = await SecureStore.getItemAsync('refreshToken');
+      if (accessToken && refreshToken) {
+        const data = await getPublicData();
+        dispatch(setIsAuth(data ? true : false));
+        dispatch(data ? setProfile(data) : clearUser());
+      } else {
+        dispatch(setIsAuth(false));
+        dispatch(clearUser());
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    if (focus) {
-      try {
-        checkIsAuth();
-      } finally {
-        setIsLoading(false);
-      }
-    } else setIsLoading(false);
+    if (focus) checkIsAuth();
+    else setIsLoading(false);
   }, [focus]);
 
   if (isLoading) return <Loading />;
