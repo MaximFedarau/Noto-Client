@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native';
 
-export const styles = (color = 'black') =>
+export const styles = (backgroundColor = 'black') =>
   StyleSheet.create({
     container: {
       position: 'absolute',
@@ -12,6 +12,6 @@ export const styles = (color = 'black') =>
       width: '32%',
       height: 32,
       borderRadius: 16,
-      backgroundColor: color,
+      backgroundColor,
     },
   });

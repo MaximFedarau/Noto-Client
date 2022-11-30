@@ -27,14 +27,14 @@ export const RecordTitle = styled(DefaultText)`
 
 // ! Auth Screens
 
-export const AuthFormErrorText = styled(DefaultText)`
+export const FormErrorText = styled(DefaultText)`
   color: red;
   font-size: 14px;
   margin-horizontal: 12px;
   margin-bottom: 12px;
 `;
 
-export const AuthNavigationText = styled(DefaultText)`
+export const NavigationText = styled(DefaultText)`
   font-size: 16px;
   font-weight: bold;
   text-align: center;

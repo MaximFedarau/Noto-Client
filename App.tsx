@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useCallback } from 'react';
+import React, { FC, useEffect, useCallback, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider } from 'react-redux';
 import Toast from 'react-native-toast-message';
@@ -14,8 +14,8 @@ import { store } from '@store';
 preventAutoHideAsync();
 
 const App: FC = () => {
-  const [isSetupError, setIsSetupError] = React.useState(false);
-  const [databaseInitialized, setDatabaseInitialized] = React.useState(false);
+  const [isSetupError, setIsSetupError] = useState(false);
+  const [databaseInitialized, setDatabaseInitialized] = useState(false);
   const [fontsLoaded, fontsError] = useFonts({
     'Roboto-Regular': require('./assets/fonts/Roboto/Roboto-Regular.ttf'),
   });

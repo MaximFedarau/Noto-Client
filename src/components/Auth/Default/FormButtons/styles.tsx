@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import { StyleSheet } from 'react-native';
 
 import Button from '@components/Default/Button/Button.component';
 import IconButton from '@components/Default/IconButton/IconButton.component';
@@ -20,3 +21,11 @@ export const HomeButton = styled(IconButton)`
   justify-content: center;
   margin-top: 16px;
 `;
+
+export const styles = StyleSheet.create({
+  buttonText: {
+    color: 'white',
+    fontSize: 22,
+    fontWeight: 'bold',
+  },
+});

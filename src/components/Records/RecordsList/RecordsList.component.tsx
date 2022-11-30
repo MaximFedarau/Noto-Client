@@ -2,7 +2,7 @@ import React, { FC, useState, useRef, useEffect } from 'react';
 import { FlatList, FlatListProps } from 'react-native';
 
 import Record from '@components/Records/Record/Record.component';
-import GoUpButton from '@components/Auth/Defaults/GoUpButton/GoUpButton.component';
+import GoUpButton from '@components/Auth/Default/GoUpButton';
 import { Record as IRecord, RecordType } from '@types';
 import { SOFT_BLUE, CYBER_YELLOW } from '@constants/colors';
 import { sizes } from '@constants/sizes';

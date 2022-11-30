@@ -89,22 +89,22 @@ export const AuthScreenContainer = styled.SafeAreaView`
   margin-top: ${Platform.OS === 'android' ? StatusBar.currentHeight : 24}px;
 `;
 
-export const AuthFormContainer = styled.View`
+export const FormContainer = styled.View`
   padding-vertical: 16px;
 `;
 
-export const AuthFormContentContainer = styled.View`
+export const FormContentContainer = styled.View`
   align-items: center;
 `;
 
-export const AuthFormFieldsContainer = styled.View``;
+export const FormFieldsContainer = styled.View``;
 
-export const AuthFormButtonsContainer = styled.View`
+export const FormButtonsContainer = styled.View`
   margin-top: 32px;
   align-items: center;
 `;
 
-export const AuthAvatarPickerContainer = styled.View`
+export const AvatarPickerContainer = styled.View`
   justify-content: center;
   align-items: center;
   padding-vertical: 16px;

@@ -1,18 +1,18 @@
-import React, { ReactElement } from 'react';
+import React, { FC } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import * as SecureStore from 'expo-secure-store';
+import { setItemAsync } from 'expo-secure-store';
 import { Formik } from 'formik';
 import { AxiosError } from 'axios';
 
-import FormField from '@components/Auth/Defaults/FormField/FormField.component';
-import Spinner from '@components/Auth/Defaults/Spinner/Spinner.component';
-import FormButtons from '@components/Auth/Defaults/FormButtons/FormButtons.component';
+import FormField from '@components/Auth/Default/FormField';
+import Spinner from '@components/Auth/Default/Spinner';
+import FormButtons from '@components/Auth/Default/FormButtons';
 import {
-  AuthFormContainer,
-  AuthFormFieldsContainer,
-  AuthFormContentContainer,
+  FormContainer,
+  FormFieldsContainer,
+  FormContentContainer,
 } from '@components/Default/View/View.component';
-import { AuthNavigationText } from '@components/Default/Text/Text.component';
+import { NavigationText } from '@components/Default/Text/Text.component';
 import {
   NavigationProps,
   NavigationAuthName,
@@ -24,9 +24,8 @@ import {
 import { signUpFormValidationSchema } from '@constants/validationSchemas';
 import { showToast, createAPIInstance } from '@utils';
 
-export default function Form(): ReactElement {
+const Form: FC = () => {
   const navigation = useNavigation<NavigationProps>();
-
   const formInitialValues: SignUpData = {
     nickname: '',
     password: '',
@@ -35,16 +34,17 @@ export default function Form(): ReactElement {
 
   const [isLoading, setIsLoading] = React.useState(false);
 
-  //going to the sign in screen
-  const onNavigationTextHandler = () => {
+  const handleNavigateSignIn = () => {
     if (!isLoading) navigation.replace(NavigationAuthName.SIGN_IN);
   };
 
-  // submit hanlder (sign up  + log in)
-  async function onFormSubmitHandler({ nickname, password }: SignUpData) {
-    setIsLoading(true); // setting that the form is loading
+  const handleReturnToHome = () =>
+    navigation.navigate(NavigationName.NOTES_OVERVIEW);
+
+  const onFormSubmitHandler = async ({ nickname, password }: SignUpData) => {
+    setIsLoading(true);
     const instance = createAPIInstance();
-    const trimmedNickname = nickname.trim(); // trimming the nickname
+    const trimmedNickname = nickname.trim();
 
     try {
       const { data: signUpData } = await instance.post<{ id: string }>(
@@ -56,13 +56,12 @@ export default function Form(): ReactElement {
       );
       const { id } = signUpData;
 
-      const { data } = await instance // in any case we login user
-        .post<AuthTokens>(`/auth/login`, {
-          nickname: trimmedNickname,
-          password,
-        });
-      await SecureStore.setItemAsync('accessToken', data.accessToken); // saving access token to secure store
-      await SecureStore.setItemAsync('refreshToken', data.refreshToken); // saving refresh token to secure store
+      const { data } = await instance.post<AuthTokens>(`/auth/login`, {
+        nickname: trimmedNickname,
+        password,
+      });
+      await setItemAsync('accessToken', data.accessToken);
+      await setItemAsync('refreshToken', data.refreshToken);
       showToast(
         ToastType.SUCCESS,
         'Congratulations!',
@@ -77,20 +76,15 @@ export default function Form(): ReactElement {
       showToast(
         ToastType.ERROR,
         'Sign Up Error',
-        response && response?.data
+        response && response.data
           ? response.data.message
           : 'Something went wrong:(',
       );
     }
-  }
-
-  // returning to the main screen
-  const handleReturnToHome = () => {
-    navigation.navigate(NavigationName.NOTES_OVERVIEW);
   };
 
   return (
-    <AuthFormContainer>
+    <FormContainer>
       <Formik
         initialValues={formInitialValues}
         onSubmit={onFormSubmitHandler}
@@ -99,8 +93,8 @@ export default function Form(): ReactElement {
         validateOnBlur={false}
       >
         {({ values, errors, handleChange, handleSubmit }) => (
-          <AuthFormContentContainer>
-            <AuthFormFieldsContainer>
+          <FormContentContainer>
+            <FormFieldsContainer>
               <FormField
                 onChangeText={handleChange('nickname')}
                 placeholder="Nickname:"
@@ -124,10 +118,10 @@ export default function Form(): ReactElement {
               >
                 {values.confirmPassword}
               </FormField>
-            </AuthFormFieldsContainer>
-            <AuthNavigationText onPress={onNavigationTextHandler}>
+            </FormFieldsContainer>
+            <NavigationText onPress={handleNavigateSignIn}>
               Sign In
-            </AuthNavigationText>
+            </NavigationText>
             {isLoading ? (
               <Spinner />
             ) : (
@@ -138,9 +132,11 @@ export default function Form(): ReactElement {
                 Sign Up
               </FormButtons>
             )}
-          </AuthFormContentContainer>
+          </FormContentContainer>
         )}
       </Formik>
-    </AuthFormContainer>
+    </FormContainer>
   );
-}
+};
+
+export default Form;

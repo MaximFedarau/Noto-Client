@@ -1,4 +1,4 @@
-import React, { FC, useEffect } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import * as SecureStore from 'expo-secure-store';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
@@ -38,7 +38,7 @@ export const MainBottomTabs: FC = () => {
   const navigation = useNavigation<NavigationProps>();
   const focus = useIsFocused();
 
-  const [isLoading, setIsLoading] = React.useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   const navigateToAuth = () => {
     navigation.navigate(NavigationName.AUTH);

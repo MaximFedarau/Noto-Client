@@ -24,7 +24,7 @@ import {
   NotesManagingLeftHeaderView,
   NotesManagingRightHeaderView,
 } from '@components/Default/View/View.component';
-import Spinner from '@components/Auth/Defaults/Spinner/Spinner.component';
+import Spinner from '@components/Auth/Default/Spinner';
 import { notesManagingFormValidationSchema } from '@constants/validationSchemas';
 import { sizes } from '@constants/sizes';
 import {

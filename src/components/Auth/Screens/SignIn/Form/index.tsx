@@ -1,18 +1,18 @@
-import React, { ReactElement } from 'react';
+import React, { FC, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import * as SecureStore from 'expo-secure-store';
+import { setItemAsync } from 'expo-secure-store';
 import { Formik } from 'formik';
 import { AxiosError } from 'axios';
 
-import FormField from '@components/Auth/Defaults/FormField/FormField.component';
-import FormButtons from '@components/Auth/Defaults/FormButtons/FormButtons.component';
-import Spinner from '@components/Auth/Defaults/Spinner/Spinner.component';
+import FormField from '@components/Auth/Default/FormField';
+import FormButtons from '@components/Auth/Default/FormButtons';
+import Spinner from '@components/Auth/Default/Spinner';
 import {
-  AuthFormContainer,
-  AuthFormFieldsContainer,
-  AuthFormContentContainer,
+  FormContainer,
+  FormFieldsContainer,
+  FormContentContainer,
 } from '@components/Default/View/View.component';
-import { AuthNavigationText } from '@components/Default/Text/Text.component';
+import { NavigationText } from '@components/Default/Text/Text.component';
 import {
   NavigationAuthName,
   NavigationProps,
@@ -24,21 +24,22 @@ import {
 import { signInFormValidationSchema } from '@constants/validationSchemas';
 import { showToast, createAPIInstance } from '@utils';
 
-export default function Form(): ReactElement {
+const Form: FC = () => {
   const navigation = useNavigation<NavigationProps>();
   const fontInitialValues: SignInData = {
     nickname: '',
     password: '',
   };
 
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // go to the sign up screen
-  const onNavigationTextHandler = () => {
+  const handleNavigateSignUp = () => {
     if (!isLoading) navigation.replace(NavigationAuthName.SIGN_UP);
   };
 
-  // submitting (log in)
+  const handleReturnToHome = () =>
+    navigation.navigate(NavigationName.NOTES_OVERVIEW);
+
   const onFormSubmitHandler = async ({ nickname, password }: SignInData) => {
     setIsLoading(true);
     const instance = createAPIInstance();
@@ -48,14 +49,14 @@ export default function Form(): ReactElement {
         nickname: nickname.trim(),
         password,
       });
-      await SecureStore.setItemAsync('accessToken', data.accessToken); // saving access token to secure store
-      await SecureStore.setItemAsync('refreshToken', data.refreshToken); // saving refresh token to secure store
+      await setItemAsync('accessToken', data.accessToken); // saving access token to secure store
+      await setItemAsync('refreshToken', data.refreshToken); // saving refresh token to secure store
       showToast(
         ToastType.SUCCESS,
         'Congratulations!',
         'You have successfully signed in.',
       );
-      handleReturnToHome(); // going to the home screen
+      handleReturnToHome();
     } catch (error) {
       const { response } = error as AxiosError<{ message: string }>;
       setIsLoading(false);
@@ -69,13 +70,8 @@ export default function Form(): ReactElement {
     }
   };
 
-  // returning home
-  const handleReturnToHome = () => {
-    navigation.navigate(NavigationName.NOTES_OVERVIEW);
-  };
-
   return (
-    <AuthFormContainer>
+    <FormContainer>
       <Formik
         initialValues={fontInitialValues}
         onSubmit={onFormSubmitHandler}
@@ -84,8 +80,8 @@ export default function Form(): ReactElement {
         validateOnBlur={false}
       >
         {({ values, errors, handleChange, handleSubmit }) => (
-          <AuthFormContentContainer>
-            <AuthFormFieldsContainer>
+          <FormContentContainer>
+            <FormFieldsContainer>
               <FormField
                 onChangeText={handleChange('nickname')}
                 placeholder="Nickname:"
@@ -101,10 +97,10 @@ export default function Form(): ReactElement {
               >
                 {values.password}
               </FormField>
-            </AuthFormFieldsContainer>
-            <AuthNavigationText onPress={onNavigationTextHandler}>
+            </FormFieldsContainer>
+            <NavigationText onPress={handleNavigateSignUp}>
               Sign Up
-            </AuthNavigationText>
+            </NavigationText>
             {isLoading ? (
               <Spinner />
             ) : (
@@ -115,9 +111,11 @@ export default function Form(): ReactElement {
                 Sign In
               </FormButtons>
             )}
-          </AuthFormContentContainer>
+          </FormContentContainer>
         )}
       </Formik>
-    </AuthFormContainer>
+    </FormContainer>
   );
-}
+};
+
+export default Form;

@@ -9,11 +9,12 @@ import Svg, { Path } from 'react-native-svg';
 
 import { showToast } from '@utils';
 import { ToastType } from '@types';
-import { styles, PickedImage } from './LogoPicker.styles';
+
+import { styles, PickedImage } from './styles';
 
 interface Props {
-  image: undefined | string;
   setImage: React.Dispatch<React.SetStateAction<string | undefined>>;
+  image?: string;
   disabled?: boolean;
 }
 
@@ -43,7 +44,7 @@ const LogoPicker: FC<Props> = ({ image, setImage, disabled = false }) => {
 
     const { canceled, assets } = await launchImageLibraryAsync({
       allowsEditing: true,
-      aspect: [1, 1],
+      aspect: [1, 1], // square
       quality: 0.8,
     });
     if (canceled) return;

@@ -4,11 +4,11 @@ import { uploadAsync, FileSystemUploadType } from 'expo-file-system';
 import { getItemAsync, setItemAsync } from 'expo-secure-store';
 import { AxiosError } from 'axios';
 
-import ContentScrollView from '@components/Auth/Defaults/ContentScrollView/ContentScrollView.component';
-import LogoPicker from '@components/Auth/Screens/AvatarPicker/LogoPicker/LogoPicker.component';
-import Spinner from '@components/Auth/Defaults/Spinner/Spinner.component';
-import FormButtons from '@components/Auth/Defaults/FormButtons/FormButtons.component';
-import { AuthAvatarPickerContainer } from '@components/Default/View/View.component';
+import ContentScrollView from '@components/Auth/Default/ContentScrollView';
+import LogoPicker from '@components/Auth/Screens/AvatarPicker/LogoPicker';
+import Spinner from '@components/Auth/Default/Spinner';
+import FormButtons from '@components/Auth/Default/FormButtons';
+import { AvatarPickerContainer } from '@components/Default/View/View.component';
 import {
   AvatarPickerRouteProp,
   NavigationProps,
@@ -29,6 +29,9 @@ const Content: FC = () => {
     showToast(ToastType.ERROR, 'Logout', 'Your session has expired');
     handleReturnToHome();
   });
+
+  const handleReturnToHome = () =>
+    navigation.navigate(NavigationName.NOTES_OVERVIEW);
 
   const onSubmitHandler = async () => {
     if (!route.params || !image) return;
@@ -82,12 +85,9 @@ const Content: FC = () => {
     }
   };
 
-  const handleReturnToHome = () =>
-    navigation.navigate(NavigationName.NOTES_OVERVIEW);
-
   return (
     <ContentScrollView>
-      <AuthAvatarPickerContainer>
+      <AvatarPickerContainer>
         <LogoPicker image={image} setImage={setImage} disabled={isLoading} />
         {isLoading ? (
           <Spinner />
@@ -99,7 +99,7 @@ const Content: FC = () => {
             Submit
           </FormButtons>
         )}
-      </AuthAvatarPickerContainer>
+      </AvatarPickerContainer>
     </ContentScrollView>
   );
 };
