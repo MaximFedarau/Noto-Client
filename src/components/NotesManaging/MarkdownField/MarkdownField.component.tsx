@@ -1,7 +1,7 @@
 import React, { ReactElement } from 'react';
 import { TextInputProps, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import * as showdown from 'showdown';
+import showdown from 'showdown';
 
 import FormField from '@components/NotesManaging/FormField/FormField.component';
 import CustomRenderHTML from '@components/Default/CustomRenderHTML/CustomRenderHTML.component';

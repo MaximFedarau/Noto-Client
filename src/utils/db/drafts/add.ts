@@ -1,11 +1,11 @@
-import * as SQLite from 'expo-sqlite';
+import { SQLResultSet, openDatabase } from 'expo-sqlite';
 
 import { Record } from '@types';
 
-const db = SQLite.openDatabase('drafts.db');
+const db = openDatabase('drafts.db');
 
 export const addDraft = ({ date, title, content }: Omit<Record, 'id'>) => {
-  const promise = new Promise<SQLite.SQLResultSet>((resolve, reject) => {
+  const promise = new Promise<SQLResultSet>((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
         'INSERT INTO drafts (title, content, date) VALUES (?, ?, ?)',

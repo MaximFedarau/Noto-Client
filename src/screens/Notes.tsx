@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState, useRef } from 'react';
 import { FAB } from '@rneui/themed';
 import { useNavigation } from '@react-navigation/native';
-import * as SecureStore from 'expo-secure-store';
+import { setItemAsync } from 'expo-secure-store';
 import { useSelector, useDispatch } from 'react-redux';
 import { isAnyOf } from '@reduxjs/toolkit';
 import { debounce } from 'lodash';
@@ -247,8 +247,8 @@ export const Notes: FC = () => {
               const { data: refreshData } =
                 await refreshInstance.post<AuthTokens>(`/auth/token/refresh`);
               const { accessToken, refreshToken } = refreshData;
-              await SecureStore.setItemAsync('accessToken', accessToken);
-              await SecureStore.setItemAsync('refreshToken', refreshToken);
+              await setItemAsync('accessToken', accessToken);
+              await setItemAsync('refreshToken', refreshToken);
 
               let emittedMessage = '';
               switch (data?.status) {
@@ -305,8 +305,8 @@ export const Notes: FC = () => {
             const { data: refreshData } =
               await refreshInstance.post<AuthTokens>(`/auth/token/refresh`);
             const { accessToken, refreshToken } = refreshData;
-            await SecureStore.setItemAsync('accessToken', accessToken);
-            await SecureStore.setItemAsync('refreshToken', refreshToken);
+            await setItemAsync('accessToken', accessToken);
+            await setItemAsync('refreshToken', refreshToken);
 
             socket.disconnect();
             dispatch(removeSocket());

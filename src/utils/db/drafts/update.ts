@@ -1,8 +1,8 @@
-import * as SQLite from 'expo-sqlite';
+import { openDatabase } from 'expo-sqlite';
 
 import { Record } from '@types';
 
-const db = SQLite.openDatabase('drafts.db');
+const db = openDatabase('drafts.db');
 
 export const updateDraftById = ({ id, title, content, date }: Record) => {
   const promise = new Promise((resolve, reject) => {

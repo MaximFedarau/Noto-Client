@@ -7,7 +7,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
-import * as SecureStore from 'expo-secure-store';
+import { getItemAsync } from 'expo-secure-store';
 import { Formik, FormikProps } from 'formik';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
@@ -388,8 +388,8 @@ export default function Form(): ReactElement {
   }, [socket, isLoading, isError]);
 
   const onFormSubmitHandler = async (values: RecordsManagingData) => {
-    const accessToken = await SecureStore.getItemAsync('accessToken');
-    const refreshToken = await SecureStore.getItemAsync('refreshToken');
+    const accessToken = await getItemAsync('accessToken');
+    const refreshToken = await getItemAsync('refreshToken');
     if (!accessToken || !refreshToken || !socket) {
       Alert.alert('Oops...', 'You are not logged in:(');
       return;
@@ -406,8 +406,8 @@ export default function Form(): ReactElement {
   const onNoteUpdateHandler = async (values: RecordsManagingData) => {
     if (!route.params || !route.params.noteId) return;
 
-    const accessToken = await SecureStore.getItemAsync('accessToken');
-    const refreshToken = await SecureStore.getItemAsync('refreshToken');
+    const accessToken = await getItemAsync('accessToken');
+    const refreshToken = await getItemAsync('refreshToken');
     // ? also we can check for form dirty, but I don't think it's necessary here, because we have cancel button. For example, such apps as Telegram, Slack and Discord check for form dirty.
     // ? (!accessToken || !refreshToken || !socket || !formRef.current.dirty)
     if (!accessToken || !refreshToken || !socket) {

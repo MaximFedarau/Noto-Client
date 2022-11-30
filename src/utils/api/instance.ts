@@ -1,4 +1,4 @@
-import * as SecureStore from 'expo-secure-store';
+import { getItemAsync, setItemAsync, deleteItemAsync } from 'expo-secure-store';
 import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
 
 import { AuthTokens } from '@types';
@@ -10,7 +10,7 @@ export const createAPIRefreshInstance = (onExit?: () => void) => {
 
   refreshInstance.interceptors.request.use(
     async (config: AxiosRequestConfig) => {
-      const refreshToken = await SecureStore.getItemAsync('refreshToken');
+      const refreshToken = await getItemAsync('refreshToken');
       (config.headers ??= {}).Authorization = `Bearer ${refreshToken}`;
       return config;
     },
@@ -20,8 +20,8 @@ export const createAPIRefreshInstance = (onExit?: () => void) => {
     (config: AxiosResponse) => config,
     async (error) => {
       if (error.response.status === 401) {
-        await SecureStore.deleteItemAsync('accessToken');
-        await SecureStore.deleteItemAsync('refreshToken');
+        await deleteItemAsync('accessToken');
+        await deleteItemAsync('refreshToken');
         onExit?.();
       }
       throw error;
@@ -39,7 +39,7 @@ export const createAPIInstance = (onExit?: () => void) => {
   });
 
   instance.interceptors.request.use(async (config: AxiosRequestConfig) => {
-    const accessToken = await SecureStore.getItemAsync('accessToken');
+    const accessToken = await getItemAsync('accessToken');
     (config.headers ??= {}).Authorization = `Bearer ${accessToken}`;
     return config;
   });
@@ -51,8 +51,8 @@ export const createAPIInstance = (onExit?: () => void) => {
         const { data } = await refreshInstance.post<AuthTokens>(
           `/auth/token/refresh`,
         );
-        await SecureStore.setItemAsync('accessToken', data.accessToken);
-        await SecureStore.setItemAsync('refreshToken', data.refreshToken);
+        await setItemAsync('accessToken', data.accessToken);
+        await setItemAsync('refreshToken', data.refreshToken);
         return instance.request(error.config);
       }
       throw error;

@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import * as SecureStore from 'expo-secure-store';
+import { getItemAsync, deleteItemAsync } from 'expo-secure-store';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useDispatch, useSelector } from 'react-redux';
@@ -45,16 +45,16 @@ export const MainBottomTabs: FC = () => {
   };
 
   const logOut = async () => {
-    await SecureStore.deleteItemAsync('accessToken');
-    await SecureStore.deleteItemAsync('refreshToken');
+    await deleteItemAsync('accessToken');
+    await deleteItemAsync('refreshToken');
     dispatch(setIsAuth(false));
     dispatch(clearUser());
   };
 
   const checkIsAuth = async () => {
     try {
-      const accessToken = await SecureStore.getItemAsync('accessToken');
-      const refreshToken = await SecureStore.getItemAsync('refreshToken');
+      const accessToken = await getItemAsync('accessToken');
+      const refreshToken = await getItemAsync('refreshToken');
       if (accessToken && refreshToken) {
         const data = await getPublicData();
         dispatch(setIsAuth(data ? true : false));
