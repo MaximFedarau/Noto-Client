@@ -28,6 +28,7 @@ export const RecordTitle = styled(DefaultText)`
 // ! Auth Screens
 
 export const FormErrorText = styled(DefaultText)`
+  align-self: flex-start;
   color: red;
   font-size: 14px;
   margin-horizontal: 12px;

@@ -12,11 +12,7 @@ interface Props {
 
 const FormButtons: FC<Props> = ({ children, onSubmit, onHomeReturn }) => (
   <FormButtonsContainer>
-    <FormSubmitButton
-      onPress={onSubmit}
-      style={({ pressed }) => (pressed ? { opacity: 0.8 } : {})}
-      textStyle={styles.buttonText}
-    >
+    <FormSubmitButton onPress={onSubmit} textStyle={styles.buttonText}>
       {children}
     </FormSubmitButton>
     <HomeButton

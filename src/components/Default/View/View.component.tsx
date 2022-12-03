@@ -91,13 +91,8 @@ export const AuthScreenContainer = styled.SafeAreaView`
 
 export const FormContainer = styled.View`
   padding-vertical: 16px;
-`;
-
-export const FormContentContainer = styled.View`
   align-items: center;
 `;
-
-export const FormFieldsContainer = styled.View``;
 
 export const FormButtonsContainer = styled.View`
   margin-top: 32px;

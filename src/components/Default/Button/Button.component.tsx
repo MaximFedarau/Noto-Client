@@ -19,9 +19,9 @@ export default function Button({
 }: ButtonProps): ReactElement {
   return (
     <ButtonContainer
-      type={type}
-      style={({ pressed }) => (pressed ? { opacity: 0.8 } : {})}
       {...props}
+      type={type}
+      style={({ pressed }) => [pressed ? { opacity: 0.8 } : {}, props.style]}
     >
       <ButtonText style={textStyle} type={type}>
         {children}

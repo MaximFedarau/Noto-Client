@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { setItemAsync } from 'expo-secure-store';
 import { Formik } from 'formik';
@@ -7,11 +7,7 @@ import { AxiosError } from 'axios';
 import FormField from '@components/Auth/Default/FormField';
 import Spinner from '@components/Auth/Default/Spinner';
 import FormButtons from '@components/Auth/Default/FormButtons';
-import {
-  FormContainer,
-  FormFieldsContainer,
-  FormContentContainer,
-} from '@components/Default/View/View.component';
+import { FormContainer } from '@components/Default/View/View.component';
 import { NavigationText } from '@components/Default/Text/Text.component';
 import {
   NavigationProps,
@@ -21,34 +17,30 @@ import {
   SignUpData,
   AuthTokens,
 } from '@types';
-import { signUpFormValidationSchema } from '@constants/validationSchemas';
+import { signUpSchema } from '@constants/validationSchemas';
 import { showToast, createAPIInstance } from '@utils';
 
 const Form: FC = () => {
-  const navigation = useNavigation<NavigationProps>();
-  const formInitialValues: SignUpData = {
+  const instance = createAPIInstance();
+  const initialValues: SignUpData = {
     nickname: '',
     password: '',
     confirmPassword: '',
   };
 
-  const [isLoading, setIsLoading] = React.useState(false);
+  const navigation = useNavigation<NavigationProps>();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleNavigateSignIn = () => {
-    if (!isLoading) navigation.replace(NavigationAuthName.SIGN_IN);
-  };
+  const navigateSignIn = () => navigation.replace(NavigationAuthName.SIGN_IN);
+  const navigateHome = () => navigation.navigate(NavigationName.NOTES_OVERVIEW);
 
-  const handleReturnToHome = () =>
-    navigation.navigate(NavigationName.NOTES_OVERVIEW);
-
-  const onFormSubmitHandler = async ({ nickname, password }: SignUpData) => {
+  const onSubmit = async ({ nickname, password }: SignUpData) => {
     setIsLoading(true);
-    const instance = createAPIInstance();
     const trimmedNickname = nickname.trim();
 
     try {
       const { data: signUpData } = await instance.post<{ id: string }>(
-        `/auth/signup`,
+        '/auth/signup',
         {
           nickname: trimmedNickname,
           password,
@@ -56,7 +48,7 @@ const Form: FC = () => {
       );
       const { id } = signUpData;
 
-      const { data } = await instance.post<AuthTokens>(`/auth/login`, {
+      const { data } = await instance.post<AuthTokens>('/auth/login', {
         nickname: trimmedNickname,
         password,
       });
@@ -67,9 +59,7 @@ const Form: FC = () => {
         'Congratulations!',
         'You have successfully signed up.',
       );
-      navigation.replace(NavigationAuthName.AVATAR_PICKER, {
-        id,
-      });
+      navigation.replace(NavigationAuthName.AVATAR_PICKER, { id });
     } catch (error) {
       const { response } = error as AxiosError<{ message: string }>;
       setIsLoading(false);
@@ -84,58 +74,51 @@ const Form: FC = () => {
   };
 
   return (
-    <FormContainer>
-      <Formik
-        initialValues={formInitialValues}
-        onSubmit={onFormSubmitHandler}
-        validationSchema={signUpFormValidationSchema}
-        validateOnChange={false}
-        validateOnBlur={false}
-      >
-        {({ values, errors, handleChange, handleSubmit }) => (
-          <FormContentContainer>
-            <FormFieldsContainer>
-              <FormField
-                onChangeText={handleChange('nickname')}
-                placeholder="Nickname:"
-                error={!values.nickname ? errors.nickname : undefined}
-              >
-                {values.nickname}
-              </FormField>
-              <FormField
-                onChangeText={handleChange('password')}
-                placeholder="Password:"
-                error={errors.password}
-                secureTextEntry
-              >
-                {values.password}
-              </FormField>
-              <FormField
-                onChangeText={handleChange('confirmPassword')}
-                placeholder="Confirm password:"
-                error={errors.confirmPassword}
-                secureTextEntry
-              >
-                {values.confirmPassword}
-              </FormField>
-            </FormFieldsContainer>
-            <NavigationText onPress={handleNavigateSignIn}>
-              Sign In
-            </NavigationText>
-            {isLoading ? (
-              <Spinner />
-            ) : (
-              <FormButtons
-                onSubmit={handleSubmit}
-                onHomeReturn={handleReturnToHome}
-              >
+    <Formik
+      initialValues={initialValues}
+      onSubmit={onSubmit}
+      validationSchema={signUpSchema}
+      validateOnChange={false}
+      validateOnBlur={false}
+    >
+      {({ values, errors, handleChange, handleSubmit }) => (
+        <FormContainer>
+          <FormField
+            onChangeText={handleChange('nickname')}
+            placeholder="Nickname:"
+            error={errors.nickname}
+          >
+            {values.nickname}
+          </FormField>
+          <FormField
+            onChangeText={handleChange('password')}
+            placeholder="Password:"
+            error={errors.password}
+            secureTextEntry
+          >
+            {values.password}
+          </FormField>
+          <FormField
+            onChangeText={handleChange('confirmPassword')}
+            placeholder="Confirm password:"
+            error={errors.confirmPassword}
+            secureTextEntry
+          >
+            {values.confirmPassword}
+          </FormField>
+          {isLoading ? (
+            <Spinner />
+          ) : (
+            <>
+              <NavigationText onPress={navigateSignIn}>Sign In</NavigationText>
+              <FormButtons onSubmit={handleSubmit} onHomeReturn={navigateHome}>
                 Sign Up
               </FormButtons>
-            )}
-          </FormContentContainer>
-        )}
-      </Formik>
-    </FormContainer>
+            </>
+          )}
+        </FormContainer>
+      )}
+    </Formik>
   );
 };
 
