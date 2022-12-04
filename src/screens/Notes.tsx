@@ -17,7 +17,7 @@ import {
   NotesContentView,
 } from '@components/Default/View/View.component';
 import RecordsList from '@components/Records/RecordsList/RecordsList.component';
-import Spinner from '@components/Auth/Default/Spinner';
+import Spinner from '@components/Default/Spinner';
 import {
   NoItemsText,
   RecordsHeaderTitle,

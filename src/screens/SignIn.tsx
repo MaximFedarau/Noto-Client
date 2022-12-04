@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 
-import ContentScrollView from '@components/Auth/Default/ContentScrollView';
-import Logo from '@components/Auth/Default/Logo';
-import Form from '@components/Auth/Screens/Form';
+import ContentScrollView from '@components/Auth/ContentScrollView';
+import Logo from '@components/Auth/Logo';
+import Form from '@components/Auth/Form';
 import { AuthScreenContainer } from '@components/Default/View/View.component';
 
 export const SignIn: FC = () => (

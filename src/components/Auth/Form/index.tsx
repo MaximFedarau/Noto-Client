@@ -4,9 +4,9 @@ import { setItemAsync } from 'expo-secure-store';
 import { Formik, FormikErrors } from 'formik';
 import { AxiosError } from 'axios';
 
-import FormField from '@components/Auth/Default/FormField';
-import FormButtons from '@components/Auth/Default/FormButtons';
-import Spinner from '@components/Auth/Default/Spinner';
+import FormField from '@components/Auth/FormField';
+import FormButtons from '@components/Auth/FormButtons';
+import Spinner from '@components/Default/Spinner';
 import { FormContainer } from '@components/Default/View/View.component';
 import { NavigationText } from '@components/Default/Text/Text.component';
 import {
