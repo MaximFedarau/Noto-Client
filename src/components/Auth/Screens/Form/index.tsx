@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { setItemAsync } from 'expo-secure-store';
-import { Formik } from 'formik';
+import { Formik, FormikErrors } from 'formik';
 import { AxiosError } from 'axios';
 
 import FormField from '@components/Auth/Default/FormField';
@@ -14,29 +14,52 @@ import {
   NavigationProps,
   NavigationName,
   ToastType,
-  SignInData,
+  AuthData,
   AuthTokens,
+  SignUpData,
 } from '@types';
-import { signInSchema } from '@constants/validationSchemas';
+import { signInSchema, signUpSchema } from '@constants/validationSchemas';
 import { showToast, createAPIInstance } from '@utils';
 
-const Form: FC = () => {
+interface Props {
+  hasAccount: boolean;
+}
+
+const Form: FC<Props> = ({ hasAccount }) => {
   const instance = createAPIInstance();
-  const initialValues: SignInData = {
+  const initialValues: AuthData = {
     nickname: '',
     password: '',
+    ...(!hasAccount && { confirmPassword: '' }),
   };
 
   const navigation = useNavigation<NavigationProps>();
   const [isLoading, setIsLoading] = useState(false);
 
-  const navigateSignUp = () => navigation.replace(NavigationAuthName.SIGN_UP);
+  const navigateAuth = () =>
+    navigation.replace(
+      hasAccount ? NavigationAuthName.SIGN_UP : NavigationAuthName.SIGN_IN,
+    );
   const navigateHome = () => navigation.navigate(NavigationName.NOTES_OVERVIEW);
 
-  const onSubmit = async ({ nickname, password }: SignInData) => {
+  const signUp = async ({ nickname, password }: AuthData) => {
+    const { data: signUpData } = await instance.post<{ id: string }>(
+      '/auth/signup',
+      {
+        nickname: nickname.trim(),
+        password,
+      },
+    );
+    return signUpData.id;
+  };
+
+  const onSubmit = async ({ nickname, password }: AuthData) => {
     setIsLoading(true);
 
     try {
+      let id = '';
+      if (!hasAccount) id = await signUp({ nickname, password });
+
       const { data } = await instance.post<AuthTokens>('/auth/login', {
         nickname: nickname.trim(),
         password,
@@ -46,15 +69,17 @@ const Form: FC = () => {
       showToast(
         ToastType.SUCCESS,
         'Congratulations!',
-        'You have successfully signed in.',
+        `You have successfully ${hasAccount ? 'signed in' : 'signed up'}.`,
       );
-      navigateHome();
+
+      if (hasAccount || !id) navigateHome();
+      else navigation.replace(NavigationAuthName.AVATAR_PICKER, { id });
     } catch (error) {
       const { response } = error as AxiosError<{ message: string }>;
       setIsLoading(false);
       showToast(
         ToastType.ERROR,
-        'Login Error',
+        `${hasAccount ? 'Sign In' : 'Sign Up'} Error`,
         response && response.data
           ? response.data.message
           : 'Something went wrong:(',
@@ -66,7 +91,7 @@ const Form: FC = () => {
     <Formik
       initialValues={initialValues}
       onSubmit={onSubmit}
-      validationSchema={signInSchema}
+      validationSchema={hasAccount ? signInSchema : signUpSchema}
       validateOnChange={false}
       validateOnBlur={false}
     >
@@ -87,13 +112,25 @@ const Form: FC = () => {
           >
             {values.password}
           </FormField>
+          {!hasAccount && (
+            <FormField
+              onChangeText={handleChange('confirmPassword')}
+              placeholder="Confirm password:"
+              error={(errors as FormikErrors<SignUpData>).confirmPassword}
+              secureTextEntry
+            >
+              {(values as SignUpData).confirmPassword}
+            </FormField>
+          )}
           {isLoading ? (
             <Spinner />
           ) : (
             <>
-              <NavigationText onPress={navigateSignUp}>Sign Up</NavigationText>
+              <NavigationText onPress={navigateAuth}>
+                {hasAccount ? 'Sign Up' : 'Sign In'}
+              </NavigationText>
               <FormButtons onSubmit={handleSubmit} onHomeReturn={navigateHome}>
-                Sign In
+                {hasAccount ? 'Sign In' : 'Sign Up'}
               </FormButtons>
             </>
           )}

@@ -1,11 +1,9 @@
-export interface SignInData {
+export interface AuthData {
   nickname: string;
   password: string;
 }
 
-export interface SignUpData {
-  nickname: string;
-  password: string;
+export interface SignUpData extends AuthData {
   confirmPassword: string;
 }
 

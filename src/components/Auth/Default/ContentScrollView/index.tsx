@@ -12,6 +12,7 @@ const ContentScrollView: FC<ScrollViewProps> = ({
     style={styles.container}
     contentContainerStyle={styles.contentContainer}
     bounces={false}
+    showsVerticalScrollIndicator={false}
   >
     {children}
   </DefaultScrollView>
