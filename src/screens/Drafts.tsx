@@ -9,7 +9,7 @@ import { Error } from './Error';
 import { Loading } from './Loading';
 import IconButton from '@components/Default/IconButton/IconButton.component';
 import SearchBar from '@components/Default/SearchBar/SearchBar.component';
-import RecordsList from '@components/Records/RecordsList/RecordsList.component';
+import RecordsList from '@components/Records/RecordsList';
 import Spinner from '@components/Default/Spinner';
 import { fetchDraftPack } from '@utils';
 import {

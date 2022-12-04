@@ -1,7 +1,7 @@
 import React, { FC, memo } from 'react';
 import { useWindowDimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import showdown from 'showdown';
+import { Converter } from 'showdown';
 
 import { RecordTitle } from '@components/Default/Text/Text.component';
 import CustomRenderHTML from '@components/Default/CustomRenderHTML/CustomRenderHTML.component';
@@ -13,7 +13,7 @@ import {
 } from '@types';
 import { contentFormat } from '@utils';
 
-import { Container } from './Record.styles';
+import { Container } from './styles';
 
 interface Props {
   children: IRecord;
@@ -24,7 +24,7 @@ const Record: FC<Props> = memo(({ children, type }) => {
   const { title, content, id } = children;
   const { width } = useWindowDimensions();
 
-  const converter = new showdown.Converter({ noHeaderId: true });
+  const converter = new Converter({ noHeaderId: true });
   const modifiedContent = contentFormat(converter.makeHtml(content || ''));
 
   const navigation = useNavigation<NavigationProps>();
