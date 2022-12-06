@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from 'react';
-import { FAB } from '@rneui/themed';
+import { FAB } from '@rneui/base';
 import { useDispatch, useSelector } from 'react-redux';
 import { isAnyOf } from '@reduxjs/toolkit';
 import { useNavigation } from '@react-navigation/native';

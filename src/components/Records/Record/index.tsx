@@ -1,4 +1,4 @@
-import React, { FC, memo } from 'react';
+import React, { FC } from 'react';
 import { useWindowDimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Converter } from 'showdown';
@@ -20,7 +20,7 @@ interface Props {
   type: RecordType;
 }
 
-const Record: FC<Props> = memo(({ children, type }) => {
+const Record: FC<Props> = ({ children, type }) => {
   const { title, content, id } = children;
   const { width } = useWindowDimensions();
 
@@ -52,6 +52,6 @@ const Record: FC<Props> = memo(({ children, type }) => {
       </CustomRenderHTML>
     </Container>
   );
-});
+};
 
 export default Record;

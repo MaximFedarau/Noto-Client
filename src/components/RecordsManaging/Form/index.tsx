@@ -1,4 +1,11 @@
-import React, { ReactElement, useEffect, useLayoutEffect } from 'react';
+import React, {
+  FC,
+  useEffect,
+  useLayoutEffect,
+  useState,
+  useRef,
+  MutableRefObject,
+} from 'react';
 import {
   AppState,
   AppStateStatus,
@@ -11,14 +18,13 @@ import { getItemAsync } from 'expo-secure-store';
 import { Formik, FormikProps } from 'formik';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
-import { AxiosError } from 'axios';
 
 import { Error } from '@screens/Error';
 import { Loading } from '@screens/Loading';
 import IconButton from '@components/Default/IconButton';
 import Button from '@components/Default/Button';
-import FormField from '@components/RecordsManaging/FormField/FormField.component';
-import MarkdownField from '@components/RecordsManaging/MarkdownField/MarkdownField.component';
+import FormField from '@components/RecordsManaging/FormField';
+import MarkdownField from '@components/RecordsManaging/MarkdownField';
 import {
   ScrollContainer,
   RecordsManagingLeftHeader,
@@ -45,6 +51,7 @@ import {
   SocketNote,
   SocketNoteStatus,
   SocketErrorCode,
+  AxiosMessageError,
 } from '@types';
 import { clearUser, setIsAuth, userIsAuthSelector } from '@store/user';
 import {
@@ -54,11 +61,11 @@ import {
 } from '@store/drafts';
 import { socketSelector } from '@store/socket';
 
-import { styles } from './Form.styles';
+import { styles } from './styles';
 
-const FORCE_NAVIGATION_STATUS = 'force'; // status for force navigation = without checking
+const FORCE_NAVIGATION_STATUS = 'force'; // status for force navigation, i.e. navigation without checking
 
-export default function Form(): ReactElement {
+const Form: FC = () => {
   const dispatch = useDispatch();
 
   const isAuth = useSelector(userIsAuthSelector);
@@ -67,19 +74,19 @@ export default function Form(): ReactElement {
   const navigation = useNavigation<NavigationProps>();
   const route = useRoute<RecordsManagingRouteProp>();
 
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [isFormLoading, setIsFormLoading] = React.useState(false);
-  const [isError, setIsError] = React.useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFormLoading, setIsFormLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
   const [formInitialValues, setFormInitialValues] =
-    React.useState<RecordsManagingData>({
+    useState<RecordsManagingData>({
       title: '',
       content: '',
     });
 
-  const appState = React.useRef(AppState.currentState);
-  const formRef = React.useRef<
+  const appState = useRef(AppState.currentState);
+  const formRef = useRef<
     FormikProps<RecordsManagingData> | undefined
-  >() as React.MutableRefObject<FormikProps<RecordsManagingData>>;
+  >() as MutableRefObject<FormikProps<RecordsManagingData>>;
 
   const defaultInstance = createAPIInstance(() => {
     dispatch(clearUser());
@@ -278,7 +285,7 @@ export default function Form(): ReactElement {
       });
       setIsError(false);
     } catch (error) {
-      errorHandling(error as AxiosError, 'Fetching Draft');
+      errorHandling(error as AxiosMessageError, 'Fetching Draft');
     } finally {
       setIsLoading(false);
     }
@@ -298,7 +305,7 @@ export default function Form(): ReactElement {
         content,
       });
     } catch (error) {
-      errorHandling(error as AxiosError, 'Fetching Note');
+      errorHandling(error as AxiosMessageError, 'Fetching Note');
     } finally {
       setIsLoading(false);
     }
@@ -387,7 +394,7 @@ export default function Form(): ReactElement {
     };
   }, [socket, isLoading, isError]);
 
-  const onFormSubmitHandler = async (values: RecordsManagingData) => {
+  const onNoteUploadHandler = async (values: RecordsManagingData) => {
     const accessToken = await getItemAsync('accessToken');
     const refreshToken = await getItemAsync('refreshToken');
     if (!accessToken || !refreshToken || !socket) {
@@ -426,17 +433,27 @@ export default function Form(): ReactElement {
     });
   };
 
-  const errorHandling = (error: AxiosError, message: string) => {
+  const errorHandling = ({ response }: AxiosMessageError, message: string) => {
     setIsError(true);
     showToast(
       ToastType.ERROR,
       message,
-      (error.response?.data as { message?: string })?.message ||
-        'Something went wrong:(',
+      response && response.data
+        ? response.data.message
+        : 'Something went wrong:(',
     );
   };
 
-  async function onDraftDeleteHandler() {
+  const onNoteDeleteHandler = async () => {
+    if (!route.params || !route.params.noteId) return;
+
+    setIsFormLoading(true);
+    const { noteId } = route.params;
+
+    (await socket)?.emit('deleteNote', { noteId: noteId });
+  };
+
+  const onDraftDeleteHandler = async () => {
     if (!route.params || !route.params.draftId) {
       formRef.current.resetForm({
         values: {
@@ -461,18 +478,9 @@ export default function Form(): ReactElement {
         });
       navigation.goBack();
     } catch (error) {
-      errorHandling(error as AxiosError, 'Deleting Draft');
+      errorHandling(error as AxiosMessageError, 'Deleting Draft');
     }
-  }
-
-  async function onNoteDeleteHandler() {
-    if (!route.params || !route.params.noteId) return;
-
-    setIsFormLoading(true);
-    const { noteId } = route.params;
-
-    (await socket)?.emit('deleteNote', { noteId: noteId });
-  }
+  };
 
   if (isError) return <Error />;
   if (isLoading) return <Loading />;
@@ -481,25 +489,23 @@ export default function Form(): ReactElement {
     <Formik
       initialValues={formInitialValues}
       onSubmit={
-        route.params?.noteId ? onNoteUpdateHandler : onFormSubmitHandler
+        route.params?.noteId ? onNoteUpdateHandler : onNoteUploadHandler
       }
       validationSchema={recordSchema}
       innerRef={formRef}
       enableReinitialize={true}
     >
       {({ values, handleChange, handleSubmit, errors }) => {
-        React.useLayoutEffect(() => {
+        useLayoutEffect(() => {
           const { title } = values;
           const convertedTitle =
             title && title.length > 16
               ? title?.substring(0, 16) + '...'
               : title || 'Manage Note';
-          navigation.setOptions({
-            headerTitle: convertedTitle,
-          });
+          navigation.setOptions({ headerTitle: convertedTitle });
         }, [values.title]);
 
-        React.useLayoutEffect(() => {
+        useLayoutEffect(() => {
           navigation.setOptions({
             headerRight:
               (values.title || values.content) && !isFormLoading
@@ -577,4 +583,6 @@ export default function Form(): ReactElement {
       }}
     </Formik>
   );
-}
+};
+
+export default Form;

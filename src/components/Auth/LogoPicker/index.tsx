@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, Dispatch, SetStateAction } from 'react';
 import { Alert, Pressable } from 'react-native';
 import {
   useMediaLibraryPermissions,
@@ -13,7 +13,7 @@ import { ToastType } from '@types';
 import { styles, PickedImage } from './styles';
 
 interface Props {
-  setImage: React.Dispatch<React.SetStateAction<string | undefined>>;
+  setImage: Dispatch<SetStateAction<string | undefined>>;
   image?: string;
   disabled?: boolean;
 }

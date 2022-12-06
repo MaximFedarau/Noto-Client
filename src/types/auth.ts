@@ -1,3 +1,5 @@
+import { AxiosError } from 'axios';
+
 export interface AuthData {
   nickname: string;
   password: string;
@@ -19,3 +21,5 @@ export interface AuthTokens {
   accessToken: string;
   refreshToken: string;
 }
+
+export type AxiosMessageError = AxiosError<{ message: string }>;

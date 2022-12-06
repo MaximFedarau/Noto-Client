@@ -1,9 +1,9 @@
-import React, { ReactElement } from 'react';
+import React, { FC, useState, useEffect } from 'react';
 import { TextInputProps, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import showdown from 'showdown';
+import { Converter } from 'showdown';
 
-import FormField from '@components/RecordsManaging/FormField/FormField.component';
+import FormField from '@components/RecordsManaging/FormField';
 import CustomRenderHTML from '@components/Default/CustomRenderHTML';
 import {
   MarkdownFieldContainer,
@@ -11,40 +11,33 @@ import {
   TabText,
   FieldContainer,
   MarkdownContainer,
-} from './MarkdownField.styles';
+} from './styles';
 
-//Interface for Props
-interface MarkdownFieldProps extends TextInputProps {
+interface Props extends TextInputProps {
   children: string;
   errorMessage?: string;
 }
 
-const MarkdownField = React.memo(function MarkdownField({
+const MarkdownField: FC<Props> = ({
   children,
   errorMessage,
   value,
   ...props
-}: MarkdownFieldProps): ReactElement {
+}) => {
   const { width } = useWindowDimensions();
-  const converter = new showdown.Converter();
+  const converter = new Converter();
 
-  const [renderedHTML, setRenderedHTML] = React.useState<string>('');
-  const [tabIndex, setTabIndex] = React.useState<number>(0);
+  const [renderedHTML, setRenderedHTML] = useState('');
+  const [tabIndex, setTabIndex] = useState(0);
 
-  // when user clears the field and is in the Preivew tab, the renderedHTML is set to an empty string
-  React.useEffect(() => {
+  useEffect(() => {
     if (!value && tabIndex === 1) setRenderedHTML('');
   }, [value]);
 
   return (
     <>
       <MarkdownFieldContainer>
-        <TabContainer
-          isActive={tabIndex === 0}
-          onPress={() => {
-            setTabIndex(0);
-          }}
-        >
+        <TabContainer isActive={tabIndex === 0} onPress={() => setTabIndex(0)}>
           <TabText isActive={tabIndex === 0}>{children}</TabText>
         </TabContainer>
         <TabContainer
@@ -79,6 +72,6 @@ const MarkdownField = React.memo(function MarkdownField({
       )}
     </>
   );
-});
+};
 
 export default MarkdownField;

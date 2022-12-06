@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState, useRef } from 'react';
-import { FAB } from '@rneui/themed';
+import { FAB } from '@rneui/base';
 import { useNavigation } from '@react-navigation/native';
 import { setItemAsync } from 'expo-secure-store';
 import { useSelector, useDispatch } from 'react-redux';
@@ -36,7 +36,6 @@ import {
   createAPIRefreshInstance,
   stringSearch,
 } from '@utils';
-
 import { setIsAuth, clearUser, userIsAuthSelector } from '@store/user';
 import {
   notesSelector,

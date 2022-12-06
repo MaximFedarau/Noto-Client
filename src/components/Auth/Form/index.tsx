@@ -2,7 +2,6 @@ import React, { FC, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { setItemAsync } from 'expo-secure-store';
 import { Formik, FormikErrors } from 'formik';
-import { AxiosError } from 'axios';
 
 import FormField from '@components/Auth/FormField';
 import FormButtons from '@components/Auth/FormButtons';
@@ -17,6 +16,7 @@ import {
   AuthData,
   AuthTokens,
   SignUpData,
+  AxiosMessageError,
 } from '@types';
 import { signInSchema, signUpSchema } from '@constants/validationSchemas';
 import { showToast, createAPIInstance } from '@utils';
@@ -75,7 +75,7 @@ const Form: FC<Props> = ({ hasAccount }) => {
       if (hasAccount || !id) navigateHome();
       else navigation.replace(NavigationAuthName.AVATAR_PICKER, { id });
     } catch (error) {
-      const { response } = error as AxiosError<{ message: string }>;
+      const { response } = error as AxiosMessageError;
       setIsLoading(false);
       showToast(
         ToastType.ERROR,
