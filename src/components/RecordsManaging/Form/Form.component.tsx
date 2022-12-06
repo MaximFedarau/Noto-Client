@@ -15,15 +15,15 @@ import { AxiosError } from 'axios';
 
 import { Error } from '@screens/Error';
 import { Loading } from '@screens/Loading';
-import IconButton from '@components/Default/IconButton/IconButton.component';
-import Button from '@components/Default/Button/Button.component';
-import FormField from '@components/NotesManaging/FormField/FormField.component';
-import MarkdownField from '@components/NotesManaging/MarkdownField/MarkdownField.component';
+import IconButton from '@components/Default/IconButton';
+import Button from '@components/Default/Button';
+import FormField from '@components/RecordsManaging/FormField/FormField.component';
+import MarkdownField from '@components/RecordsManaging/MarkdownField/MarkdownField.component';
 import {
-  FormView,
-  NotesManagingLeftHeaderView,
-  NotesManagingRightHeaderView,
-} from '@components/Default/View/View.component';
+  ScrollContainer,
+  RecordsManagingLeftHeader,
+  RecordsManagingRightHeader,
+} from '@components/Default/View';
 import Spinner from '@components/Default/Spinner';
 import { recordSchema } from '@constants/validationSchemas';
 import { sizes } from '@constants/sizes';
@@ -36,7 +36,7 @@ import {
   showToast,
 } from '@utils';
 import {
-  NotesManagingRouteProp,
+  RecordsManagingRouteProp,
   NavigationProps,
   ButtonType,
   ToastType,
@@ -65,7 +65,7 @@ export default function Form(): ReactElement {
   const socket = useSelector(socketSelector);
 
   const navigation = useNavigation<NavigationProps>();
-  const route = useRoute<NotesManagingRouteProp>();
+  const route = useRoute<RecordsManagingRouteProp>();
 
   const [isLoading, setIsLoading] = React.useState(false);
   const [isFormLoading, setIsFormLoading] = React.useState(false);
@@ -172,14 +172,14 @@ export default function Form(): ReactElement {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: ({ tintColor }) => (
-        <NotesManagingLeftHeaderView>
+        <RecordsManagingLeftHeader>
           <IconButton
             iconName="close-outline"
             size={sizes.SIDE_ICON_SIZE}
             color={tintColor}
             onPress={() => navigation.goBack()}
           />
-        </NotesManagingLeftHeaderView>
+        </RecordsManagingLeftHeader>
       ),
     });
 
@@ -505,7 +505,7 @@ export default function Form(): ReactElement {
               (values.title || values.content) && !isFormLoading
                 ? () => {
                     return (
-                      <NotesManagingRightHeaderView>
+                      <RecordsManagingRightHeader>
                         <IconButton
                           iconName="trash"
                           size={sizes.SIDE_ICON_SIZE}
@@ -516,7 +516,7 @@ export default function Form(): ReactElement {
                               : onDraftDeleteHandler
                           }
                         />
-                      </NotesManagingRightHeaderView>
+                      </RecordsManagingRightHeader>
                     );
                   }
                 : () => null,
@@ -535,7 +535,7 @@ export default function Form(): ReactElement {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             style={styles.contentContainer}
           >
-            <FormView
+            <ScrollContainer
               bounces={false}
               contentContainerStyle={styles.contentContainer}
             >
@@ -571,7 +571,7 @@ export default function Form(): ReactElement {
                   {route.params?.noteId ? 'Update' : 'Upload'}
                 </Button>
               )}
-            </FormView>
+            </ScrollContainer>
           </KeyboardAvoidingView>
         );
       }}

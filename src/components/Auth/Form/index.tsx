@@ -7,8 +7,8 @@ import { AxiosError } from 'axios';
 import FormField from '@components/Auth/FormField';
 import FormButtons from '@components/Auth/FormButtons';
 import Spinner from '@components/Default/Spinner';
-import { FormContainer } from '@components/Default/View/View.component';
-import { NavigationText } from '@components/Default/Text/Text.component';
+import { FormContainer } from '@components/Default/View';
+import { NavigationText } from '@components/Default/Text';
 import {
   NavigationAuthName,
   NavigationProps,

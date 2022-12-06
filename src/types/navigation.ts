@@ -6,14 +6,14 @@ export type AvatarPickerRouteProp = RouteProp<
   AuthNavigationRootStackParamList,
   NavigationAuthName.AVATAR_PICKER
 >; // for route object (React Navigation) - Avatar Picker screen
-export type NotesManagingRouteProp = RouteProp<
+export type RecordsManagingRouteProp = RouteProp<
   RootStackParamList,
-  NavigationName.NOTES_MANAGING
+  NavigationName.RECORDS_MANAGING
 >; // for route object (React Navigation) - Notes Managing screen
 
 type RootStackParamList = {
   [NavigationName.NOTES_OVERVIEW]?: undefined;
-  [NavigationName.NOTES_MANAGING]?: {
+  [NavigationName.RECORDS_MANAGING]?: {
     draftId?: string;
     noteId?: string;
   };
@@ -35,7 +35,7 @@ type NotesRootStackParamList = {
 export enum NavigationName {
   AUTH = 'Auth',
   NOTES_OVERVIEW = 'NotesOverview',
-  NOTES_MANAGING = 'NotesManaging',
+  RECORDS_MANAGING = 'RecordsManaging',
 }
 
 export enum NavigationNotesName {

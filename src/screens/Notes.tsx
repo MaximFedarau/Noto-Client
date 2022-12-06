@@ -9,19 +9,13 @@ import { AxiosError } from 'axios';
 
 import { Error } from './Error';
 import { Loading } from './Loading';
-import { LeftHeaderView } from '@components/Default/View/View.component';
-import IconButton from '@components/Default/IconButton/IconButton.component';
-import SearchBar from '@components/Default/SearchBar/SearchBar.component';
-import {
-  NotesView,
-  NotesContentView,
-} from '@components/Default/View/View.component';
+import { LeftHeader } from '@components/Default/View';
+import IconButton from '@components/Default/IconButton';
+import SearchBar from '@components/Records/SearchBar';
+import { RecordsContainer, RecordsContent } from '@components/Default/View';
 import RecordsList from '@components/Records/RecordsList';
 import Spinner from '@components/Default/Spinner';
-import {
-  NoItemsText,
-  RecordsHeaderTitle,
-} from '@components/Default/Text/Text.component';
+import { NoItemsText, RecordsHeaderTitle } from '@components/Default/Text';
 import { SOFT_BLUE } from '@constants/colors';
 import { sizes } from '@constants/sizes';
 import {
@@ -141,14 +135,14 @@ export const Notes: FC = () => {
         },
         // open search bar button
         headerLeft: ({ tintColor }) => (
-          <LeftHeaderView>
+          <LeftHeader>
             <IconButton
               iconName="search"
               size={sizes.SIDE_ICON_SIZE}
               color={tintColor}
               onPress={onSearchButtonClickHandler}
             />
-          </LeftHeaderView>
+          </LeftHeader>
         ),
       });
     } else clearAuthHeader();
@@ -346,8 +340,8 @@ export const Notes: FC = () => {
   if (isLoading) return <Loading />;
 
   return (
-    <NotesView>
-      <NotesContentView>
+    <RecordsContainer>
+      <RecordsContent>
         {notes.length ? (
           <RecordsList
             type={RecordType.NOTE}
@@ -368,10 +362,10 @@ export const Notes: FC = () => {
               name: 'add',
               color: 'white',
             }}
-            onPress={() => navigation.navigate(NavigationName.NOTES_MANAGING)}
+            onPress={() => navigation.navigate(NavigationName.RECORDS_MANAGING)}
           />
         )}
-      </NotesContentView>
-    </NotesView>
+      </RecordsContent>
+    </RecordsContainer>
   );
 };

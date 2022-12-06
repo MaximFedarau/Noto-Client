@@ -3,8 +3,8 @@ import { useWindowDimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Converter } from 'showdown';
 
-import { RecordTitle } from '@components/Default/Text/Text.component';
-import CustomRenderHTML from '@components/Default/CustomRenderHTML/CustomRenderHTML.component';
+import { RecordTitle } from '@components/Default/Text';
+import CustomRenderHTML from '@components/Default/CustomRenderHTML';
 import {
   NavigationProps,
   NavigationName,
@@ -31,7 +31,7 @@ const Record: FC<Props> = memo(({ children, type }) => {
 
   const onPressHandler = () => {
     if (!title && !content) return;
-    navigation.navigate(NavigationName.NOTES_MANAGING, {
+    navigation.navigate(NavigationName.RECORDS_MANAGING, {
       ...(type === RecordType.DRAFT ? { draftId: id } : { noteId: id }),
     });
   };

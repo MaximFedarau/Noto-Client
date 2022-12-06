@@ -1,21 +1,21 @@
 import React, { FC } from 'react';
 import { ScrollViewProps } from 'react-native';
 
-import { DefaultScrollView } from '@components/Default/View/View.component';
+import { ScrollContainer } from '@components/Default/View';
 
 import { styles } from './styles';
 
 const ContentScrollView: FC<ScrollViewProps> = ({
   children,
 }: ScrollViewProps) => (
-  <DefaultScrollView
+  <ScrollContainer
     style={styles.container}
     contentContainerStyle={styles.contentContainer}
     bounces={false}
     showsVerticalScrollIndicator={false}
   >
     {children}
-  </DefaultScrollView>
+  </ScrollContainer>
 );
 
 export default ContentScrollView;

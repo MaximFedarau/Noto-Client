@@ -7,7 +7,7 @@ import { AxiosError } from 'axios';
 import {
   AuthScreenContainer,
   AvatarPickerContainer,
-} from '@components/Default/View/View.component';
+} from '@components/Default/View';
 import ContentScrollView from '@components/Auth/ContentScrollView';
 import LogoPicker from '@components/Auth/LogoPicker';
 import Spinner from '@components/Default/Spinner';

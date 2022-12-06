@@ -1,14 +1,14 @@
 import React, { FC } from 'react';
 import { StatusBar } from 'expo-status-bar';
 
-import { LoadingView } from '@components/Default/View/View.component';
-import { NoItemsText } from '@components/Default/Text/Text.component';
+import { LoadingContainer } from '@components/Default/View';
+import { NoItemsText } from '@components/Default/Text';
 
 export const Loading: FC = () => (
   <>
     <StatusBar style="dark" />
-    <LoadingView>
+    <LoadingContainer>
       <NoItemsText>Loading...</NoItemsText>
-    </LoadingView>
+    </LoadingContainer>
   </>
 );

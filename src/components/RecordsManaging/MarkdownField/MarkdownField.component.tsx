@@ -3,8 +3,8 @@ import { TextInputProps, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import showdown from 'showdown';
 
-import FormField from '@components/NotesManaging/FormField/FormField.component';
-import CustomRenderHTML from '@components/Default/CustomRenderHTML/CustomRenderHTML.component';
+import FormField from '@components/RecordsManaging/FormField/FormField.component';
+import CustomRenderHTML from '@components/Default/CustomRenderHTML';
 import {
   MarkdownFieldContainer,
   TabContainer,

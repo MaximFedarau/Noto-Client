@@ -7,20 +7,17 @@ import { debounce } from 'lodash';
 
 import { Error } from './Error';
 import { Loading } from './Loading';
-import IconButton from '@components/Default/IconButton/IconButton.component';
-import SearchBar from '@components/Default/SearchBar/SearchBar.component';
+import IconButton from '@components/Default/IconButton';
+import SearchBar from '@components/Records/SearchBar';
 import RecordsList from '@components/Records/RecordsList';
 import Spinner from '@components/Default/Spinner';
 import { fetchDraftPack } from '@utils';
 import {
-  DraftsView,
-  DraftsContentView,
-  LeftHeaderView,
-} from '@components/Default/View/View.component';
-import {
-  NoItemsText,
-  RecordsHeaderTitle,
-} from '@components/Default/Text/Text.component';
+  RecordsContainer,
+  RecordsContent,
+  LeftHeader,
+} from '@components/Default/View';
+import { NoItemsText, RecordsHeaderTitle } from '@components/Default/Text';
 import {
   NavigationProps,
   NavigationName,
@@ -97,14 +94,14 @@ export const Drafts: FC = () => {
         },
         // open search bar button
         headerLeft: ({ tintColor }) => (
-          <LeftHeaderView>
+          <LeftHeader>
             <IconButton
               iconName="search"
               size={sizes.SIDE_ICON_SIZE}
               color={tintColor}
               onPress={onSearchButtonClickHandler}
             />
-          </LeftHeaderView>
+          </LeftHeader>
         ),
       });
     } else clearAuthHeader();
@@ -168,8 +165,8 @@ export const Drafts: FC = () => {
   if (isLoading) return <Loading />;
 
   return (
-    <DraftsView>
-      <DraftsContentView>
+    <RecordsContainer>
+      <RecordsContent>
         {drafts.length ? (
           <RecordsList
             type={RecordType.DRAFT}
@@ -189,10 +186,10 @@ export const Drafts: FC = () => {
             placement="right"
             color={CYBER_YELLOW}
             icon={{ name: 'add', color: 'white' }}
-            onPress={() => navigation.navigate(NavigationName.NOTES_MANAGING)}
+            onPress={() => navigation.navigate(NavigationName.RECORDS_MANAGING)}
           />
         )}
-      </DraftsContentView>
-    </DraftsView>
+      </RecordsContent>
+    </RecordsContainer>
   );
 };

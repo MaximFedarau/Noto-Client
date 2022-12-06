@@ -1,15 +1,14 @@
 import styled from 'styled-components/native';
-import { Pressable } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 
 import { ButtonType } from '@types';
 import { BUNTING } from '@constants/colors';
 
-//Interface for Props
-interface ButtonStylingProps {
+interface Props {
   type?: ButtonType;
 }
 
-export const ButtonContainer = styled(Pressable)<ButtonStylingProps>`
+export const ButtonContainer = styled(TouchableOpacity)<Props>`
   display: flex;
   justify-content: center;
   background-color: ${({ type }) =>
@@ -22,7 +21,7 @@ export const ButtonContainer = styled(Pressable)<ButtonStylingProps>`
   border-radius: 20px;
 `;
 
-export const ButtonText = styled.Text<ButtonStylingProps>`
+export const ButtonText = styled.Text<Props>`
   color: ${({ type }) => (type === ButtonType.CONTAINED ? 'white' : BUNTING)};
   font-size: 16px;
   text-align: center;

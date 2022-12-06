@@ -1,19 +1,12 @@
-import { ReactElement } from 'react';
-import {
-  TextInputProps,
-  View,
-  useWindowDimensions,
-  Platform,
-} from 'react-native';
+import React, { FC } from 'react';
+import { TextInputProps, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { SearchBarInput } from '@components/Default/Input';
 import { sizes } from '@constants/sizes';
 
-import { SearchBarInput } from './SearchBar.styles';
-
-export default function SearchBar(props: TextInputProps): ReactElement {
+const SearchBar: FC<TextInputProps> = (props) => {
   const { width } = useWindowDimensions();
-  const { OS } = Platform;
   const insets = useSafeAreaInsets();
   return (
     <View
@@ -28,11 +21,9 @@ export default function SearchBar(props: TextInputProps): ReactElement {
         height: 36,
       }}
     >
-      <SearchBarInput
-        {...props}
-        {...(OS === 'ios' && { selectionColor: 'black' })}
-        autoCapitalize="none"
-      />
+      <SearchBarInput {...props} autoCapitalize="none" />
     </View>
   );
-}
+};
+
+export default SearchBar;

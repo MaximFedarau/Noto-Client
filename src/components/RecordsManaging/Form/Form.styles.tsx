@@ -3,6 +3,7 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   contentContainer: {
     flexGrow: 1,
+    paddingVertical: 4,
   },
   submitButton: {
     height: 44,

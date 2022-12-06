@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { AuthStack, MainBottomTabs } from '@navigation';
-import { NotesManaging } from '@screens/NotesManaging';
+import { RecordsManaging } from '@screens/RecordsManaging';
 import { OSLO_GRAY, SPRING_WOOD } from '@constants/colors';
 import { NavigationName } from '@types';
 
@@ -15,8 +15,8 @@ const Navigator: FC = () => (
       component={MainBottomTabs}
     />
     <Stack.Screen
-      name={NavigationName.NOTES_MANAGING}
-      component={NotesManaging}
+      name={NavigationName.RECORDS_MANAGING}
+      component={RecordsManaging}
       options={{
         headerShown: true,
         headerShadowVisible: false,

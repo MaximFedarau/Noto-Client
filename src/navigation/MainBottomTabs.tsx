@@ -6,9 +6,9 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Loading, Notes, Drafts } from '@screens';
-import IconButton from '@components/Default/IconButton/IconButton.component';
-import Avatar from '@components/Default/Avatar/Avatar.component';
-import { RightHeaderView } from '@components/Default/View/View.component';
+import IconButton from '@components/Default/IconButton';
+import Avatar from '@components/Default/Avatar';
+import { RightHeader } from '@components/Default/View';
 import {
   OSLO_GRAY,
   SPRING_WOOD,
@@ -96,7 +96,7 @@ export const MainBottomTabs: FC = () => {
           tabBarIcon: (props) => <Ionicons name="document" {...props} />,
           headerRight: ({ tintColor }) => {
             return (
-              <RightHeaderView>
+              <RightHeader>
                 {avatar ? (
                   <Avatar
                     size={sizes.SIDE_ICON_SIZE}
@@ -111,7 +111,7 @@ export const MainBottomTabs: FC = () => {
                     onPress={isAuth ? logOut : navigateToAuth}
                   />
                 )}
-              </RightHeaderView>
+              </RightHeader>
             );
           },
           tabBarActiveTintColor: isAuth ? SOFT_BLUE : CYBER_YELLOW,
@@ -125,7 +125,7 @@ export const MainBottomTabs: FC = () => {
           tabBarIcon: (props) => <Ionicons name="archive" {...props} />,
           headerRight: ({ tintColor }) => {
             return (
-              <RightHeaderView>
+              <RightHeader>
                 {avatar ? (
                   <Avatar
                     size={sizes.SIDE_ICON_SIZE}
@@ -140,7 +140,7 @@ export const MainBottomTabs: FC = () => {
                     onPress={isAuth ? logOut : navigateToAuth}
                   />
                 )}
-              </RightHeaderView>
+              </RightHeader>
             );
           },
           title: 'Drafts',

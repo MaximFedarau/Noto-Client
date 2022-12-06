@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { FormButtonsContainer } from '@components/Default/View/View.component';
+import { FormButtonsContainer } from '@components/Default/View';
 
 import { FormSubmitButton, HomeButton, styles } from './styles';
 
