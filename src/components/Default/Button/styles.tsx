@@ -2,7 +2,6 @@ import styled from 'styled-components/native';
 import { TouchableOpacity } from 'react-native';
 
 import { ButtonType } from '@types';
-import { BUNTING } from '@constants/colors';
 
 interface Props {
   type?: ButtonType;
@@ -11,18 +10,19 @@ interface Props {
 export const ButtonContainer = styled(TouchableOpacity)<Props>`
   display: flex;
   justify-content: center;
-  background-color: ${({ type }) =>
-    type === ButtonType.CONTAINED ? BUNTING : 'transparent'};
-  border: ${({ type }) =>
-    type === ButtonType.CONTAINED ? '' : `2px solid ${BUNTING}`};
+  background-color: ${({ type, theme }) =>
+    type === ButtonType.CONTAINED ? theme.colors.bunting : 'transparent'};
+  border: ${({ type, theme }) =>
+    type === ButtonType.CONTAINED ? '' : `2px solid ${theme.colors.bunting}`};
   align-self: center;
   width: 60%;
-  height: 32px;
-  border-radius: 20px;
+  height: ${({ theme }) => theme.sizes['4xl']}px;
+  border-radius: ${({ theme }) => theme.sizes.xl}px;
 `;
 
 export const ButtonText = styled.Text<Props>`
-  color: ${({ type }) => (type === ButtonType.CONTAINED ? 'white' : BUNTING)};
-  font-size: 16px;
+  color: ${({ type, theme }) =>
+    type === ButtonType.CONTAINED ? theme.colors.white : theme.colors.bunting};
+  font-size: ${({ theme }) => theme.fonts.sizes.lg}px;
   text-align: center;
 `;

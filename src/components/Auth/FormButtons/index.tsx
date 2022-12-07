@@ -1,6 +1,7 @@
 import React, { FC } from 'react';
 
 import { FormButtonsContainer } from '@components/Default';
+import { SIZES, COLORS } from '@constants';
 
 import { FormSubmitButton, HomeButton, styles } from './styles';
 
@@ -21,8 +22,8 @@ export const FormButtons: FC<Props> = ({
     </FormSubmitButton>
     <HomeButton
       iconName="home"
-      color="white"
-      size={24}
+      color={COLORS.white}
+      size={SIZES['2xl']}
       onPress={onHomeReturn}
     />
   </FormButtonsContainer>

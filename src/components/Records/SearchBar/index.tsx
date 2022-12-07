@@ -3,7 +3,7 @@ import { TextInputProps, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { SearchBarInput } from '@components/Default';
-import { sizes } from '@constants/sizes';
+import { SIZES } from '@constants';
 
 export const SearchBar: FC<TextInputProps> = (props) => {
   const { width } = useWindowDimensions();
@@ -13,12 +13,12 @@ export const SearchBar: FC<TextInputProps> = (props) => {
       style={{
         width:
           width -
-          sizes.SIDE_ICON_SIZE * 2 -
-          24 * 2 - // 24px * 2 for padding on both sides
+          SIZES['4xl'] * 2 -
+          SIZES['2xl'] * 2 - // SIZES['2xl'] * 2 for padding on both sides
           insets.left -
           insets.right,
         alignSelf: 'center',
-        height: 36,
+        height: SIZES['5xl'],
       }}
     >
       <SearchBarInput {...props} autoCapitalize="none" />

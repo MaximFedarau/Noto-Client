@@ -1,15 +1,27 @@
-import React, { FC, useEffect, useCallback, useState } from 'react';
+import React, {
+  FC,
+  useEffect,
+  useCallback,
+  useState,
+  PropsWithChildren,
+} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider } from 'react-redux';
 import Toast from 'react-native-toast-message';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import { preventAutoHideAsync, hideAsync } from 'expo-splash-screen';
+import { ThemeProvider } from 'styled-components/native';
 
 import Navigator from './src';
 import { Loading, Error } from '@screens';
 import { initDbDrafts } from '@utils';
+import { THEME } from '@constants';
 import { store } from '@store';
+
+const ThemeContainer: FC<PropsWithChildren> = ({ children }) => (
+  <ThemeProvider theme={THEME}>{children}</ThemeProvider>
+);
 
 preventAutoHideAsync();
 
@@ -39,16 +51,28 @@ const App: FC = () => {
     if (fontsLoaded && databaseInitialized) hideAsync();
   }, [fontsLoaded, databaseInitialized]);
 
-  if (!fontsLoaded) return <Loading />; // from Expo docs
+  if (!fontsLoaded)
+    return (
+      <ThemeContainer>
+        <Loading />
+      </ThemeContainer>
+    ); // from Expo docs
 
-  if (fontsError || isSetupError) return <Error />;
+  if (fontsError || isSetupError)
+    return (
+      <ThemeContainer>
+        <Error />
+      </ThemeContainer>
+    );
 
   return (
     <>
       <StatusBar style="dark" animated />
       <Provider store={store}>
         <NavigationContainer>
-          <Navigator />
+          <ThemeContainer>
+            <Navigator />
+          </ThemeContainer>
         </NavigationContainer>
       </Provider>
       <Toast />

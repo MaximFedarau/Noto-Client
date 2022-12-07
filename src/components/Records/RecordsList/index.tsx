@@ -3,9 +3,8 @@ import { FlatList, FlatListProps } from 'react-native';
 
 import { Record } from '@components/Records/Record';
 import { GoUpButton } from '@components/Records/GoUpButton';
+import { SIZES, COLORS } from '@constants';
 import { Record as IRecord, RecordType } from '@types';
-import { SOFT_BLUE, CYBER_YELLOW } from '@constants/colors';
-import { sizes } from '@constants/sizes';
 
 interface Props
   extends Omit<FlatListProps<IRecord>, 'children' | 'data' | 'renderItem'> {
@@ -53,7 +52,8 @@ export const RecordsList: FC<Props> = ({ children, type, ...props }) => {
           setLayoutHeight(nativeEvent.layout.height);
         }}
         onContentSizeChange={(_, height) => {
-          if (height >= sizes.NOTES_LIST_MINIMUM_ITEM_SIZE) {
+          // SIZES['22xl'] - min height of one item
+          if (height >= SIZES['22xl']) {
             // setting required height for list data
             setContentHeight(height);
           }
@@ -63,7 +63,9 @@ export const RecordsList: FC<Props> = ({ children, type, ...props }) => {
         layoutHeight > 0 && // when list is rendered => layoutHeight (its height) is not 0
         Math.trunc(offset) < Math.trunc(threshold) && ( // when user has not scrolled to the end
           <GoUpButton
-            color={type === RecordType.DRAFT ? CYBER_YELLOW : SOFT_BLUE}
+            color={
+              type === RecordType.DRAFT ? COLORS.cyberYellow : COLORS.softBlue
+            }
             onPress={scrollToEndHandler}
           />
         )}

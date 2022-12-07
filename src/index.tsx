@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { AuthStack, MainBottomTabs } from '@navigation';
 import { RecordsManaging } from '@screens/RecordsManaging';
-import { OSLO_GRAY, SPRING_WOOD } from '@constants/colors';
+import { COLORS, FONTS } from '@constants';
 import { NavigationName } from '@types';
 
 const Stack = createNativeStackNavigator();
@@ -21,10 +21,10 @@ const Navigator: FC = () => (
         headerShown: true,
         headerShadowVisible: false,
         headerTitleAlign: 'center',
-        headerTintColor: OSLO_GRAY,
-        headerTitleStyle: { fontFamily: 'Roboto-Regular' },
-        headerStyle: { backgroundColor: SPRING_WOOD },
-        contentStyle: { backgroundColor: SPRING_WOOD },
+        headerTintColor: COLORS.osloGray,
+        headerTitleStyle: { fontFamily: FONTS.families.primary },
+        headerStyle: { backgroundColor: COLORS.springWood },
+        contentStyle: { backgroundColor: COLORS.springWood },
       }}
     />
     <Stack.Screen name={NavigationName.AUTH} component={AuthStack} />

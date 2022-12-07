@@ -38,8 +38,7 @@ import {
   removeDraft,
 } from '@store/drafts';
 import { listener, AppStartListening } from '@store/middlewares';
-import { CYBER_YELLOW } from '@constants/colors';
-import { sizes } from '@constants/sizes';
+import { SIZES, COLORS } from '@constants';
 import { stringSearch } from '@utils';
 
 export const Drafts: FC = () => {
@@ -98,7 +97,7 @@ export const Drafts: FC = () => {
           <LeftHeader>
             <IconButton
               iconName="search"
-              size={sizes.SIDE_ICON_SIZE}
+              size={SIZES['4xl']}
               color={tintColor}
               onPress={onSearchButtonClickHandler}
             />
@@ -185,8 +184,8 @@ export const Drafts: FC = () => {
         {!openSearchBar && (
           <FAB
             placement="right"
-            color={CYBER_YELLOW}
-            icon={{ name: 'add', color: 'white' }}
+            color={COLORS.cyberYellow}
+            icon={{ name: 'add', color: COLORS.white }}
             onPress={() => navigation.navigate(NavigationName.RECORDS_MANAGING)}
           />
         )}

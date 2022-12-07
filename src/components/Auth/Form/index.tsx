@@ -16,7 +16,7 @@ import {
   SignUpData,
   AxiosMessageError,
 } from '@types';
-import { signInSchema, signUpSchema } from '@constants/validationSchemas';
+import { signInSchema, signUpSchema } from '@constants';
 import { showToast, createAPIInstance } from '@utils';
 
 interface Props {

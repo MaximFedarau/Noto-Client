@@ -2,6 +2,8 @@ import React, { FC } from 'react';
 import { TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
+import { COLORS, SIZES } from '@constants';
+
 import { styles } from './styles';
 
 interface Props {
@@ -13,13 +15,13 @@ interface Props {
 export const GoUpButton: FC<Props> = ({
   onPress,
   color,
-  iconColor = 'white',
+  iconColor = COLORS.white,
 }) => (
   <TouchableOpacity
     style={styles(color).container}
     onPress={onPress}
     activeOpacity={0.8}
   >
-    <Ionicons name="arrow-up" size={24} color={iconColor} />
+    <Ionicons name="arrow-up" size={SIZES['2xl']} color={iconColor} />
   </TouchableOpacity>
 );

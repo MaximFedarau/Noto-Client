@@ -5,6 +5,8 @@ import { Converter } from 'showdown';
 
 import { RecordsManagingFormField } from '@components/RecordsManaging/FormField';
 import { CustomRenderHTML } from '@components/Default';
+import { SIZES } from '@constants';
+
 import {
   MarkdownFieldContainer,
   TabContainer,
@@ -59,7 +61,7 @@ export const MarkdownField: FC<Props> = ({
             multiline
             autoComplete="off"
             scrollEnabled={false}
-            leftIcon={<Ionicons name="logo-markdown" size={20} />}
+            leftIcon={<Ionicons name="logo-markdown" size={SIZES.xl} />}
           />
         </FieldContainer>
       )}

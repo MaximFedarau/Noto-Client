@@ -31,8 +31,7 @@ import {
   RecordsManagingLeftHeader,
   RecordsManagingRightHeader,
 } from '@components/Default';
-import { recordSchema } from '@constants/validationSchemas';
-import { sizes } from '@constants/sizes';
+import { COLORS, recordSchema, SIZES } from '@constants';
 import {
   addDraft,
   fetchDraftById,
@@ -182,7 +181,7 @@ export const RecordsManagingForm: FC = () => {
         <RecordsManagingLeftHeader>
           <IconButton
             iconName="close-outline"
-            size={sizes.SIDE_ICON_SIZE}
+            size={SIZES['4xl']}
             color={tintColor}
             onPress={() => navigation.goBack()}
           />
@@ -514,8 +513,8 @@ export const RecordsManagingForm: FC = () => {
                       <RecordsManagingRightHeader>
                         <IconButton
                           iconName="trash"
-                          size={sizes.SIDE_ICON_SIZE}
-                          color="red"
+                          size={SIZES['4xl']}
+                          color={COLORS.red}
                           onPress={
                             route.params?.noteId
                               ? onNoteDeleteHandler

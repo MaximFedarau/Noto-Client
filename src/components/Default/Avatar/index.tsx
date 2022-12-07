@@ -19,7 +19,7 @@ export const Avatar: FC<Props> = ({ size, image, onPress }) => {
   return (
     <TouchableOpacity
       style={styles.button}
-      activeOpacity={0.5}
+      activeOpacity={0.8}
       onPress={onPress}
     >
       {isLoading && <ActivityIndicator size="small" style={styles.spinner} />}

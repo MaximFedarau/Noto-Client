@@ -20,8 +20,7 @@ import {
   RecordsList,
   SearchBar,
 } from '@components';
-import { SOFT_BLUE } from '@constants/colors';
-import { sizes } from '@constants/sizes';
+import { SIZES, COLORS } from '@constants';
 import {
   NavigationProps,
   NavigationName,
@@ -141,7 +140,7 @@ export const Notes: FC = () => {
           <LeftHeader>
             <IconButton
               iconName="search"
-              size={sizes.SIDE_ICON_SIZE}
+              size={SIZES['4xl']}
               color={tintColor}
               onPress={onSearchButtonClickHandler}
             />
@@ -360,10 +359,10 @@ export const Notes: FC = () => {
         {!openSearchBar && isAuth && (
           <FAB
             placement="right"
-            color={SOFT_BLUE}
+            color={COLORS.softBlue}
             icon={{
               name: 'add',
-              color: 'white',
+              color: COLORS.white,
             }}
             onPress={() => navigation.navigate(NavigationName.RECORDS_MANAGING)}
           />

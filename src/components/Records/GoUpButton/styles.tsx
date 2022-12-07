@@ -1,17 +1,19 @@
 import { StyleSheet } from 'react-native';
 
-export const styles = (backgroundColor = 'black') =>
+import { SIZES, COLORS } from '@constants';
+
+export const styles = (backgroundColor = COLORS.black) =>
   StyleSheet.create({
     container: {
       position: 'absolute',
-      top: 8,
+      top: SIZES.sm,
       flexDirection: 'row',
       alignSelf: 'center',
       alignItems: 'center',
       justifyContent: 'center',
       width: '32%',
-      height: 32,
-      borderRadius: 16,
+      height: SIZES['4xl'],
+      borderRadius: SIZES.lg,
       backgroundColor,
     },
   });

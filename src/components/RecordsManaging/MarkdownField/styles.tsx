@@ -1,7 +1,6 @@
 import styled from 'styled-components/native';
 
 import { Container, DefaultText } from '@components/Default';
-import { BUNTING } from '@constants/colors';
 
 interface Props {
   isActive?: boolean;
@@ -10,8 +9,8 @@ interface Props {
 export const MarkdownFieldContainer = styled(Container)`
   flex: none;
   flex-direction: row;
-  margin-horizontal: 8px;
-  border-bottom-color: ${BUNTING};
+  margin-horizontal: ${({ theme }) => theme.sizes.sm}px;
+  border-bottom-color: ${({ theme }) => theme.colors.bunting};
   border-bottom-width: 1px;
 `;
 
@@ -21,23 +20,24 @@ export const FieldContainer = styled(Container)`
 
 export const MarkdownContainer = styled(Container)`
   flex: 1;
-  margin-bottom: 48px;
-  margin-horizontal: 8px;
+  margin-bottom: ${({ theme }) => theme.sizes['8xl']}px;
+  margin-horizontal: ${({ theme }) => theme.sizes.sm}px;
 `;
 
 export const TabText = styled(DefaultText)<Props>`
-  color: ${({ isActive }) => (isActive ? 'white' : BUNTING)};
-  font-size: 17px;
+  color: ${({ isActive, theme }) =>
+    isActive ? theme.colors.white : theme.colors.bunting};
+  font-size: ${({ theme }) => theme.fonts.sizes.lg}px;
 `;
 
 export const TabContainer = styled.Pressable<Props>`
-  height: 40px;
+  height: ${({ theme }) => theme.sizes['7xl']}px;
   width: 50%;
   align-items: center;
   justify-content: center;
-  padding-horizontal: 8px;
-  padding-vertical: 8px;
-  background-color: ${({ isActive }) => (isActive ? BUNTING : 'transparent')};
-  border-top-end-radius: 5px;
-  border-top-start-radius: 5px;
+  padding: ${({ theme }) => theme.sizes.sm}px;
+  background-color: ${({ isActive, theme }) =>
+    isActive ? theme.colors.bunting : 'transparent'};
+  border-top-end-radius: ${({ theme }) => theme.sizes.sm / 2}px;
+  border-top-start-radius: ${({ theme }) => theme.sizes.sm / 2}px;
 `;

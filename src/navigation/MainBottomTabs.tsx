@@ -7,13 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { Loading, Notes, Drafts } from '@screens';
 import { Avatar, IconButton, RightHeader } from '@components';
-import {
-  OSLO_GRAY,
-  SPRING_WOOD,
-  CYBER_YELLOW,
-  SOFT_BLUE,
-} from '@constants/colors';
-import { sizes } from '@constants/sizes';
+import { COLORS, FONTS, SIZES } from '@constants';
 import { NavigationProps, NavigationName, NavigationNotesName } from '@types';
 import { getPublicData } from '@utils';
 import {
@@ -76,43 +70,39 @@ export const MainBottomTabs: FC = () => {
   return (
     <BottomTab.Navigator
       screenOptions={{
-        headerTintColor: OSLO_GRAY,
-        headerTitleStyle: { fontFamily: 'Roboto-Regular' },
+        headerTintColor: COLORS.osloGray,
+        headerTitleStyle: { fontFamily: FONTS.families.primary },
         headerTitleAlign: 'center',
-        headerStyle: { backgroundColor: SPRING_WOOD },
+        headerStyle: { backgroundColor: COLORS.springWood },
         headerShadowVisible: false,
-        tabBarStyle: { backgroundColor: SPRING_WOOD },
-        tabBarActiveTintColor: CYBER_YELLOW,
+        tabBarStyle: { backgroundColor: COLORS.springWood },
+        tabBarActiveTintColor: COLORS.cyberYellow,
         tabBarShowLabel: false,
+        headerRight: ({ tintColor }) => {
+          return (
+            <RightHeader>
+              {avatar ? (
+                <Avatar size={SIZES['4xl']} image={avatar} onPress={logOut} />
+              ) : (
+                <IconButton
+                  iconName="person"
+                  size={SIZES['4xl']}
+                  color={isAuth ? COLORS.softBlue : tintColor}
+                  onPress={isAuth ? logOut : navigateToAuth}
+                />
+              )}
+            </RightHeader>
+          );
+        },
       }}
-      sceneContainerStyle={{ backgroundColor: SPRING_WOOD }}
+      sceneContainerStyle={{ backgroundColor: COLORS.springWood }}
     >
       <BottomTab.Screen
         name={NavigationNotesName.NOTES}
         component={Notes}
         options={{
           tabBarIcon: (props) => <Ionicons name="document" {...props} />,
-          headerRight: ({ tintColor }) => {
-            return (
-              <RightHeader>
-                {avatar ? (
-                  <Avatar
-                    size={sizes.SIDE_ICON_SIZE}
-                    image={avatar}
-                    onPress={logOut}
-                  />
-                ) : (
-                  <IconButton
-                    iconName="person"
-                    size={sizes.SIDE_ICON_SIZE}
-                    color={isAuth ? SOFT_BLUE : tintColor}
-                    onPress={isAuth ? logOut : navigateToAuth}
-                  />
-                )}
-              </RightHeader>
-            );
-          },
-          tabBarActiveTintColor: isAuth ? SOFT_BLUE : CYBER_YELLOW,
+          tabBarActiveTintColor: isAuth ? COLORS.softBlue : COLORS.cyberYellow,
           title: nickname ? `${nickname}'s Notes` : 'Notes',
         }}
       />
@@ -121,26 +111,6 @@ export const MainBottomTabs: FC = () => {
         component={Drafts}
         options={{
           tabBarIcon: (props) => <Ionicons name="archive" {...props} />,
-          headerRight: ({ tintColor }) => {
-            return (
-              <RightHeader>
-                {avatar ? (
-                  <Avatar
-                    size={sizes.SIDE_ICON_SIZE}
-                    image={avatar}
-                    onPress={logOut}
-                  />
-                ) : (
-                  <IconButton
-                    iconName="person"
-                    size={sizes.SIDE_ICON_SIZE}
-                    color={isAuth ? SOFT_BLUE : tintColor}
-                    onPress={isAuth ? logOut : navigateToAuth}
-                  />
-                )}
-              </RightHeader>
-            );
-          },
           title: 'Drafts',
         }}
       />

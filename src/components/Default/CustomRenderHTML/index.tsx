@@ -14,12 +14,8 @@ export const CustomRenderHTML: FC<Props> = memo(
       source={{ html: children }}
       ignoredDomTags={['script', 'img', 'svg', 'button']}
       renderersProps={{
-        ul: {
-          enableExperimentalRtl: true,
-        },
-        ol: {
-          enableExperimentalRtl: true,
-        },
+        ul: { enableExperimentalRtl: true },
+        ol: { enableExperimentalRtl: true },
       }}
       ignoredStyles={[
         'fontSize',

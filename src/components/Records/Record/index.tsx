@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Converter } from 'showdown';
 
 import { CustomRenderHTML, RecordTitle } from '@components/Default';
+import { SIZES } from '@constants';
 import {
   NavigationProps,
   NavigationName,
@@ -45,8 +46,8 @@ export const Record: FC<Props> = ({ children, type }) => {
           {title}
         </RecordTitle>
       )}
-      <CustomRenderHTML contentWidth={width - 32}>
-        {/* 32 is the padding of the container */}
+      <CustomRenderHTML contentWidth={width - SIZES.lg * 2}>
+        {/* SIZES.lg is the padding of the container */}
         {modifiedContent}
       </CustomRenderHTML>
     </Container>

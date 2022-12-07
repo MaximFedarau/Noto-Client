@@ -1,16 +1,18 @@
 import { StyleSheet } from 'react-native';
 
+import { SIZES, FONTS } from '@constants';
+
 export const styles = StyleSheet.create({
   container: {
-    marginBottom: 24,
+    marginBottom: SIZES['2xl'],
   },
   input: {
-    fontSize: 20,
+    fontSize: FONTS.sizes.xl,
   },
   label: {
     fontWeight: '400',
   },
   error: {
-    fontSize: 16,
+    fontSize: FONTS.sizes.base,
   },
 });

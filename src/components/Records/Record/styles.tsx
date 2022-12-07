@@ -1,17 +1,13 @@
 import styled from 'styled-components/native';
 
-import { sizes } from '@constants/sizes';
-
 export const Container = styled.Pressable`
-  margin-vertical: 16px;
-  background-color: white;
-  margin-horizontal: 18px;
-  border-color: black;
+  margin: ${({ theme }) => theme.sizes.lg}px;
+  background-color: ${({ theme }) => theme.colors.white};
+  border-color: ${({ theme }) => theme.colors.black};
   border-width: 2px;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.sizes.sm}px;
   max-height: 696px;
-  min-height: ${sizes.NOTES_LIST_MINIMUM_ITEM_SIZE}px;
+  min-height: ${({ theme }) => theme.sizes['22xl']}px;
   overflow: hidden;
-  padding-horizontal: 16px;
-  padding-vertical: 16px;
+  padding: ${({ theme }) => theme.sizes.lg}px;
 `;

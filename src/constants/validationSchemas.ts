@@ -1,6 +1,5 @@
 import { object, string, ref } from 'yup';
 
-// * Notes Managing (Adding Note/Draft) Form
 export const recordSchema = object().shape({
   title: string().nullable(),
   content: string().nullable(),

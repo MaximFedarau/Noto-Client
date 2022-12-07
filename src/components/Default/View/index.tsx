@@ -1,8 +1,6 @@
 import styled from 'styled-components/native';
 import { Platform, StatusBar } from 'react-native';
 
-import { SPRING_WOOD } from '@constants/colors';
-
 export const Container = styled.View`
   flex: 1;
   flex-direction: column;
@@ -20,32 +18,32 @@ export const SafeAreaContainer = styled.SafeAreaView`
 export const ErrorContainer = styled(Container)`
   align-items: center;
   justify-content: center;
-  background-color: ${SPRING_WOOD};
+  background-color: ${({ theme }) => theme.colors.springWood};
 `;
 
 export const LoadingContainer = styled(Container)`
   flex: 1;
-  background-color: ${SPRING_WOOD};
+  background-color: ${({ theme }) => theme.colors.springWood};
   align-items: center;
   justify-content: center;
 `;
 
 export const RightHeader = styled(Container)`
-  margin-right: 12px;
+  margin-right: ${({ theme }) => theme.sizes.md}px;
   flex: none;
 `;
 
 export const LeftHeader = styled(Container)`
-  margin-left: 12px;
+  margin-left: ${({ theme }) => theme.sizes.md}px;
   flex: none;
 `;
 
 export const RecordsManagingRightHeader = styled(RightHeader)`
-  margin-right: -4px;
+  margin-right: -${({ theme }) => theme.sizes.sm / 2}px; // because trash icon is thicker, than close icon
 `;
 
 export const RecordsManagingLeftHeader = styled(LeftHeader)`
-  margin-left: -8px;
+  margin-left: -${({ theme }) => theme.sizes.sm}px;
 `;
 
 export const RecordsContainer = styled(SafeAreaContainer)`
@@ -57,17 +55,18 @@ export const RecordsContent = styled(Container)`
 `;
 
 export const AuthScreenContainer = styled(SafeAreaContainer)`
-  margin-top: ${Platform.OS === 'android' ? StatusBar.currentHeight : 24}px;
+  margin-top: ${({ theme }) =>
+    Platform.OS === 'android' ? StatusBar.currentHeight : theme.sizes['2xl']}px;
 `;
 
 export const FormContainer = styled(Container)`
-  padding-vertical: 16px;
+  padding-vertical: ${({ theme }) => theme.sizes.lg}px;
   align-items: center;
   flex: none;
 `;
 
 export const FormButtonsContainer = styled(Container)`
-  margin-top: 32px;
+  margin-top: ${({ theme }) => theme.sizes['4xl']}px;
   align-items: center;
   flex: none;
 `;
@@ -75,5 +74,5 @@ export const FormButtonsContainer = styled(Container)`
 export const AvatarPickerContainer = styled(Container)`
   justify-content: center;
   align-items: center;
-  padding-vertical: 16px;
+  padding-vertical: ${({ theme }) => theme.sizes.lg}px;
 `;
