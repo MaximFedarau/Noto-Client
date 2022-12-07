@@ -1,7 +1,6 @@
 import styled from 'styled-components/native';
 
-import { Container } from '@components/Default/View';
-import { DefaultText } from '@components/Default/Text';
+import { Container, DefaultText } from '@components/Default';
 import { BUNTING } from '@constants/colors';
 
 interface Props {

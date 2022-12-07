@@ -9,13 +9,17 @@ import { AxiosError } from 'axios';
 
 import { Error } from './Error';
 import { Loading } from './Loading';
-import { LeftHeader } from '@components/Default/View';
-import IconButton from '@components/Default/IconButton';
-import SearchBar from '@components/Records/SearchBar';
-import { RecordsContainer, RecordsContent } from '@components/Default/View';
-import RecordsList from '@components/Records/RecordsList';
-import Spinner from '@components/Default/Spinner';
-import { NoItemsText, RecordsHeaderTitle } from '@components/Default/Text';
+import {
+  IconButton,
+  Spinner,
+  LeftHeader,
+  NoItemsText,
+  RecordsHeaderTitle,
+  RecordsContainer,
+  RecordsContent,
+  RecordsList,
+  SearchBar,
+} from '@components';
 import { SOFT_BLUE } from '@constants/colors';
 import { sizes } from '@constants/sizes';
 import {

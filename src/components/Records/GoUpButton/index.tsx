@@ -10,7 +10,11 @@ interface Props {
   iconColor?: string;
 }
 
-const GoUpButton: FC<Props> = ({ onPress, color, iconColor = 'white' }) => (
+export const GoUpButton: FC<Props> = ({
+  onPress,
+  color,
+  iconColor = 'white',
+}) => (
   <TouchableOpacity
     style={styles(color).container}
     onPress={onPress}
@@ -19,5 +23,3 @@ const GoUpButton: FC<Props> = ({ onPress, color, iconColor = 'white' }) => (
     <Ionicons name="arrow-up" size={24} color={iconColor} />
   </TouchableOpacity>
 );
-
-export default GoUpButton;

@@ -2,10 +2,10 @@ import React, { FC } from 'react';
 import { TextInputProps, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { SearchBarInput } from '@components/Default/Input';
+import { SearchBarInput } from '@components/Default';
 import { sizes } from '@constants/sizes';
 
-const SearchBar: FC<TextInputProps> = (props) => {
+export const SearchBar: FC<TextInputProps> = (props) => {
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   return (
@@ -25,5 +25,3 @@ const SearchBar: FC<TextInputProps> = (props) => {
     </View>
   );
 };
-
-export default SearchBar;

@@ -18,7 +18,11 @@ interface Props {
   disabled?: boolean;
 }
 
-const LogoPicker: FC<Props> = ({ image, setImage, disabled = false }) => {
+export const LogoPicker: FC<Props> = ({
+  image,
+  setImage,
+  disabled = false,
+}) => {
   const [cameraPermission, requestPermission] = useMediaLibraryPermissions();
 
   const verifyPermissions = async () => {
@@ -84,5 +88,3 @@ const LogoPicker: FC<Props> = ({ image, setImage, disabled = false }) => {
     </Pressable>
   );
 };
-
-export default LogoPicker;

@@ -1,10 +1,9 @@
 import React, { FC } from 'react';
 
-import Form from '@components/RecordsManaging/Form';
-import { SafeAreaContainer } from '@components/Default/View';
+import { SafeAreaContainer, RecordsManagingForm } from '@components';
 
 export const RecordsManaging: FC = () => (
   <SafeAreaContainer>
-    <Form />
+    <RecordsManagingForm />
   </SafeAreaContainer>
 );

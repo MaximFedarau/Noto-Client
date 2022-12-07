@@ -1,8 +1,7 @@
 import styled from 'styled-components/native';
 import { StyleSheet } from 'react-native';
 
-import Button from '@components/Default/Button';
-import IconButton from '@components/Default/IconButton';
+import { Button, IconButton } from '@components/Default';
 import { SOFT_BLUE } from '@constants/colors';
 
 export const FormSubmitButton = styled(Button)`

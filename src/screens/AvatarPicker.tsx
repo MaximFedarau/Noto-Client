@@ -5,13 +5,13 @@ import { getItemAsync, setItemAsync } from 'expo-secure-store';
 import { AxiosError } from 'axios';
 
 import {
+  FormButtons,
+  Spinner,
+  ContentScrollView,
+  LogoPicker,
   AuthScreenContainer,
   AvatarPickerContainer,
-} from '@components/Default/View';
-import ContentScrollView from '@components/Auth/ContentScrollView';
-import LogoPicker from '@components/Auth/LogoPicker';
-import Spinner from '@components/Default/Spinner';
-import FormButtons from '@components/Auth/FormButtons';
+} from '@components';
 import {
   AvatarPickerRouteProp,
   NavigationProps,

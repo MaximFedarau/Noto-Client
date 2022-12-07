@@ -10,12 +10,10 @@ interface Props extends TouchableOpacityProps {
   textStyle?: StyleProp<TextStyle>;
 }
 
-const Button: FC<Props> = ({ children, type, textStyle, ...props }) => (
+export const Button: FC<Props> = ({ children, type, textStyle, ...props }) => (
   <ButtonContainer {...props} type={type} activeOpacity={0.8}>
     <ButtonText style={textStyle} type={type}>
       {children}
     </ButtonText>
   </ButtonContainer>
 );
-
-export default Button;

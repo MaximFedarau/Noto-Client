@@ -7,17 +7,18 @@ import { debounce } from 'lodash';
 
 import { Error } from './Error';
 import { Loading } from './Loading';
-import IconButton from '@components/Default/IconButton';
-import SearchBar from '@components/Records/SearchBar';
-import RecordsList from '@components/Records/RecordsList';
-import Spinner from '@components/Default/Spinner';
-import { fetchDraftPack } from '@utils';
 import {
+  IconButton,
+  Spinner,
   RecordsContainer,
   RecordsContent,
   LeftHeader,
-} from '@components/Default/View';
-import { NoItemsText, RecordsHeaderTitle } from '@components/Default/Text';
+  NoItemsText,
+  RecordsHeaderTitle,
+  RecordsList,
+  SearchBar,
+} from '@components';
+import { fetchDraftPack } from '@utils';
 import {
   NavigationProps,
   NavigationName,

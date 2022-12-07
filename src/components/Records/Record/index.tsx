@@ -3,8 +3,7 @@ import { useWindowDimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Converter } from 'showdown';
 
-import { RecordTitle } from '@components/Default/Text';
-import CustomRenderHTML from '@components/Default/CustomRenderHTML';
+import { CustomRenderHTML, RecordTitle } from '@components/Default';
 import {
   NavigationProps,
   NavigationName,
@@ -20,7 +19,7 @@ interface Props {
   type: RecordType;
 }
 
-const Record: FC<Props> = ({ children, type }) => {
+export const Record: FC<Props> = ({ children, type }) => {
   const { title, content, id } = children;
   const { width } = useWindowDimensions();
 
@@ -53,5 +52,3 @@ const Record: FC<Props> = ({ children, type }) => {
     </Container>
   );
 };
-
-export default Record;

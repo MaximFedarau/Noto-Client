@@ -1,11 +1,11 @@
 import React, { FC } from 'react';
 import { ScrollViewProps } from 'react-native';
 
-import { ScrollContainer } from '@components/Default/View';
+import { ScrollContainer } from '@components/Default';
 
 import { styles } from './styles';
 
-const ContentScrollView: FC<ScrollViewProps> = ({
+export const ContentScrollView: FC<ScrollViewProps> = ({
   children,
 }: ScrollViewProps) => (
   <ScrollContainer
@@ -17,5 +17,3 @@ const ContentScrollView: FC<ScrollViewProps> = ({
     {children}
   </ScrollContainer>
 );
-
-export default ContentScrollView;

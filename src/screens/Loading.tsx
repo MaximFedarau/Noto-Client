@@ -1,8 +1,7 @@
 import React, { FC } from 'react';
 import { StatusBar } from 'expo-status-bar';
 
-import { LoadingContainer } from '@components/Default/View';
-import { NoItemsText } from '@components/Default/Text';
+import { LoadingContainer, NoItemsText } from '@components/Default';
 
 export const Loading: FC = () => (
   <>

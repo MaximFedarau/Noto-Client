@@ -21,16 +21,16 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { Error } from '@screens/Error';
 import { Loading } from '@screens/Loading';
-import IconButton from '@components/Default/IconButton';
-import Button from '@components/Default/Button';
-import FormField from '@components/RecordsManaging/FormField';
-import MarkdownField from '@components/RecordsManaging/MarkdownField';
+import { RecordsManagingFormField } from '@components/RecordsManaging/FormField';
+import { MarkdownField } from '@components/RecordsManaging/MarkdownField';
 import {
+  Button,
+  IconButton,
+  Spinner,
   ScrollContainer,
   RecordsManagingLeftHeader,
   RecordsManagingRightHeader,
-} from '@components/Default/View';
-import Spinner from '@components/Default/Spinner';
+} from '@components/Default';
 import { recordSchema } from '@constants/validationSchemas';
 import { sizes } from '@constants/sizes';
 import {
@@ -65,7 +65,7 @@ import { styles } from './styles';
 
 const FORCE_NAVIGATION_STATUS = 'force'; // status for force navigation, i.e. navigation without checking
 
-const Form: FC = () => {
+export const RecordsManagingForm: FC = () => {
   const dispatch = useDispatch();
 
   const isAuth = useSelector(userIsAuthSelector);
@@ -545,14 +545,14 @@ const Form: FC = () => {
               bounces={false}
               contentContainerStyle={styles.contentContainer}
             >
-              <FormField
+              <RecordsManagingFormField
                 onChangeText={handleChange('title')}
                 value={values.title}
                 errorMessage={errors.title}
                 editable={!isFormLoading}
               >
                 Title
-              </FormField>
+              </RecordsManagingFormField>
               <MarkdownField
                 onChangeText={handleChange('content')}
                 value={values.content}
@@ -584,5 +584,3 @@ const Form: FC = () => {
     </Formik>
   );
 };
-
-export default Form;

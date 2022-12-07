@@ -10,7 +10,11 @@ interface Props extends TextInputProps {
   leftIcon?: IconNode;
 }
 
-const FormField: FC<Props> = ({ children, errorMessage, ...props }) => (
+export const RecordsManagingFormField: FC<Props> = ({
+  children,
+  errorMessage,
+  ...props
+}) => (
   <Input
     {...props}
     label={children}
@@ -21,5 +25,3 @@ const FormField: FC<Props> = ({ children, errorMessage, ...props }) => (
     inputStyle={styles.input}
   />
 );
-
-export default FormField;

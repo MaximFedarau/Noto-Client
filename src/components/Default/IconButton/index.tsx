@@ -8,10 +8,8 @@ interface Props extends TouchableOpacityProps {
   color?: string;
 }
 
-const IconButton: FC<Props> = ({ iconName, size, color, ...props }) => (
+export const IconButton: FC<Props> = ({ iconName, size, color, ...props }) => (
   <TouchableOpacity {...props} activeOpacity={0.8}>
     <Ionicons name={iconName} size={size} color={color} />
   </TouchableOpacity>
 );
-
-export default IconButton;

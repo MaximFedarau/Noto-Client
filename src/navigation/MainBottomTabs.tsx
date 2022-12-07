@@ -6,9 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { Loading, Notes, Drafts } from '@screens';
-import IconButton from '@components/Default/IconButton';
-import Avatar from '@components/Default/Avatar';
-import { RightHeader } from '@components/Default/View';
+import { Avatar, IconButton, RightHeader } from '@components';
 import {
   OSLO_GRAY,
   SPRING_WOOD,

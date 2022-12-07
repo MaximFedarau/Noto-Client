@@ -9,7 +9,7 @@ interface Props {
   onPress?: () => void;
 }
 
-const Avatar: FC<Props> = ({ size, image, onPress }) => {
+export const Avatar: FC<Props> = ({ size, image, onPress }) => {
   const styles = getStyles(size);
 
   const [isLoading, setIsLoading] = useState(true);
@@ -31,5 +31,3 @@ const Avatar: FC<Props> = ({ size, image, onPress }) => {
     </TouchableOpacity>
   );
 };
-
-export default Avatar;

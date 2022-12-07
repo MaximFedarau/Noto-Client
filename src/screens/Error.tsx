@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 
-import { ErrorContainer } from '@components/Default/View';
+import { ErrorContainer } from '@components/Default';
 
 export const Error: FC = () => (
   <>

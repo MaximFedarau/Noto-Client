@@ -3,11 +3,9 @@ import { useNavigation } from '@react-navigation/native';
 import { setItemAsync } from 'expo-secure-store';
 import { Formik, FormikErrors } from 'formik';
 
-import FormField from '@components/Auth/FormField';
-import FormButtons from '@components/Auth/FormButtons';
-import Spinner from '@components/Default/Spinner';
-import { FormContainer } from '@components/Default/View';
-import { NavigationText } from '@components/Default/Text';
+import { AuthFormField } from '@components/Auth/FormField';
+import { FormButtons } from '@components/Auth/FormButtons';
+import { Spinner, FormContainer, NavigationText } from '@components/Default';
 import {
   NavigationAuthName,
   NavigationProps,
@@ -25,7 +23,7 @@ interface Props {
   hasAccount: boolean;
 }
 
-const Form: FC<Props> = ({ hasAccount }) => {
+export const AuthForm: FC<Props> = ({ hasAccount }) => {
   const instance = createAPIInstance();
   const initialValues: AuthData = {
     nickname: '',
@@ -97,30 +95,30 @@ const Form: FC<Props> = ({ hasAccount }) => {
     >
       {({ values, errors, handleChange, handleSubmit }) => (
         <FormContainer>
-          <FormField
+          <AuthFormField
             onChangeText={handleChange('nickname')}
             placeholder="Nickname:"
             error={errors.nickname}
           >
             {values.nickname}
-          </FormField>
-          <FormField
+          </AuthFormField>
+          <AuthFormField
             onChangeText={handleChange('password')}
             placeholder="Password:"
             error={errors.password}
             secureTextEntry
           >
             {values.password}
-          </FormField>
+          </AuthFormField>
           {!hasAccount && (
-            <FormField
+            <AuthFormField
               onChangeText={handleChange('confirmPassword')}
               placeholder="Confirm password:"
               error={(errors as FormikErrors<SignUpData>).confirmPassword}
               secureTextEntry
             >
               {(values as SignUpData).confirmPassword}
-            </FormField>
+            </AuthFormField>
           )}
           {isLoading ? (
             <Spinner />
@@ -139,5 +137,3 @@ const Form: FC<Props> = ({ hasAccount }) => {
     </Formik>
   );
 };
-
-export default Form;

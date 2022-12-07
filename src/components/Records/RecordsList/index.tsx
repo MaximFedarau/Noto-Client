@@ -1,8 +1,8 @@
 import React, { FC, useState, useRef, useEffect } from 'react';
 import { FlatList, FlatListProps } from 'react-native';
 
-import Record from '@components/Records/Record';
-import GoUpButton from '@components/Records/GoUpButton';
+import { Record } from '@components/Records/Record';
+import { GoUpButton } from '@components/Records/GoUpButton';
 import { Record as IRecord, RecordType } from '@types';
 import { SOFT_BLUE, CYBER_YELLOW } from '@constants/colors';
 import { sizes } from '@constants/sizes';
@@ -13,7 +13,7 @@ interface Props
   type: RecordType;
 }
 
-const RecordsList: FC<Props> = ({ children, type, ...props }) => {
+export const RecordsList: FC<Props> = ({ children, type, ...props }) => {
   const [threshold, setThreshold] = useState(0);
   const [contentHeight, setContentHeight] = useState(0);
   const [layoutHeight, setLayoutHeight] = useState(0);
@@ -70,5 +70,3 @@ const RecordsList: FC<Props> = ({ children, type, ...props }) => {
     </>
   );
 };
-
-export default RecordsList;

@@ -6,6 +6,7 @@
     "types": ["styled-components-react-native", "node"],
     "baseUrl": ".",
     "paths": {
+      "@components": ["src/components"],
       "@components/*": ["src/components/*"],
 
       "@constants/*": ["src/constants/*"],

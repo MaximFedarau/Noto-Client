@@ -3,8 +3,8 @@ import { TextInputProps, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Converter } from 'showdown';
 
-import FormField from '@components/RecordsManaging/FormField';
-import CustomRenderHTML from '@components/Default/CustomRenderHTML';
+import { RecordsManagingFormField } from '@components/RecordsManaging/FormField';
+import { CustomRenderHTML } from '@components/Default';
 import {
   MarkdownFieldContainer,
   TabContainer,
@@ -18,7 +18,7 @@ interface Props extends TextInputProps {
   errorMessage?: string;
 }
 
-const MarkdownField: FC<Props> = ({
+export const MarkdownField: FC<Props> = ({
   children,
   errorMessage,
   value,
@@ -52,7 +52,7 @@ const MarkdownField: FC<Props> = ({
       </MarkdownFieldContainer>
       {tabIndex === 0 && (
         <FieldContainer>
-          <FormField
+          <RecordsManagingFormField
             {...props}
             value={value}
             errorMessage={errorMessage}
@@ -73,5 +73,3 @@ const MarkdownField: FC<Props> = ({
     </>
   );
 };
-
-export default MarkdownField;

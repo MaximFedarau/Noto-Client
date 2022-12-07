@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import Svg, { Path } from 'react-native-svg';
 
-const Logo: FC = () => (
+export const Logo: FC = () => (
   <Svg width="140" height="176" viewBox="0 0 64 84" fill="none">
     <Path
       d="M12 8V56H52V8H12ZM10 4H54C54.5304 4 55.0391 4.21071 55.4142 4.58579C55.7893 4.96086 56 5.46957 56 6V58C56 58.5304 55.7893 59.0391 55.4142 59.4142C55.0391 59.7893 54.5304 60 54 60H10C9.46957 60 8.96086 59.7893 8.58579 59.4142C8.21071 59.0391 8 58.5304 8 58V6C8 5.46957 8.21071 4.96086 8.58579 4.58579C8.96086 4.21071 9.46957 4 10 4Z"
@@ -17,5 +17,3 @@ const Logo: FC = () => (
     />
   </Svg>
 );
-
-export default Logo;

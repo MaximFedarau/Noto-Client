@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 
-import { FormButtonsContainer } from '@components/Default/View';
+import { FormButtonsContainer } from '@components/Default';
 
 import { FormSubmitButton, HomeButton, styles } from './styles';
 
@@ -10,7 +10,11 @@ interface Props {
   onHomeReturn: () => void;
 }
 
-const FormButtons: FC<Props> = ({ children, onSubmit, onHomeReturn }) => (
+export const FormButtons: FC<Props> = ({
+  children,
+  onSubmit,
+  onHomeReturn,
+}) => (
   <FormButtonsContainer>
     <FormSubmitButton onPress={onSubmit} textStyle={styles.buttonText}>
       {children}
@@ -23,5 +27,3 @@ const FormButtons: FC<Props> = ({ children, onSubmit, onHomeReturn }) => (
     />
   </FormButtonsContainer>
 );
-
-export default FormButtons;
