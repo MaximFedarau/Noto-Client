@@ -310,11 +310,10 @@ export const RecordsManagingForm: FC = () => {
     }
   };
 
-  const socketCleanup = async () => {
-    const socketConnection = await socket;
-    if (socketConnection) {
-      socketConnection.off('local');
-      socketConnection.off('localError');
+  const socketCleanup = () => {
+    if (socket) {
+      socket.off('local');
+      socket.off('localError');
     }
   };
 
@@ -322,75 +321,71 @@ export const RecordsManagingForm: FC = () => {
     // ! we check isLoading and isError, because we don't want to send events when we are fetching data
     // ! if we remove this checks, then when we have error screen, it will create another client
     if (socket && !isLoading && !isError) {
-      socket.then((socket) => {
-        socket.on(
-          'local',
-          async ({ status, note, isDeleteOrigin }: SocketNote) => {
-            if (
-              typeof isDeleteOrigin === 'boolean' &&
-              !isDeleteOrigin &&
-              note.id !== route.params?.noteId
-            )
-              return; // ! if note is not deleted from current device and note id is not equal to current note id, then we don't do anything
+      socket.on(
+        'local',
+        async ({ status, note, isDeleteOrigin }: SocketNote) => {
+          if (
+            typeof isDeleteOrigin === 'boolean' &&
+            !isDeleteOrigin &&
+            note.id !== route.params?.noteId
+          )
+            return; // ! if note is not deleted from current device and note id is not equal to current note id, then we don't do anything
 
-            let message = 'Action was completed successfully';
+          let message = 'Action was completed successfully';
 
-            switch (status) {
-              case SocketNoteStatus.CREATED:
-                message = 'Note was created successfully';
-                if (route.params?.draftId) {
-                  await onDraftDeleteHandler();
-                  showToast(
-                    ToastType.SUCCESS,
-                    'Congratulations!',
-                    'Note was successfully uploaded and draft was deleted.',
-                  );
-                  return;
-                }
-                break;
+          switch (status) {
+            case SocketNoteStatus.CREATED:
+              message = 'Note was created successfully';
+              if (route.params?.draftId) {
+                await onDraftDeleteHandler();
+                showToast(
+                  ToastType.SUCCESS,
+                  'Congratulations!',
+                  'Note was successfully uploaded and draft was deleted.',
+                );
+                return;
+              }
+              break;
 
-              case SocketNoteStatus.UPDATED:
-                message = 'Note was successfully updated.';
-                break;
+            case SocketNoteStatus.UPDATED:
+              message = 'Note was successfully updated.';
+              break;
 
-              case SocketNoteStatus.DELETED:
-                message = isDeleteOrigin
-                  ? 'Note was successfully deleted.'
-                  : 'Note was successfully deleted from other device.';
-                break;
-            }
+            case SocketNoteStatus.DELETED:
+              message = isDeleteOrigin
+                ? 'Note was successfully deleted.'
+                : 'Note was successfully deleted from other device.';
+              break;
+          }
 
-            showToast(ToastType.SUCCESS, 'Congratulations!', message);
-            formRef.current.setStatus(FORCE_NAVIGATION_STATUS);
-            navigation.goBack();
-          },
-        );
-        socket.on(
-          'localError',
-          ({
-            status,
-            message,
-          }: {
-            status: SocketErrorCode;
-            message: string | string[];
-          }) => {
-            if (status === SocketErrorCode.UNAUTHORIZED) return;
+          showToast(ToastType.SUCCESS, 'Congratulations!', message);
+          formRef.current.setStatus(FORCE_NAVIGATION_STATUS);
+          navigation.goBack();
+        },
+      );
+      socket.on(
+        'localError',
+        ({
+          status,
+          message,
+        }: {
+          status: SocketErrorCode;
+          message: string | string[];
+        }) => {
+          if (status === SocketErrorCode.UNAUTHORIZED) return;
 
-            setIsFormLoading(false);
-            showToast(
-              ToastType.ERROR,
-              'Note Uploading Error',
-              Array.isArray(message) ? message[0] : message,
-            );
-          },
-        );
-      });
+          setIsFormLoading(false);
+          showToast(
+            ToastType.ERROR,
+            'Note Uploading Error',
+            Array.isArray(message) ? message[0] : message,
+          );
+        },
+      );
     }
 
     // removing socket listener, because we don't need it anymore & if we don't do that, we will send duplicate requests
-    return () => {
-      socketCleanup();
-    };
+    return () => socketCleanup();
   }, [socket, isLoading, isError]);
 
   const onNoteUploadHandler = async (values: RecordsManagingData) => {
@@ -403,7 +398,7 @@ export const RecordsManagingForm: FC = () => {
 
     setIsFormLoading(true);
     const { title = '', content = '' } = values;
-    (await socket).emit('createNote', {
+    socket.emit('createNote', {
       title: title.trim(),
       content: content.trim(),
     });
@@ -425,7 +420,7 @@ export const RecordsManagingForm: FC = () => {
     setIsFormLoading(true);
     const { title = '', content = '' } = values;
     const { noteId } = route.params;
-    (await socket).emit('updateNote', {
+    socket.emit('updateNote', {
       id: noteId,
       title: title.trim(),
       content: content.trim(),
@@ -449,7 +444,7 @@ export const RecordsManagingForm: FC = () => {
     setIsFormLoading(true);
     const { noteId } = route.params;
 
-    (await socket)?.emit('deleteNote', { noteId: noteId });
+    socket?.emit('deleteNote', { noteId: noteId });
   };
 
   const onDraftDeleteHandler = async () => {

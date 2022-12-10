@@ -1,16 +1,18 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Socket } from 'socket.io-client';
 
-import { createSocket } from '@utils';
+interface State {
+  socket?: Socket;
+}
+
+const initialState: State = {};
 
 export const socketSlice = createSlice({
   name: 'socketSlice',
-  initialState: {
-    socket: undefined as Promise<Socket> | undefined,
-  },
+  initialState,
   reducers: {
-    initSocket: (state) => {
-      state.socket = createSocket();
+    setSocket: (state, { payload }: PayloadAction<Socket>) => {
+      (state as State).socket = payload;
     },
     removeSocket: (state) => {
       state.socket = undefined;
@@ -18,4 +20,4 @@ export const socketSlice = createSlice({
   },
 });
 
-export const { initSocket, removeSocket } = socketSlice.actions;
+export const { setSocket, removeSocket } = socketSlice.actions;

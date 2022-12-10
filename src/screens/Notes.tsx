@@ -38,6 +38,7 @@ import {
   showToast,
   createAPIRefreshInstance,
   stringSearch,
+  createSocket,
 } from '@utils';
 import { setIsAuth, clearUser, userIsAuthSelector } from '@store/user';
 import {
@@ -51,7 +52,7 @@ import {
   addNote,
   removeNote,
 } from '@store/notes';
-import { socketSelector, initSocket, removeSocket } from '@store/socket';
+import { socketSelector, setSocket, removeSocket } from '@store/socket';
 import { listener, AppStartListening } from '@store/middlewares';
 
 export const Notes: FC = () => {
@@ -195,107 +196,52 @@ export const Notes: FC = () => {
     fetchNotesPack();
   }, [isAuth, isEnd, searchText]);
 
+  const initializeSocket = async () => {
+    const socket = await createSocket();
+    dispatch(setSocket(socket));
+  };
+
   useEffect(() => {
     if (!isAuth) {
-      if (socket)
-        socket.then((socket) => {
-          socket.disconnect();
-          dispatch(removeSocket());
-        });
+      if (socket) {
+        socket.disconnect();
+        dispatch(removeSocket());
+      }
       return;
     }
-    if (!socket) dispatch(initSocket());
-    if (socket) socket.then((socket) => socket.emit('joinRoom'));
+    if (!socket) initializeSocket();
+    if (socket) socket.emit('joinRoom');
   }, [isAuth, socket]);
 
   useEffect(() => {
     if (!socket || !isAuth) return;
-    socket.then((socket) => {
-      // handling unauthorized note events
-      socket.onAny(
-        async (
-          event,
-          args: {
-            status: SocketErrorCode;
-            message: string | string[];
-            data?: {
-              status?: SocketNoteStatus;
-              note: Omit<Record, 'date' | 'id'> | { noteId: string };
-            };
-          },
-        ) => {
-          // as soon as we connect to the room, we complete all cancelled tasks (if there are any)
-          // tasks are cancelled because of unauthorized error
-          if (event === 'joinRoom') {
-            if (cancelledSocketEvents.current.length) {
-              cancelledSocketEvents.current.forEach(({ event, data }) => {
-                socket.emit(event, data);
-              });
-              cancelledSocketEvents.current = [];
-            }
-          }
-
-          if (event === 'localError') {
-            const { status, data } = args;
-            if (status !== SocketErrorCode.UNAUTHORIZED) return;
-
-            try {
-              const { data: refreshData } =
-                await refreshInstance.post<AuthTokens>(`/auth/token/refresh`);
-              const { accessToken, refreshToken } = refreshData;
-              await setItemAsync('accessToken', accessToken);
-              await setItemAsync('refreshToken', refreshToken);
-
-              let emittedMessage = '';
-              switch (data?.status) {
-                case SocketNoteStatus.CREATED:
-                  emittedMessage = 'createNote';
-                  break;
-
-                case SocketNoteStatus.UPDATED:
-                  emittedMessage = 'updateNote';
-                  break;
-
-                case SocketNoteStatus.DELETED:
-                  emittedMessage = 'deleteNote';
-                  break;
-              }
-              // pushing cancelled event to the array
-              cancelledSocketEvents.current.push({
-                event: emittedMessage,
-                data: data?.note || {},
-              });
-
-              socket.disconnect(); // disconnecting socket to reconnect with new token
-              dispatch(removeSocket());
-            } catch (error) {
-              const { response } = error as AxiosError;
-              if (response && response.status === 401) return;
-            }
-          }
+    // handling unauthorized note events
+    socket.onAny(
+      async (
+        event,
+        args: {
+          status: SocketErrorCode;
+          message: string | string[];
+          data?: {
+            status?: SocketNoteStatus;
+            note: Omit<Record, 'date' | 'id'> | { noteId: string };
+          };
         },
-      );
-
-      socket.on('global', ({ status, note }: SocketNote) => {
-        switch (status) {
-          case SocketNoteStatus.CREATED:
-            dispatch(addNote(note));
-            break;
-
-          case SocketNoteStatus.UPDATED:
-            dispatch(updateNote(note));
-            break;
-
-          case SocketNoteStatus.DELETED:
-            dispatch(removeNote(note.id));
-            break;
+      ) => {
+        // as soon as we connect to the room, we complete all cancelled tasks (if there are any)
+        // tasks are cancelled because of unauthorized error
+        if (event === 'joinRoom') {
+          if (cancelledSocketEvents.current.length) {
+            cancelledSocketEvents.current.forEach(({ event, data }) => {
+              socket.emit(event, data);
+            });
+            cancelledSocketEvents.current = [];
+          }
         }
-      });
 
-      socket.on(
-        'globalError',
-        async (error: { status: number; message: string | string[] }) => {
-          if (error.status !== SocketErrorCode.UNAUTHORIZED) return;
+        if (event === 'localError') {
+          const { status, data } = args;
+          if (status !== SocketErrorCode.UNAUTHORIZED) return;
 
           try {
             const { data: refreshData } =
@@ -304,15 +250,73 @@ export const Notes: FC = () => {
             await setItemAsync('accessToken', accessToken);
             await setItemAsync('refreshToken', refreshToken);
 
-            socket.disconnect();
+            let emittedMessage = '';
+            switch (data?.status) {
+              case SocketNoteStatus.CREATED:
+                emittedMessage = 'createNote';
+                break;
+
+              case SocketNoteStatus.UPDATED:
+                emittedMessage = 'updateNote';
+                break;
+
+              case SocketNoteStatus.DELETED:
+                emittedMessage = 'deleteNote';
+                break;
+            }
+            // pushing cancelled event to the array
+            cancelledSocketEvents.current.push({
+              event: emittedMessage,
+              data: data?.note || {},
+            });
+
+            socket.disconnect(); // disconnecting socket to reconnect with new token
             dispatch(removeSocket());
           } catch (error) {
             const { response } = error as AxiosError;
             if (response && response.status === 401) return;
           }
-        },
-      );
+        }
+      },
+    );
+
+    socket.on('global', ({ status, note }: SocketNote) => {
+      switch (status) {
+        case SocketNoteStatus.CREATED:
+          dispatch(addNote(note));
+          break;
+
+        case SocketNoteStatus.UPDATED:
+          dispatch(updateNote(note));
+          break;
+
+        case SocketNoteStatus.DELETED:
+          dispatch(removeNote(note.id));
+          break;
+      }
     });
+
+    socket.on(
+      'globalError',
+      async (error: { status: number; message: string | string[] }) => {
+        if (error.status !== SocketErrorCode.UNAUTHORIZED) return;
+
+        try {
+          const { data: refreshData } = await refreshInstance.post<AuthTokens>(
+            `/auth/token/refresh`,
+          );
+          const { accessToken, refreshToken } = refreshData;
+          await setItemAsync('accessToken', accessToken);
+          await setItemAsync('refreshToken', refreshToken);
+
+          socket.disconnect();
+          dispatch(removeSocket());
+        } catch (error) {
+          const { response } = error as AxiosError;
+          if (response && response.status === 401) return;
+        }
+      },
+    );
     // We do not return anything, because we want to keep socket connection in the background
   }, [isAuth, socket]);
 
