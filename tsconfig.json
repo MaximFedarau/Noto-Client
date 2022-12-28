@@ -4,16 +4,28 @@
     "strict": true,
     "jsx": "react-native",
     "types": ["styled-components-react-native", "node"],
-    "baseUrl": "./",
+    "baseUrl": ".",
     "paths": {
-      "@components/*": ["./components/*"],
-      "@constants/*": ["./constants/*"],
-      "@screens/*": ["./screens/*"],
-      "@assets/*": ["./assets/*"],
-      "@navigation/*": ["./navigation/*"],
-      "@app-types/*": ["./types/*"],
-      "@utils/*": ["./utils/*"],
-      "@store/*": ["./store/*"],
+      "@components": ["src/components"],
+      "@components/*": ["src/components/*"],
+
+      "@constants": ["src/constants"],
+      "@constants/*": ["src/constants/*"],
+
+      "@screens": ["src/screens"],
+      "@screens/*": ["src/screens/*"],
+
+      "@navigation": ["src/navigation"],
+      "@navigation/*": ["src/navigation/*"],
+
+      "@types": ["src/types"],
+      "@types/*": ["src/types/*"],
+
+      "@utils": ["src/utils"],
+      "@utils/*": ["src/utils/*"],
+
+      "@store": ["src/store"],
+      "@store/*": ["src/store/*"]
     }
   }
 }

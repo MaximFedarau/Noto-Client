@@ -1,79 +1,83 @@
-import React, { ReactElement } from 'react';
+import React, {
+  FC,
+  useEffect,
+  useCallback,
+  useState,
+  PropsWithChildren,
+} from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { Provider } from 'react-redux';
+import Toast from 'react-native-toast-message';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
-import { Provider } from 'react-redux';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Toast from 'react-native-toast-message';
+import { preventAutoHideAsync, hideAsync } from 'expo-splash-screen';
+import { ThemeProvider } from 'styled-components/native';
 
-import MainBottomTabs from '@navigation/MainBottomTabs/MainBottomTabs.navigation';
-import AuthStack from '@navigation/AuthStack/AuthStack.navigation';
-import NotesManaging from '@screens/NotesManaging/NotesManaging.screen';
-import Error from '@screens/Error/Error.screen';
-import { initDbDrafts } from '@utils/db/drafts/init';
-import { store } from '@store/store';
-import { NAVIGATION_NAMES } from '@app-types/enum';
-import { OSLO_GRAY, SPRING_WOOD } from '@constants/colors';
+import Navigator from './src';
+import { Loading, Error } from '@screens';
+import { initDbDrafts } from '@utils';
+import { THEME } from '@constants';
+import { store } from '@store';
 
-const Stack = createNativeStackNavigator();
+const ThemeContainer: FC<PropsWithChildren> = ({ children }) => (
+  <ThemeProvider theme={THEME}>{children}</ThemeProvider>
+);
 
-export default function App(): ReactElement | null {
-  const [isSetupError, setIsSetupError] = React.useState<boolean>(false);
+preventAutoHideAsync();
 
-  React.useEffect(() => {
-    initDbDrafts()
-      .then((message) => {
-        setIsSetupError(false);
-        console.info(message);
-      })
-      .catch((error) => {
-        console.error(error, 'App setup');
-        setIsSetupError(true);
-      });
-  }, []);
-
-  const [fontsLoaded] = useFonts({
+const App: FC = () => {
+  const [isSetupError, setIsSetupError] = useState(false);
+  const [databaseInitialized, setDatabaseInitialized] = useState(false);
+  const [fontsLoaded, fontsError] = useFonts({
     'Roboto-Regular': require('./assets/fonts/Roboto/Roboto-Regular.ttf'),
   });
 
-  if (!fontsLoaded) return null;
+  const initDrafts = useCallback(async () => {
+    try {
+      await initDbDrafts();
+    } catch (error) {
+      setIsSetupError(true);
+      console.error(error, 'App setup');
+    } finally {
+      setDatabaseInitialized(true); // anyway, db is initialized, so we show either app screen or error screen
+    }
+  }, []);
 
-  if (isSetupError) return <Error />;
+  useEffect(() => {
+    initDrafts();
+  }, []);
+
+  useEffect(() => {
+    if (fontsLoaded && databaseInitialized) hideAsync();
+  }, [fontsLoaded, databaseInitialized]);
+
+  if (!fontsLoaded)
+    return (
+      <ThemeContainer>
+        <Loading />
+      </ThemeContainer>
+    ); // from Expo docs
+
+  if (fontsError || isSetupError)
+    return (
+      <ThemeContainer>
+        <Error />
+      </ThemeContainer>
+    );
 
   return (
     <>
       <StatusBar style="dark" animated />
       <Provider store={store}>
         <NavigationContainer>
-          <Stack.Navigator
-            screenOptions={{
-              headerShown: false,
-            }}
-          >
-            <Stack.Screen
-              name={NAVIGATION_NAMES.NOTES_OVERVIEW}
-              component={MainBottomTabs}
-            />
-            <Stack.Screen
-              name={NAVIGATION_NAMES.NOTES_MANAGING}
-              component={NotesManaging}
-              options={{
-                headerShown: true,
-                headerShadowVisible: false,
-                headerTitleAlign: 'center',
-                headerTintColor: OSLO_GRAY,
-                headerTitleStyle: {
-                  fontFamily: 'Roboto-Regular',
-                },
-                headerStyle: { backgroundColor: SPRING_WOOD },
-                contentStyle: { backgroundColor: SPRING_WOOD },
-              }}
-            />
-            <Stack.Screen name={NAVIGATION_NAMES.AUTH} component={AuthStack} />
-          </Stack.Navigator>
+          <ThemeContainer>
+            <Navigator />
+          </ThemeContainer>
         </NavigationContainer>
       </Provider>
       <Toast />
     </>
   );
-}
+};
+
+export default App;

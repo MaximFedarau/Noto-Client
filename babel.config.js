@@ -7,17 +7,21 @@ module.exports = function (api) {
         'module-resolver',
         {
           alias: {
-            '@components': './components',
-            '@constants': './constants',
-            '@screens': './screens',
-            '@assets': './assets',
-            '@navigation': './navigation',
-            '@app-types': './types',
-            '@utils': './utils',
-            '@store': './store',
+            '@components': './src/components',
+            '@constants': './src/constants',
+            '@screens': './src/screens',
+            '@navigation': './src/navigation',
+            '@types': './src/types',
+            '@utils': './src/utils',
+            '@store': './src/store',
           },
         },
+      ],
+      [
         'transform-inline-environment-variables',
+        {
+          include: ['API_URL'],
+        },
       ],
     ],
   };
