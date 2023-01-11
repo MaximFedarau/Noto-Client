@@ -77,10 +77,7 @@ export const RecordsManagingForm: FC = () => {
   const [isFormLoading, setIsFormLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const [formInitialValues, setFormInitialValues] =
-    useState<RecordsManagingData>({
-      title: '',
-      content: '',
-    });
+    useState<RecordsManagingData>({ title: '', content: '' });
 
   const appState = useRef(AppState.currentState);
   const formRef = useRef<
@@ -129,58 +126,21 @@ export const RecordsManagingForm: FC = () => {
     [navigation, isFormLoading],
   );
 
-  const draftCleanup = async () => {
-    if (
-      route.params?.noteId ||
-      formRef.current?.status === FORCE_NAVIGATION_STATUS
-    )
-      return;
-
-    const { title = '', content = '' } = formRef.current?.values || {};
-    const trimmedTitle = title.trim();
-    const trimmedContent = content.trim();
-
-    // if draft exists
-    if (route.params?.draftId) {
-      if (trimmedTitle === '' && trimmedContent === '') {
-        await deleteDraftById(route.params?.draftId);
-        if (route.params?.draftId) dispatch(removeDraft(route.params?.draftId));
-      } else {
-        if (!formRef.current?.dirty) return;
-        const updateData = {
-          id: route.params?.draftId,
-          date: new Date().toISOString(),
-          title: trimmedTitle,
-          content: trimmedContent,
-        };
-        await updateDraftById(updateData);
-        dispatch(updateDraft(updateData));
-      }
-      return;
-    }
-
-    if (trimmedTitle !== '' || trimmedContent !== '') {
-      const draftData = {
-        date: new Date().toISOString(),
-        title: trimmedTitle,
-        content: trimmedContent,
-      };
-      const { insertId } = await addDraft(draftData);
-      dispatch(
-        appendDraft({
-          id: String(insertId),
-          ...draftData,
-        }),
-      );
-    }
-  };
+  useEffect(() => {
+    if (route.params?.noteId) return;
+    const subscription = AppState.addEventListener(
+      'change',
+      _handleAppStateChange,
+    );
+    return () => subscription.remove();
+  }, [route.params]); // handling when app goes to the background
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: ({ tintColor }) => (
         <RecordsManagingLeftHeader>
           <IconButton
-            iconName="close-outline"
+            iconName="close-sharp"
             size={SIZES['4xl']}
             color={tintColor}
             onPress={() => navigation.goBack()}
@@ -202,7 +162,7 @@ export const RecordsManagingForm: FC = () => {
     return () => {
       draftCleanup();
     };
-  }, [route]);
+  }, [route.params]);
 
   useEffect(() => {
     if (isLoading || isError) return;
@@ -213,39 +173,21 @@ export const RecordsManagingForm: FC = () => {
     }
   }, [isAuth, isLoading, isError, isFormLoading]); // route is not included because route.params?.noteId is not changing
 
-  useEffect(() => {
-    if (route.params?.noteId) return;
-    const subscription = AppState.addEventListener(
-      'change',
-      _handleAppStateChange,
-    );
-    return () => subscription.remove();
-  }, [route.params]); // handling when app goes to the background
-
   // if current note is empty and app goes to the background, then we delete this note
   const _handleAppStateChange = async (nextAppState: AppStateStatus) => {
     if (appState.current === 'active') {
-      const { title = '', content = '' } = formRef.current?.values || {};
+      const { title = '', content = '' } = formRef.current?.values;
       const trimmedTitle = title.trim();
       const trimmedContent = content.trim();
 
       if (!route.params?.draftId) {
         if (trimmedTitle === '' && trimmedContent === '') return;
 
-        const draftData = {
-          date: new Date().toISOString(),
-          title: trimmedTitle,
-          content: trimmedContent,
-        };
+        const draftData = { date: new Date().toISOString(), title, content };
         const { insertId } = await addDraft(draftData);
         setIsError(false);
         navigation.setParams({ draftId: String(insertId) }); // setting draftId to route params => we will work with the draft
-        dispatch(
-          appendDraft({
-            id: String(insertId),
-            ...draftData,
-          }),
-        );
+        dispatch(appendDraft({ id: String(insertId), ...draftData }));
         return;
       }
 
@@ -262,31 +204,51 @@ export const RecordsManagingForm: FC = () => {
       const updateData = {
         id: draftId,
         date: new Date().toISOString(),
-        title: trimmedTitle,
-        content: trimmedContent,
+        title,
+        content,
       };
       await updateDraftById(updateData);
-      setFormInitialValues({ title: trimmedTitle, content: trimmedContent });
+      setFormInitialValues({ title, content });
       dispatch(updateDraft(updateData));
     }
 
     appState.current = nextAppState;
   };
 
-  const fetchingDraft = async () => {
-    if (!route.params || !route.params.draftId) return;
+  const draftCleanup = async () => {
+    if (
+      route.params?.noteId ||
+      formRef.current?.status === FORCE_NAVIGATION_STATUS
+    )
+      return;
 
-    try {
-      const { title, content } = await fetchDraftById(route.params.draftId);
-      setFormInitialValues({
-        title,
-        content,
-      });
-      setIsError(false);
-    } catch (error) {
-      errorHandling(error as AxiosMessageError, 'Fetching Draft');
-    } finally {
-      setIsLoading(false);
+    const { title = '', content = '' } = formRef.current?.values || {};
+    const trimmedTitle = title.trim();
+    const trimmedContent = content.trim();
+
+    // if draft exists
+    if (route.params?.draftId) {
+      if (trimmedTitle === '' && trimmedContent === '') {
+        await deleteDraftById(route.params?.draftId);
+        dispatch(removeDraft(route.params?.draftId));
+      } else {
+        if (!formRef.current?.dirty) return;
+        const updateData = {
+          id: route.params?.draftId,
+          date: new Date().toISOString(),
+          title,
+          content,
+        };
+        await updateDraftById(updateData);
+        dispatch(updateDraft(updateData));
+      }
+      return;
+    }
+
+    if (trimmedTitle !== '' || trimmedContent !== '') {
+      const draftData = { date: new Date().toISOString(), title, content };
+      const { insertId } = await addDraft(draftData);
+      dispatch(appendDraft({ id: String(insertId), ...draftData }));
     }
   };
 
@@ -299,12 +261,23 @@ export const RecordsManagingForm: FC = () => {
       );
       setIsError(false);
       const { title, content } = data;
-      setFormInitialValues({
-        title,
-        content,
-      });
+      setFormInitialValues({ title, content });
     } catch (error) {
       errorHandling(error as AxiosMessageError, 'Fetching Note');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchingDraft = async () => {
+    if (!route.params || !route.params.draftId) return;
+
+    try {
+      const { title, content } = await fetchDraftById(route.params.draftId);
+      setFormInitialValues({ title, content });
+      setIsError(false);
+    } catch (error) {
+      errorHandling(error as AxiosMessageError, 'Fetching Draft');
     } finally {
       setIsLoading(false);
     }
@@ -398,10 +371,7 @@ export const RecordsManagingForm: FC = () => {
 
     setIsFormLoading(true);
     const { title = '', content = '' } = values;
-    socket.emit('createNote', {
-      title: title.trim(),
-      content: content.trim(),
-    });
+    socket.emit('createNote', { title, content });
   };
 
   const onNoteUpdateHandler = async (values: RecordsManagingData) => {
@@ -409,9 +379,8 @@ export const RecordsManagingForm: FC = () => {
 
     const accessToken = await getItemAsync('accessToken');
     const refreshToken = await getItemAsync('refreshToken');
-    // ? also we can check for form dirty, but I don't think it's necessary here, because we have cancel button. For example, such apps as Telegram, Slack and Discord check for form dirty.
-    // ? (!accessToken || !refreshToken || !socket || !formRef.current.dirty)
-    if (!accessToken || !refreshToken || !socket) {
+
+    if (!accessToken || !refreshToken || !socket || !formRef.current.dirty) {
       formRef.current?.setStatus(FORCE_NAVIGATION_STATUS);
       navigation.goBack();
       return;
@@ -420,11 +389,32 @@ export const RecordsManagingForm: FC = () => {
     setIsFormLoading(true);
     const { title = '', content = '' } = values;
     const { noteId } = route.params;
-    socket.emit('updateNote', {
-      id: noteId,
-      title: title.trim(),
-      content: content.trim(),
-    });
+    socket.emit('updateNote', { id: noteId, title, content });
+  };
+
+  const onNoteDeleteHandler = async () => {
+    if (!route.params || !route.params.noteId) return;
+
+    setIsFormLoading(true);
+    const { noteId } = route.params;
+
+    socket?.emit('deleteNote', { noteId });
+  };
+
+  const onDraftDeleteHandler = async () => {
+    if (!route.params || !route.params.draftId) return;
+
+    try {
+      await deleteDraftById(route.params.draftId);
+      if (route.params?.draftId) dispatch(removeDraft(route.params?.draftId));
+      navigation.setParams({ draftId: null });
+
+      if (formRef.current)
+        formRef.current.resetForm({ values: { title: '', content: '' } });
+      navigation.goBack();
+    } catch (error) {
+      errorHandling(error as AxiosMessageError, 'Deleting Draft');
+    }
   };
 
   const errorHandling = ({ response }: AxiosMessageError, message: string) => {
@@ -436,44 +426,6 @@ export const RecordsManagingForm: FC = () => {
         ? response.data.message
         : 'Something went wrong:(',
     );
-  };
-
-  const onNoteDeleteHandler = async () => {
-    if (!route.params || !route.params.noteId) return;
-
-    setIsFormLoading(true);
-    const { noteId } = route.params;
-
-    socket?.emit('deleteNote', { noteId: noteId });
-  };
-
-  const onDraftDeleteHandler = async () => {
-    if (!route.params || !route.params.draftId) {
-      formRef.current.resetForm({
-        values: {
-          title: '',
-          content: '',
-        },
-      });
-      return;
-    }
-
-    try {
-      await deleteDraftById(route.params.draftId);
-      if (route.params?.draftId) dispatch(removeDraft(route.params?.draftId));
-      navigation.setParams({ draftId: null });
-
-      if (formRef.current)
-        formRef.current.resetForm({
-          values: {
-            title: '',
-            content: '',
-          },
-        });
-      navigation.goBack();
-    } catch (error) {
-      errorHandling(error as AxiosMessageError, 'Deleting Draft');
-    }
   };
 
   if (isError) return <Error />;
@@ -488,37 +440,41 @@ export const RecordsManagingForm: FC = () => {
       validationSchema={recordSchema}
       innerRef={formRef}
       enableReinitialize={true}
+      validateOnChange={false}
+      validateOnBlur={false}
     >
-      {({ values, handleChange, handleSubmit, errors }) => {
-        useLayoutEffect(() => {
-          const { title } = values;
-          const convertedTitle =
-            title && title.length > 16
-              ? title?.substring(0, 16) + '...'
-              : title || 'Manage Note';
-          navigation.setOptions({ headerTitle: convertedTitle });
-        }, [values.title]);
+      {({ values: { title, content }, handleChange, handleSubmit, errors }) => {
+        const formatRecordTitle = (title?: string) => {
+          if (!title || title.length < 16) return title;
+          const substring = title.substring(0, 16);
+          if (/^[\p{L}\p{N}]*$/u.test(substring[15])) return substring + '...'; // if it ends with a unicode letter or number
+          return substring;
+        };
 
         useLayoutEffect(() => {
+          navigation.setOptions({ headerTitle: formatRecordTitle(title) });
+        }, [title]);
+
+        useLayoutEffect(() => {
+          const isRecord = route.params?.draftId || route.params?.noteId,
+            hasContent = title || content;
           navigation.setOptions({
             headerRight:
-              (values.title || values.content) && !isFormLoading
-                ? () => {
-                    return (
-                      <RecordsManagingRightHeader>
-                        <IconButton
-                          iconName="trash"
-                          size={SIZES['4xl']}
-                          color={COLORS.red}
-                          onPress={
-                            route.params?.noteId
-                              ? onNoteDeleteHandler
-                              : onDraftDeleteHandler
-                          }
-                        />
-                      </RecordsManagingRightHeader>
-                    );
-                  }
+              hasContent && !isFormLoading && isRecord
+                ? () => (
+                    <RecordsManagingRightHeader>
+                      <IconButton
+                        iconName="trash-sharp"
+                        size={SIZES['4xl']}
+                        color={COLORS.red}
+                        onPress={
+                          route.params?.noteId
+                            ? onNoteDeleteHandler
+                            : onDraftDeleteHandler
+                        }
+                      />
+                    </RecordsManagingRightHeader>
+                  )
                 : () => null,
           });
 
@@ -528,7 +484,7 @@ export const RecordsManagingForm: FC = () => {
               headerRight: () => null,
             });
           };
-        }, [values, isFormLoading]);
+        }, [title, content, isFormLoading, route.params]);
 
         return (
           <KeyboardAvoidingView
@@ -541,7 +497,7 @@ export const RecordsManagingForm: FC = () => {
             >
               <RecordsManagingFormField
                 onChangeText={handleChange('title')}
-                value={values.title}
+                value={title}
                 errorMessage={errors.title}
                 editable={!isFormLoading}
               >
@@ -549,7 +505,7 @@ export const RecordsManagingForm: FC = () => {
               </RecordsManagingFormField>
               <MarkdownField
                 onChangeText={handleChange('content')}
-                value={values.content}
+                value={content}
                 errorMessage={errors.content}
                 editable={!isFormLoading}
               >
