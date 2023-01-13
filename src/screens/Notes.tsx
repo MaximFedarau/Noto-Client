@@ -163,9 +163,9 @@ export const Notes: FC = () => {
 
     try {
       const { data } = await instance.get(
-        `/notes/pack/${
-          isInitial ? 1 : packNumber
-        }?pattern=${searchText.trim()}`,
+        `/notes/pack/${isInitial ? 1 : packNumber}?pattern=${encodeURIComponent(
+          searchText.trim(),
+        )}`,
       );
       const { notePack, isEnd } = data;
       if (notePack.length) {
