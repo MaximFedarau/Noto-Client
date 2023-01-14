@@ -1,10 +1,4 @@
-import React, {
-  FC,
-  useEffect,
-  useCallback,
-  useState,
-  PropsWithChildren,
-} from 'react';
+import React, { FC, useEffect, useState, PropsWithChildren } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { Provider } from 'react-redux';
 import Toast from 'react-native-toast-message';
@@ -32,7 +26,7 @@ const App: FC = () => {
     'Roboto-Regular': require('./assets/fonts/Roboto/Roboto-Regular.ttf'),
   });
 
-  const initDrafts = useCallback(async () => {
+  const initDrafts = async () => {
     try {
       await initDbDrafts();
     } catch (error) {
@@ -41,7 +35,7 @@ const App: FC = () => {
     } finally {
       setDatabaseInitialized(true); // anyway, db is initialized, so we show either app screen or error screen
     }
-  }, []);
+  };
 
   useEffect(() => {
     initDrafts();
@@ -50,13 +44,6 @@ const App: FC = () => {
   useEffect(() => {
     if (fontsLoaded && databaseInitialized) hideAsync();
   }, [fontsLoaded, databaseInitialized]);
-
-  if (!fontsLoaded)
-    return (
-      <ThemeContainer>
-        <Loading />
-      </ThemeContainer>
-    ); // from Expo docs
 
   if (fontsError || isSetupError)
     return (
@@ -71,7 +58,7 @@ const App: FC = () => {
       <Provider store={store}>
         <NavigationContainer>
           <ThemeContainer>
-            <Navigator />
+            {fontsLoaded ? <Navigator /> : <Loading />}
           </ThemeContainer>
         </NavigationContainer>
       </Provider>

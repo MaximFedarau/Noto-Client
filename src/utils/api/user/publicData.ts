@@ -12,7 +12,8 @@ export const getPublicData = async () => {
     if (!res) return;
     data = res.data;
   } catch (error) {
-    console.error(error, 'fetching public data');
+    console.error(error, 'getting public data');
+    throw new Error('Error occurred while getting public data.');
   }
   return data;
 };
