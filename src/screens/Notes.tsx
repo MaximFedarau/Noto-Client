@@ -201,16 +201,20 @@ export const Notes: FC = () => {
     dispatch(setSocket(socket));
   };
 
-  useEffect(() => {
-    if (!isAuth) {
-      if (socket) {
-        socket.disconnect();
-        dispatch(removeSocket());
-      }
-      return;
+  const socketCleanup = () => {
+    if (socket) {
+      socket.disconnect();
+      dispatch(removeSocket());
     }
+  };
+
+  useEffect(() => {
+    if (!isAuth) return; // allow connection only if user is authenticated
     if (!socket) initializeSocket();
     if (socket) socket.emit('joinRoom');
+
+    // removing socket, when user is not authenticated, Notes screen is fast refreshed and so on
+    return () => socketCleanup();
   }, [isAuth, socket]);
 
   useEffect(() => {
