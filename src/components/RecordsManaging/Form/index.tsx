@@ -28,8 +28,6 @@ import {
   IconButton,
   Spinner,
   ScrollContainer,
-  RecordsManagingLeftHeader,
-  RecordsManagingRightHeader,
 } from '@components/Default';
 import { COLORS, recordSchema, SIZES } from '@constants';
 import {
@@ -138,14 +136,12 @@ export const RecordsManagingForm: FC = () => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: ({ tintColor }) => (
-        <RecordsManagingLeftHeader>
-          <IconButton
-            iconName="close-sharp"
-            size={SIZES['4xl']}
-            color={tintColor}
-            onPress={() => navigation.goBack()}
-          />
-        </RecordsManagingLeftHeader>
+        <IconButton
+          iconName="close-sharp"
+          size={SIZES['4xl']}
+          color={tintColor}
+          onPress={() => navigation.goBack()}
+        />
       ),
     });
 
@@ -462,18 +458,16 @@ export const RecordsManagingForm: FC = () => {
             headerRight:
               hasContent && !isFormLoading && isRecord
                 ? () => (
-                    <RecordsManagingRightHeader>
-                      <IconButton
-                        iconName="trash-sharp"
-                        size={SIZES['4xl']}
-                        color={COLORS.red}
-                        onPress={
-                          route.params?.noteId
-                            ? onNoteDeleteHandler
-                            : onDraftDeleteHandler
-                        }
-                      />
-                    </RecordsManagingRightHeader>
+                    <IconButton
+                      iconName="trash-sharp"
+                      size={SIZES['4xl']}
+                      color={COLORS.red}
+                      onPress={
+                        route.params?.noteId
+                          ? onNoteDeleteHandler
+                          : onDraftDeleteHandler
+                      }
+                    />
                   )
                 : () => null,
           });

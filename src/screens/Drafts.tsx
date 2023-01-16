@@ -2,7 +2,7 @@ import React, { FC, useEffect, useState } from 'react';
 import { FAB } from '@rneui/base';
 import { useDispatch, useSelector } from 'react-redux';
 import { isAnyOf } from '@reduxjs/toolkit';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { debounce } from 'lodash';
 
 import { Error } from './Error';
@@ -12,7 +12,6 @@ import {
   Spinner,
   RecordsContainer,
   RecordsContent,
-  LeftHeader,
   NoItemsText,
   RecordsHeaderTitle,
   RecordsList,
@@ -25,6 +24,7 @@ import {
   Record,
   FetchPackType,
   RecordType,
+  MAIN_NAVIGATOR_ID,
 } from '@types';
 import {
   draftsSelector,
@@ -46,7 +46,7 @@ export const Drafts: FC = () => {
   const drafts = useSelector(draftsSelector);
   const isEnd = useSelector(isEndSelector);
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [isPackLoading, setIsPackLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
@@ -54,19 +54,18 @@ export const Drafts: FC = () => {
   const [searchText, setSearchText] = useState('');
 
   const navigation = useNavigation<NavigationProps>();
+  const isFocused = useIsFocused();
+  const parentNavigator = navigation.getParent<NavigationProps>(
+    MAIN_NAVIGATOR_ID as any,
+  );
 
-  const onSearchBarChange = debounce((text) => {
-    setSearchText(text);
+  const onSearchBarDebounce = debounce(() => {
     dispatch(setIsEnd(false));
   }, 300);
 
-  const clearAuthHeader = () => {
-    setOpenSearchBar(false);
-    setSearchText('');
-    navigation.setOptions({
-      headerTitle: (props) => <RecordsHeaderTitle {...props} />,
-      headerLeft: () => null,
-    });
+  const onSearchBarChange = (text: string) => {
+    setSearchText(text);
+    onSearchBarDebounce();
   };
 
   const onSearchButtonClickHandler = () => {
@@ -74,40 +73,39 @@ export const Drafts: FC = () => {
     // do not fetch again, when searchText is already empty
     if (searchText !== '') dispatch(setIsEnd(false));
     // removing debounce
-    onSearchBarChange.cancel();
+    onSearchBarDebounce.cancel();
     setSearchText('');
   };
 
   useEffect(() => {
-    if (drafts.length || searchText.length) {
-      navigation.setOptions({
-        //Implement search bar
-        headerTitle: (props) => {
-          if (openSearchBar)
-            return (
-              <SearchBar
-                placeholder="Search in Drafts:"
-                onChangeText={onSearchBarChange}
-              />
-            );
-          return <RecordsHeaderTitle {...props} />;
-        },
-        // open search bar button
-        headerLeft: ({ tintColor }) => (
-          <LeftHeader>
-            <IconButton
-              iconName="search"
-              size={SIZES['4xl']}
-              color={tintColor}
-              onPress={onSearchButtonClickHandler}
+    if (!isFocused) return;
+    parentNavigator.setOptions({
+      //Implement search bar
+      headerTitle: (props) => {
+        if (openSearchBar && (drafts.length || searchText))
+          return (
+            <SearchBar
+              placeholder="Search in Drafts:"
+              onChangeText={onSearchBarChange}
+              defaultValue={searchText}
             />
-          </LeftHeader>
+          );
+        return <RecordsHeaderTitle {...props}>Drafts</RecordsHeaderTitle>;
+      },
+      // open search bar button
+      headerLeft: ({ tintColor }) =>
+        (drafts.length || searchText) && (
+          <IconButton
+            iconName="search"
+            size={SIZES['4xl']}
+            color={tintColor}
+            onPress={onSearchButtonClickHandler}
+          />
         ),
-      });
-    } else clearAuthHeader();
+    });
 
-    return () => onSearchBarChange.cancel(); //removing debounce, when component is unmounted
-  }, [drafts.length, openSearchBar]);
+    return () => onSearchBarDebounce.cancel(); //removing debounce, when component is unmounted
+  }, [drafts.length, openSearchBar, isFocused]);
 
   const fetchDraftsPack = async (
     type: FetchPackType = FetchPackType.INITIAL,

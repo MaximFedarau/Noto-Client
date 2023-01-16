@@ -48,3 +48,5 @@ export enum NavigationAuthName {
   SIGN_UP = 'SignUp',
   AVATAR_PICKER = 'AvatarPicker',
 }
+
+export const MAIN_NAVIGATOR_ID = 'MainNavigator';

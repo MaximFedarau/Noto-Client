@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useState, useRef } from 'react';
 import { FAB } from '@rneui/base';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { setItemAsync } from 'expo-secure-store';
 import { useSelector, useDispatch } from 'react-redux';
 import { isAnyOf } from '@reduxjs/toolkit';
@@ -12,7 +12,6 @@ import { Loading } from './Loading';
 import {
   IconButton,
   Spinner,
-  LeftHeader,
   NoItemsText,
   RecordsHeaderTitle,
   RecordsContainer,
@@ -32,6 +31,7 @@ import {
   SocketErrorCode,
   AuthTokens,
   RecordType,
+  MAIN_NAVIGATOR_ID,
 } from '@types';
 import {
   createAPIInstance,
@@ -40,7 +40,12 @@ import {
   stringSearch,
   createSocket,
 } from '@utils';
-import { setIsAuth, clearUser, userIsAuthSelector } from '@store/user';
+import {
+  setIsAuth,
+  clearUser,
+  userIsAuthSelector,
+  userNicknameSelector,
+} from '@store/user';
 import {
   notesSelector,
   isEndSelector,
@@ -57,6 +62,10 @@ import { listener, AppStartListening } from '@store/middlewares';
 
 export const Notes: FC = () => {
   const navigation = useNavigation<NavigationProps>();
+  const isFocused = useIsFocused();
+  const parentNavigator = navigation.getParent<NavigationProps>(
+    MAIN_NAVIGATOR_ID as any,
+  );
 
   const cancelledSocketEvents = useRef<
     {
@@ -68,10 +77,11 @@ export const Notes: FC = () => {
   const dispatch = useDispatch();
   const socket = useSelector(socketSelector);
   const isAuth = useSelector(userIsAuthSelector);
+  const nickname = useSelector(userNicknameSelector);
   const notes = useSelector(notesSelector);
   const isEnd = useSelector(isEndSelector);
 
-  const [isLoading, setIsLoading] = useState(true); // general loading
+  const [isLoading, setIsLoading] = useState(false); // general loading
   const [isPackLoading, setIsPackLoading] = useState(false); // only for pack loading
   const [isError, setIsError] = useState(false);
 
@@ -95,63 +105,71 @@ export const Notes: FC = () => {
     // after setting isAuth to false, other logout actions will be called by fetchNotesPack useEffect
   });
 
-  const clearAuthHeader = () => {
-    setOpenSearchBar(false);
-    setSearchText('');
-    navigation.setOptions({
-      headerTitle: (props) => <RecordsHeaderTitle {...props} />,
+  const clearHeader = () => {
+    parentNavigator.setOptions({
+      headerTitle: (props) => (
+        <RecordsHeaderTitle {...props}>
+          {isAuth ? `${nickname}'s Notes` : 'Notes'}
+        </RecordsHeaderTitle>
+      ),
       headerLeft: () => null,
     });
   };
 
-  const onSearchBarChange = debounce((text) => {
-    setSearchText(text);
+  const onSearchBarDebounce = debounce(() => {
     dispatch(setIsEnd(false));
   }, 300);
+
+  const onSearchBarChange = (text: string) => {
+    setSearchText(text);
+    onSearchBarDebounce();
+  };
 
   const onSearchButtonClickHandler = () => {
     setOpenSearchBar(!openSearchBar);
     // do not fetch again, if searchText is already empty
     if (searchText !== '') dispatch(setIsEnd(false));
     // removing debounce
-    onSearchBarChange.cancel();
+    onSearchBarDebounce.cancel();
     setSearchText('');
   };
 
   useEffect(() => {
-    if (!isAuth) {
-      clearAuthHeader();
+    if (!isAuth && isFocused) {
+      clearHeader();
       return;
     }
 
-    if (notes.length || searchText.length) {
-      navigation.setOptions({
-        headerTitle: (props) => {
-          if (openSearchBar)
-            return (
-              <SearchBar
-                placeholder="Search in Notes:"
-                onChangeText={onSearchBarChange}
-              />
-            );
-          return <RecordsHeaderTitle {...props} />;
-        },
-        // open search bar button
-        headerLeft: ({ tintColor }) => (
-          <LeftHeader>
-            <IconButton
-              iconName="search"
-              size={SIZES['4xl']}
-              color={tintColor}
-              onPress={onSearchButtonClickHandler}
+    if (!isFocused) return;
+    parentNavigator.setOptions({
+      headerTitle: (props) => {
+        if (openSearchBar && (notes.length || searchText))
+          return (
+            <SearchBar
+              placeholder="Search in Notes:"
+              defaultValue={searchText}
+              onChangeText={onSearchBarChange}
             />
-          </LeftHeader>
+          );
+        return (
+          <RecordsHeaderTitle {...props}>
+            {isAuth ? `${nickname}'s Notes` : 'Notes'}
+          </RecordsHeaderTitle>
+        );
+      },
+      headerLeft: ({ tintColor }) =>
+        (notes.length || searchText) && (
+          <IconButton
+            iconName="search"
+            size={SIZES['4xl']}
+            color={tintColor}
+            onPress={onSearchButtonClickHandler}
+          />
         ),
-      });
-    } else clearAuthHeader();
+    });
 
-    return () => onSearchBarChange.cancel(); //removing debounce, when component is unmounted
-  }, [notes.length, openSearchBar, isAuth]);
+    return () => onSearchBarDebounce.cancel(); //removing debounce, when component is unmounted
+  }, [notes.length, openSearchBar, isAuth, isFocused, nickname]);
 
   const fetchNotesPack = async (
     type: FetchPackType = FetchPackType.INITIAL,
@@ -191,6 +209,8 @@ export const Notes: FC = () => {
     if (!isAuth) {
       dispatch(clearNotes());
       setIsLoading(false);
+      setOpenSearchBar(false);
+      setSearchText('');
       return;
     }
     fetchNotesPack();
