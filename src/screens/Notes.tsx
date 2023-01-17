@@ -88,7 +88,7 @@ export const Notes: FC = () => {
   const [openSearchBar, setOpenSearchBar] = useState(false);
   const [searchText, setSearchText] = useState('');
 
-  const [packNumber, setPackNumber] = useState(1);
+  const [packCursor, setPackCursor] = useState(new Date());
 
   const instance = createAPIInstance(() => {
     showToast(ToastType.ERROR, 'Logout', 'Your session has expired');
@@ -181,14 +181,14 @@ export const Notes: FC = () => {
 
     try {
       const { data } = await instance.get(
-        `/notes/pack/${isInitial ? 1 : packNumber}?pattern=${encodeURIComponent(
-          searchText.trim(),
-        )}`,
+        `/notes/pack/${
+          isInitial ? null : packCursor
+        }?pattern=${encodeURIComponent(searchText.trim())}`,
       );
       const { notePack, isEnd } = data;
       if (notePack.length) {
         dispatch(isInitial ? assignNotes(notePack) : addNotes(notePack));
-        setPackNumber(isInitial ? 2 : packNumber + 1);
+        setPackCursor(notePack[notePack.length - 1].date);
         dispatch(setIsEnd(isEnd));
       } else {
         isInitial && dispatch(clearNotes()); // clearing notes, when it is initial fetch and there are no notes (for example, when we are making first search request)

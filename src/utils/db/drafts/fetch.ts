@@ -27,7 +27,7 @@ export const fetchDraftPack = (offset = 0, pattern = '') => {
     });
     db.transaction((tx) => {
       tx.executeSql(
-        `SELECT * FROM drafts WHERE title LIKE ? OR content LIKE ? ORDER BY datetime(date) ASC LIMIT 10 OFFSET ?`,
+        `SELECT * FROM drafts WHERE title LIKE ? OR content LIKE ? ORDER BY datetime(date) DESC LIMIT 10 OFFSET ?`,
         [`%${pattern}%`, `%${pattern}%`, offset],
         (_, result) => {
           resolve({
