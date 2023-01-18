@@ -59,21 +59,19 @@ export const Drafts: FC = () => {
     MAIN_NAVIGATOR_ID as any,
   );
 
-  const onSearchBarDebounce = debounce(() => {
+  const [packCursor, setPackCursor] = useState(new Date());
+
+  const onSearchBarChange = debounce((text) => {
+    setSearchText(text);
     dispatch(setIsEnd(false));
   }, 300);
-
-  const onSearchBarChange = (text: string) => {
-    setSearchText(text);
-    onSearchBarDebounce();
-  };
 
   const onSearchButtonClickHandler = () => {
     setOpenSearchBar(!openSearchBar);
     // do not fetch again, when searchText is already empty
     if (searchText !== '') dispatch(setIsEnd(false));
     // removing debounce
-    onSearchBarDebounce.cancel();
+    onSearchBarChange.cancel();
     setSearchText('');
   };
 
@@ -104,7 +102,7 @@ export const Drafts: FC = () => {
         ),
     });
 
-    return () => onSearchBarDebounce.cancel(); //removing debounce, when component is unmounted
+    return () => onSearchBarChange.cancel(); //removing debounce, when component is unmounted
   }, [drafts.length, openSearchBar, isFocused]);
 
   const fetchDraftsPack = async (
@@ -116,11 +114,12 @@ export const Drafts: FC = () => {
     isInitial ? setIsLoading(true) : setIsPackLoading(true);
     try {
       const { draftsPack, isEnd } = await fetchDraftPack(
-        isInitial ? 0 : drafts.length, // when searching we need to have first pack
+        isInitial ? undefined : packCursor.toISOString(), // when searching we need to have first pack
         searchText.trim(),
       );
       if (draftsPack.length) {
         dispatch(isInitial ? assignDrafts(draftsPack) : addDrafts(draftsPack));
+        setPackCursor(new Date(draftsPack[draftsPack.length - 1].date));
         dispatch(setIsEnd(isEnd));
       } else {
         isInitial && dispatch(clearDrafts()); // when searching we need to clear first seearch result

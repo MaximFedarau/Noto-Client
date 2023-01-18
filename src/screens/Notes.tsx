@@ -116,21 +116,17 @@ export const Notes: FC = () => {
     });
   };
 
-  const onSearchBarDebounce = debounce(() => {
+  const onSearchBarChange = debounce((text) => {
+    setSearchText(text);
     dispatch(setIsEnd(false));
   }, 300);
-
-  const onSearchBarChange = (text: string) => {
-    setSearchText(text);
-    onSearchBarDebounce();
-  };
 
   const onSearchButtonClickHandler = () => {
     setOpenSearchBar(!openSearchBar);
     // do not fetch again, if searchText is already empty
     if (searchText !== '') dispatch(setIsEnd(false));
     // removing debounce
-    onSearchBarDebounce.cancel();
+    onSearchBarChange.cancel();
     setSearchText('');
   };
 
@@ -168,9 +164,10 @@ export const Notes: FC = () => {
         ),
     });
 
-    return () => onSearchBarDebounce.cancel(); //removing debounce, when component is unmounted
+    return () => onSearchBarChange.cancel(); //removing debounce, when component is unmounted
   }, [notes.length, openSearchBar, isAuth, isFocused, nickname]);
 
+  // ? also we can add socket check - if there is no socket, do not fetch notes, because we can possibly miss some updated notes due to tokens refreshing
   const fetchNotesPack = async (
     type: FetchPackType = FetchPackType.INITIAL,
   ) => {
@@ -182,7 +179,7 @@ export const Notes: FC = () => {
     try {
       const { data } = await instance.get(
         `/notes/pack/${
-          isInitial ? null : packCursor
+          isInitial ? undefined : packCursor
         }?pattern=${encodeURIComponent(searchText.trim())}`,
       );
       const { notePack, isEnd } = data;
