@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { useWindowDimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { Converter } from 'showdown';
+import { marked } from 'marked';
 
 import { CustomRenderHTML, RecordTitle } from '@components/Default';
 import { SIZES } from '@constants';
@@ -24,8 +24,9 @@ export const Record: FC<Props> = ({ children, type }) => {
   const { title, content, id } = children;
   const { width } = useWindowDimensions();
 
-  const converter = new Converter({ noHeaderId: true });
-  const modifiedContent = contentFormat(converter.makeHtml(content || ''));
+  const modifiedContent = contentFormat(
+    marked.parse(content || '', { headerIds: false }),
+  );
 
   const navigation = useNavigation<NavigationProps>();
 

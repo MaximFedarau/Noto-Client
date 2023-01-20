@@ -1,7 +1,9 @@
 import React, { FC, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { setItemAsync } from 'expo-secure-store';
+import { setItemAsync, getItemAsync } from 'expo-secure-store';
 import { Formik, FormikErrors } from 'formik';
+import { useDispatch } from 'react-redux';
+import { AxiosError } from 'axios';
 
 import { AuthFormField } from '@components/Auth/FormField';
 import { FormButtons } from '@components/Auth/FormButtons';
@@ -14,10 +16,10 @@ import {
   AuthData,
   AuthTokens,
   SignUpData,
-  AxiosMessageError,
 } from '@types';
+import { setProfile, clearUser, setIsAuth } from '@store/user';
 import { signInSchema, signUpSchema } from '@constants';
-import { showToast, createAPIInstance } from '@utils';
+import { showToast, createAPIInstance, getPublicData } from '@utils';
 
 interface Props {
   hasAccount: boolean;
@@ -31,7 +33,10 @@ export const AuthForm: FC<Props> = ({ hasAccount }) => {
     ...(!hasAccount && { confirmPassword: '' }),
   };
 
+  const dispatch = useDispatch();
+
   const navigation = useNavigation<NavigationProps>();
+
   const [isLoading, setIsLoading] = useState(false);
 
   const navigateAuth = () =>
@@ -51,6 +56,23 @@ export const AuthForm: FC<Props> = ({ hasAccount }) => {
     return signUpData.id;
   };
 
+  const getProfile = async () => {
+    try {
+      const accessToken = await getItemAsync('accessToken');
+      const refreshToken = await getItemAsync('refreshToken');
+      if (accessToken && refreshToken) {
+        const data = await getPublicData();
+        dispatch(setIsAuth(data ? true : false));
+        dispatch(data ? setProfile(data) : clearUser());
+      } else throw new Error('Invalid token.');
+    } catch (error) {
+      let message = 'Something went wrong:(';
+      if (error instanceof Error) message = error.message || message; // if error.message is empty
+      if (!hasAccount) message = message.trim() + ' Please, sign in later.'; // if sign up is successful (account is created), but can't get profile
+      throw new Error(message);
+    }
+  };
+
   const onSubmit = async ({ nickname, password }: AuthData) => {
     setIsLoading(true);
 
@@ -64,23 +86,25 @@ export const AuthForm: FC<Props> = ({ hasAccount }) => {
       });
       await setItemAsync('accessToken', data.accessToken);
       await setItemAsync('refreshToken', data.refreshToken);
+      await getProfile();
       showToast(
         ToastType.SUCCESS,
         'Congratulations!',
         `You have successfully ${hasAccount ? 'signed in' : 'signed up'}.`,
       );
 
-      if (hasAccount || !id) navigateHome();
+      if (!id) navigateHome();
       else navigation.replace(NavigationAuthName.AVATAR_PICKER, { id });
     } catch (error) {
-      const { response } = error as AxiosMessageError;
+      let message = 'Something went wrong:(';
+      if (error instanceof AxiosError)
+        message = error.response?.data.message || message;
+      else if (error instanceof Error) message = error.message || message;
       setIsLoading(false);
       showToast(
         ToastType.ERROR,
         `${hasAccount ? 'Sign In' : 'Sign Up'} Error`,
-        response && response.data
-          ? response.data.message
-          : 'Something went wrong:(',
+        message,
       );
     }
   };

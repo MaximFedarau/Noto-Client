@@ -28,24 +28,6 @@ export const LoadingContainer = styled(Container)`
   justify-content: center;
 `;
 
-export const RightHeader = styled(Container)`
-  margin-right: ${({ theme }) => theme.sizes.md}px;
-  flex: none;
-`;
-
-export const LeftHeader = styled(Container)`
-  margin-left: ${({ theme }) => theme.sizes.md}px;
-  flex: none;
-`;
-
-export const RecordsManagingRightHeader = styled(RightHeader)`
-  margin-right: -${({ theme }) => theme.sizes.sm / 2}px; // because trash icon is thicker, than close icon
-`;
-
-export const RecordsManagingLeftHeader = styled(LeftHeader)`
-  margin-left: -${({ theme }) => theme.sizes.sm}px;
-`;
-
 export const RecordsContainer = styled(SafeAreaContainer)`
   justify-content: center;
 `;

@@ -17,10 +17,8 @@ export const draftsSlice = createSlice({
   initialState,
   reducers: {
     addDraft: (state, { payload }: PayloadAction<Record>) => {
-      const { drafts, isEnd } = state;
-      // if user does not see the draft, then we do not change state - new draft will be shown when user scrolls to the end
-      if (!isEnd) return state;
-      drafts.push(payload);
+      const { drafts } = state;
+      drafts.unshift(payload);
     },
     addDrafts: ({ drafts }, { payload }: PayloadAction<Record[]>) => {
       drafts.push(...payload);
@@ -30,22 +28,12 @@ export const draftsSlice = createSlice({
       state.drafts = drafts.filter(({ id }) => id !== payload);
     },
     updateDraft: (state, { payload }: PayloadAction<Record>) => {
-      const { drafts, isEnd } = state;
-      // if user does not see the draft, then we just remove it - saved draft will be shown when user scrolls to the end
-      if (!isEnd) {
-        state.drafts = drafts.filter(({ id }) => id !== payload.id);
-        return;
-      }
+      const { drafts } = state;
       const index = drafts.findIndex(({ id }) => id === payload.id);
       if (index !== -1) {
-        const length = drafts.length;
-        if (length > 1 && index < length - 1) {
-          drafts.splice(index, 1);
-          drafts.push(payload);
-          return;
-        }
-        drafts[index] = payload;
-      } else drafts.push(payload);
+        drafts.splice(index, 1);
+        drafts.unshift(payload);
+      } else drafts.unshift(payload);
     },
     assignDrafts: (state, { payload }: PayloadAction<Record[]>) => {
       state.drafts = payload;

@@ -1,5 +1,6 @@
 import React, { FC, useState } from 'react';
 import { useRoute, useNavigation } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
 import { uploadAsync, FileSystemUploadType } from 'expo-file-system';
 import { getItemAsync, setItemAsync } from 'expo-secure-store';
 import { AxiosError } from 'axios';
@@ -12,6 +13,7 @@ import {
   AuthScreenContainer,
   AvatarPickerContainer,
 } from '@components';
+import { setAvatar } from '@store/user';
 import {
   AvatarPickerRouteProp,
   NavigationProps,
@@ -25,6 +27,8 @@ export const AvatarPicker: FC = () => {
   const navigation = useNavigation<NavigationProps>();
   const route = useRoute<AvatarPickerRouteProp>();
 
+  const dispatch = useDispatch();
+
   const [image, setImage] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -32,6 +36,7 @@ export const AvatarPicker: FC = () => {
     showToast(ToastType.ERROR, 'Logout', 'Your session has expired');
     navigateHome();
   });
+
   const navigateHome = () => navigation.navigate(NavigationName.NOTES_OVERVIEW);
 
   const onSubmit = async () => {
@@ -40,7 +45,7 @@ export const AvatarPicker: FC = () => {
 
     const accessToken = await getItemAsync('accessToken');
     try {
-      const { status } = await uploadAsync(
+      const { status, body: avatarUrl } = await uploadAsync(
         `${process.env.API_URL}/auth/image/upload/${route.params.id}`,
         image,
         {
@@ -54,6 +59,7 @@ export const AvatarPicker: FC = () => {
       );
 
       if (status < 400) {
+        dispatch(setAvatar(avatarUrl));
         showToast(
           ToastType.SUCCESS,
           'Congratulatons!',

@@ -16,6 +16,9 @@ export const userSlice = createSlice({
       state.avatar = payload.avatar;
       state.nickname = payload.nickname;
     },
+    setAvatar: (state, { payload }: PayloadAction<string>) => {
+      state.avatar = payload;
+    },
     setIsAuth: (state, { payload }: PayloadAction<boolean>) => {
       state.isAuth = payload;
     },
@@ -23,4 +26,5 @@ export const userSlice = createSlice({
   },
 });
 
-export const { setProfile, setIsAuth, clearUser } = userSlice.actions;
+export const { setProfile, setIsAuth, clearUser, setAvatar } =
+  userSlice.actions;

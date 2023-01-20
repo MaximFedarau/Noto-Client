@@ -30,8 +30,7 @@ export const RecordsList: FC<Props> = ({ children, type, ...props }) => {
   }, [layoutHeight, contentHeight]);
 
   const scrollToEndHandler = () => {
-    if (ref.current)
-      ref.current.scrollToOffset({ animated: true, offset: threshold });
+    if (ref.current) ref.current.scrollToOffset({ animated: true, offset: 0 });
   };
 
   return (
@@ -40,8 +39,6 @@ export const RecordsList: FC<Props> = ({ children, type, ...props }) => {
         {...props}
         data={children}
         renderItem={({ item }) => <Record type={type}>{item}</Record>}
-        scrollsToTop
-        inverted
         ref={ref}
         onScroll={({ nativeEvent }) => {
           // setting user's current scroll position
@@ -59,9 +56,9 @@ export const RecordsList: FC<Props> = ({ children, type, ...props }) => {
           }
         }}
       />
-      {offset >= 0 && // if user has scrolled (bounced)
+      {offset > 0 && // if user has scrolled down
         layoutHeight > 0 && // when list is rendered => layoutHeight (its height) is not 0
-        Math.trunc(offset) < Math.trunc(threshold) && ( // when user has not scrolled to the end
+        Math.trunc(offset) <= Math.trunc(threshold) && ( // when user has scrolled to the bottom
           <GoUpButton
             color={
               type === RecordType.DRAFT ? COLORS.cyberYellow : COLORS.softBlue

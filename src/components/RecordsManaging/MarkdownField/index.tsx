@@ -1,7 +1,7 @@
 import React, { FC, useState, useEffect } from 'react';
 import { TextInputProps, useWindowDimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Converter } from 'showdown';
+import { marked } from 'marked';
 
 import { RecordsManagingFormField } from '@components/RecordsManaging/FormField';
 import { CustomRenderHTML } from '@components/Default';
@@ -27,7 +27,6 @@ export const MarkdownField: FC<Props> = ({
   ...props
 }) => {
   const { width } = useWindowDimensions();
-  const converter = new Converter();
 
   const [renderedHTML, setRenderedHTML] = useState('');
   const [tabIndex, setTabIndex] = useState(0);
@@ -45,7 +44,7 @@ export const MarkdownField: FC<Props> = ({
         <TabContainer
           isActive={tabIndex === 1}
           onPress={() => {
-            setRenderedHTML(converter.makeHtml(value || '')); // when we switch to markdown (html) tab, then we convert our value to html
+            setRenderedHTML(marked.parse(value || '', { headerIds: false })); // when we switch to markdown (html) tab, then we convert our value to html
             setTabIndex(1);
           }}
         >
