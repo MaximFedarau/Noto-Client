@@ -4,7 +4,7 @@ import { useNavigation, useIsFocused } from '@react-navigation/native';
 import { setItemAsync } from 'expo-secure-store';
 import { useSelector, useDispatch } from 'react-redux';
 import { isAnyOf } from '@reduxjs/toolkit';
-import { debounce } from 'lodash';
+import debounce from 'lodash.debounce';
 import { AxiosError } from 'axios';
 
 import { Error } from './Error';

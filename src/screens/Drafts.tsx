@@ -3,7 +3,7 @@ import { FAB } from '@rneui/base';
 import { useDispatch, useSelector } from 'react-redux';
 import { isAnyOf } from '@reduxjs/toolkit';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
-import { debounce } from 'lodash';
+import debounce from 'lodash.debounce';
 
 import { Error } from './Error';
 import { Loading } from './Loading';
