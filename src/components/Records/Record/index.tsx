@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useCallback, useMemo, memo } from 'react';
 import { useWindowDimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { marked } from 'marked';
@@ -20,22 +20,23 @@ interface Props {
   type: RecordType;
 }
 
-export const Record: FC<Props> = ({ children, type }) => {
+// add caching to optimize parent list re-renders
+export const Record: FC<Props> = memo(({ children, type }) => {
   const { title, content, id } = children;
   const { width } = useWindowDimensions();
-
-  const modifiedContent = contentFormat(
-    marked.parse(content || '', { headerIds: false }),
-  );
-
   const navigation = useNavigation<NavigationProps>();
 
-  const onPressHandler = () => {
+  const modifiedContent = useMemo(
+    () => contentFormat(marked.parse(content || '', { headerIds: false })),
+    [content],
+  );
+
+  const onPressHandler = useCallback(() => {
     if (!title && !content) return;
     navigation.navigate(NavigationName.RECORDS_MANAGING, {
       ...(type === RecordType.DRAFT ? { draftId: id } : { noteId: id }),
     });
-  };
+  }, [title, content, navigation, type, id]);
 
   return (
     <Container
@@ -53,4 +54,4 @@ export const Record: FC<Props> = ({ children, type }) => {
       </CustomRenderHTML>
     </Container>
   );
-};
+});
