@@ -6,7 +6,8 @@ import { marked } from 'marked';
 import { CustomRenderHTML, RecordTitle } from '@components/Default';
 import { SIZES } from '@constants';
 import {
-  NavigationProps,
+  RecordsTabScreenProps,
+  NavigationRecordsName,
   NavigationName,
   Record as IRecord,
   RecordType,
@@ -20,11 +21,15 @@ interface Props {
   type: RecordType;
 }
 
+type ScreenProps =
+  | RecordsTabScreenProps<NavigationRecordsName.NOTES>
+  | RecordsTabScreenProps<NavigationRecordsName.DRAFTS>;
+
 // add caching to optimize parent list re-renders
 export const Record: FC<Props> = memo(({ children, type }) => {
   const { title, content, id } = children;
   const { width } = useWindowDimensions();
-  const navigation = useNavigation<NavigationProps>();
+  const navigation = useNavigation<ScreenProps['navigation']>();
 
   const modifiedContent = useMemo(
     () => contentFormat(marked.parse(content || '', { headerIds: false })),

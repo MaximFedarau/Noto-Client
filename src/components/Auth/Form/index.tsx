@@ -10,7 +10,7 @@ import { FormButtons } from '@components/Auth/FormButtons';
 import { Spinner, FormContainer, NavigationText } from '@components/Default';
 import {
   NavigationAuthName,
-  NavigationProps,
+  AuthStackScreenProps,
   NavigationName,
   ToastType,
   AuthData,
@@ -25,6 +25,10 @@ interface Props {
   hasAccount: boolean;
 }
 
+type ScreenProps =
+  | AuthStackScreenProps<NavigationAuthName.SIGN_IN>
+  | AuthStackScreenProps<NavigationAuthName.SIGN_UP>;
+
 export const AuthForm: FC<Props> = ({ hasAccount }) => {
   const instance = createAPIInstance();
   const initialValues: AuthData = {
@@ -35,7 +39,7 @@ export const AuthForm: FC<Props> = ({ hasAccount }) => {
 
   const dispatch = useDispatch();
 
-  const navigation = useNavigation<NavigationProps>();
+  const navigation = useNavigation<ScreenProps['navigation']>();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -43,7 +47,8 @@ export const AuthForm: FC<Props> = ({ hasAccount }) => {
     navigation.replace(
       hasAccount ? NavigationAuthName.SIGN_UP : NavigationAuthName.SIGN_IN,
     );
-  const navigateHome = () => navigation.navigate(NavigationName.NOTES_OVERVIEW);
+  const navigateHome = () =>
+    navigation.navigate(NavigationName.RECORDS_OVERVIEW);
 
   const signUp = async ({ nickname, password }: AuthData) => {
     const { data: signUpData } = await instance.post<{ id: string }>(

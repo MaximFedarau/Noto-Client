@@ -39,8 +39,7 @@ import {
   showToast,
 } from '@utils';
 import {
-  RecordsManagingRouteProp,
-  NavigationProps,
+  RootStackScreenProps,
   ButtonType,
   ToastType,
   RecordsManagingData,
@@ -49,6 +48,7 @@ import {
   SocketNoteStatus,
   SocketErrorCode,
   AxiosMessageError,
+  NavigationName,
 } from '@types';
 import { clearUser, setIsAuth, userIsAuthSelector } from '@store/user';
 import {
@@ -62,14 +62,16 @@ import { styles } from './styles';
 
 const FORCE_NAVIGATION_STATUS = 'force'; // status for force navigation, i.e. navigation without checking
 
+type ScreenProps = RootStackScreenProps<NavigationName.RECORDS_MANAGING>;
+
 export const RecordsManagingForm: FC = () => {
   const dispatch = useDispatch();
 
   const isAuth = useSelector(userIsAuthSelector);
   const socket = useSelector(socketSelector);
 
-  const navigation = useNavigation<NavigationProps>();
-  const route = useRoute<RecordsManagingRouteProp>();
+  const navigation = useNavigation<ScreenProps['navigation']>();
+  const route = useRoute<ScreenProps['route']>();
 
   const [isLoading, setIsLoading] = useState(false);
   const [isFormLoading, setIsFormLoading] = useState(false);

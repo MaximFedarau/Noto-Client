@@ -17,20 +17,23 @@ import {
 import { getPublicData, showToast } from '@utils';
 import { COLORS, FONTS, SIZES } from '@constants';
 import {
+  RootStackScreenProps,
   NavigationName,
   ToastType,
-  NavigationProps,
   MAIN_NAVIGATOR_ID,
 } from '@types';
 
 const Stack = createNativeStackNavigator();
+
+type RecordsOverviewScreenProps =
+  RootStackScreenProps<NavigationName.RECORDS_OVERVIEW>;
 
 const Navigator: FC = () => {
   const dispatch = useDispatch();
   const avatar = useSelector(userAvatarSelector);
   const isAuth = useSelector(userIsAuthSelector);
 
-  const navigation = useNavigation<NavigationProps>();
+  const navigation = useNavigation<RecordsOverviewScreenProps['navigation']>();
 
   const navigateToAuth = () => navigation.navigate(NavigationName.AUTH);
 
@@ -79,7 +82,7 @@ const Navigator: FC = () => {
       }}
     >
       <Stack.Screen
-        name={NavigationName.NOTES_OVERVIEW}
+        name={NavigationName.RECORDS_OVERVIEW}
         component={MainBottomTabs}
         options={{
           headerRight: ({ tintColor }) => {

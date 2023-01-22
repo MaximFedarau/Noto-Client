@@ -21,8 +21,10 @@ import {
 } from '@components';
 import { SIZES, COLORS } from '@constants';
 import {
-  NavigationProps,
+  RecordsTabScreenProps,
+  NavigationRecordsName,
   NavigationName,
+  RootStackScreenProps,
   ToastType,
   Record,
   FetchPackType,
@@ -60,12 +62,14 @@ import {
 import { socketSelector, setSocket, removeSocket } from '@store/socket';
 import { listener, AppStartListening } from '@store/middlewares';
 
+type ScreenProps = RecordsTabScreenProps<NavigationRecordsName.NOTES>;
+type ParentScreenProps = RootStackScreenProps<NavigationName.RECORDS_OVERVIEW>;
+
 export const Notes: FC = () => {
-  const navigation = useNavigation<NavigationProps>();
+  const navigation = useNavigation<ScreenProps['navigation']>();
   const isFocused = useIsFocused();
-  const parentNavigator = navigation.getParent<NavigationProps>(
-    MAIN_NAVIGATOR_ID as any,
-  );
+  const parentNavigator =
+    navigation.getParent<ParentScreenProps['navigation']>(MAIN_NAVIGATOR_ID);
 
   const cancelledSocketEvents = useRef<
     {
