@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 
 import { Notes, Drafts } from '@screens';
 import { COLORS } from '@constants';
-import { NavigationNotesName } from '@types';
+import { NavigationRecordsName } from '@types';
 import { userIsAuthSelector } from '@store/user';
 
 const BottomTab = createBottomTabNavigator();
@@ -24,7 +24,7 @@ export const MainBottomTabs: FC = () => {
       sceneContainerStyle={{ backgroundColor: COLORS.springWood }}
     >
       <BottomTab.Screen
-        name={NavigationNotesName.NOTES}
+        name={NavigationRecordsName.NOTES}
         component={Notes}
         options={{
           tabBarIcon: (props) => <Ionicons name="document" {...props} />,
@@ -32,7 +32,7 @@ export const MainBottomTabs: FC = () => {
         }}
       />
       <BottomTab.Screen
-        name={NavigationNotesName.DRAFTS}
+        name={NavigationRecordsName.DRAFTS}
         component={Drafts}
         options={{
           tabBarIcon: (props) => <Ionicons name="archive" {...props} />,

@@ -3,7 +3,7 @@ import { FAB } from '@rneui/base';
 import { useDispatch, useSelector } from 'react-redux';
 import { isAnyOf } from '@reduxjs/toolkit';
 import { useNavigation, useIsFocused } from '@react-navigation/native';
-import { debounce } from 'lodash';
+import debounce from 'lodash.debounce';
 
 import { Error } from './Error';
 import { Loading } from './Loading';
@@ -19,7 +19,9 @@ import {
 } from '@components';
 import { fetchDraftPack } from '@utils';
 import {
-  NavigationProps,
+  RecordsTabScreenProps,
+  NavigationRecordsName,
+  RootStackScreenProps,
   NavigationName,
   Record,
   FetchPackType,
@@ -41,6 +43,9 @@ import { listener, AppStartListening } from '@store/middlewares';
 import { SIZES, COLORS } from '@constants';
 import { stringSearch } from '@utils';
 
+type ScreenProps = RecordsTabScreenProps<NavigationRecordsName.DRAFTS>;
+type ParentScreenProps = RootStackScreenProps<NavigationName.RECORDS_OVERVIEW>;
+
 export const Drafts: FC = () => {
   const dispatch = useDispatch();
   const drafts = useSelector(draftsSelector);
@@ -53,11 +58,10 @@ export const Drafts: FC = () => {
   const [openSearchBar, setOpenSearchBar] = useState(false);
   const [searchText, setSearchText] = useState('');
 
-  const navigation = useNavigation<NavigationProps>();
+  const navigation = useNavigation<ScreenProps['navigation']>();
   const isFocused = useIsFocused();
-  const parentNavigator = navigation.getParent<NavigationProps>(
-    MAIN_NAVIGATOR_ID as any,
-  );
+  const parentNavigator =
+    navigation.getParent<ParentScreenProps['navigation']>(MAIN_NAVIGATOR_ID);
 
   const [packCursor, setPackCursor] = useState(new Date());
 

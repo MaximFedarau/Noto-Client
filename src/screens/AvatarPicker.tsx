@@ -15,17 +15,19 @@ import {
 } from '@components';
 import { setAvatar } from '@store/user';
 import {
-  AvatarPickerRouteProp,
-  NavigationProps,
+  AuthStackScreenProps,
   NavigationName,
   ToastType,
   AuthTokens,
+  NavigationAuthName,
 } from '@types';
 import { showToast, createAPIRefreshInstance } from '@utils';
 
+type ScreenProps = AuthStackScreenProps<NavigationAuthName.AVATAR_PICKER>;
+
 export const AvatarPicker: FC = () => {
-  const navigation = useNavigation<NavigationProps>();
-  const route = useRoute<AvatarPickerRouteProp>();
+  const navigation = useNavigation<ScreenProps['navigation']>();
+  const route = useRoute<ScreenProps['route']>();
 
   const dispatch = useDispatch();
 
@@ -37,7 +39,8 @@ export const AvatarPicker: FC = () => {
     navigateHome();
   });
 
-  const navigateHome = () => navigation.navigate(NavigationName.NOTES_OVERVIEW);
+  const navigateHome = () =>
+    navigation.navigate(NavigationName.RECORDS_OVERVIEW);
 
   const onSubmit = async () => {
     if (!route.params || !image) return;

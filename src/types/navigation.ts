@@ -1,44 +1,50 @@
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RouteProp } from '@react-navigation/native';
+import {
+  CompositeScreenProps,
+  NavigatorScreenParams,
+} from '@react-navigation/native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 
-export type NavigationProps = NativeStackNavigationProp<RootStackParamList>; // for navigation object (React Navigation)
-export type AvatarPickerRouteProp = RouteProp<
-  AuthNavigationRootStackParamList,
-  NavigationAuthName.AVATAR_PICKER
->; // for route object (React Navigation) - Avatar Picker screen
-export type RecordsManagingRouteProp = RouteProp<
-  RootStackParamList,
-  NavigationName.RECORDS_MANAGING
->; // for route object (React Navigation) - Notes Managing screen
+export type RootStackScreenProps<T extends keyof RootStackParamList> =
+  NativeStackScreenProps<RootStackParamList, T, string>;
+export type AuthStackScreenProps<T extends keyof AuthStackParamList> =
+  CompositeScreenProps<
+    NativeStackScreenProps<AuthStackParamList, T>,
+    RootStackScreenProps<keyof RootStackParamList>
+  >;
+export type RecordsTabScreenProps<T extends keyof RecordsTabParamList> =
+  CompositeScreenProps<
+    BottomTabScreenProps<RecordsTabParamList, T>,
+    RootStackScreenProps<keyof RootStackParamList>
+  >;
 
 type RootStackParamList = {
-  [NavigationName.NOTES_OVERVIEW]?: undefined;
+  [NavigationName.RECORDS_OVERVIEW]?: NavigatorScreenParams<RecordsTabParamList>;
   [NavigationName.RECORDS_MANAGING]?: {
-    draftId?: string;
-    noteId?: string;
+    draftId?: string | null;
+    noteId?: string | null;
   };
-  [NavigationName.AUTH]: undefined;
-} & AuthNavigationRootStackParamList &
-  NotesRootStackParamList;
-
-type AuthNavigationRootStackParamList = {
-  [NavigationAuthName.SIGN_IN]: undefined;
-  [NavigationAuthName.SIGN_UP]: undefined;
-  [NavigationAuthName.AVATAR_PICKER]: { id: string };
+  [NavigationName.AUTH]?: NavigatorScreenParams<AuthStackParamList>;
 };
 
-type NotesRootStackParamList = {
-  [NavigationNotesName.NOTES]?: undefined;
-  [NavigationNotesName.DRAFTS]?: undefined;
+type AuthStackParamList = {
+  [NavigationAuthName.SIGN_IN]: undefined;
+  [NavigationAuthName.SIGN_UP]: undefined;
+  [NavigationAuthName.AVATAR_PICKER]: { id: string }; // required param
+};
+
+type RecordsTabParamList = {
+  [NavigationRecordsName.NOTES]: undefined;
+  [NavigationRecordsName.DRAFTS]: undefined;
 };
 
 export enum NavigationName {
   AUTH = 'Auth',
-  NOTES_OVERVIEW = 'NotesOverview',
+  RECORDS_OVERVIEW = 'RecordsOverview',
   RECORDS_MANAGING = 'RecordsManaging',
 }
 
-export enum NavigationNotesName {
+export enum NavigationRecordsName {
   NOTES = 'Notes',
   DRAFTS = 'Drafts',
 }
